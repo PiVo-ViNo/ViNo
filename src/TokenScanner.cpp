@@ -12,12 +12,38 @@
 #include <memory>
 #include <cctype>
 #include <format>
+#include <iostream>
+#include <utility>
 
 #include "TokenScanner.h"
 #include "custom_errors.h"
 #include "stuff.h"
 
 namespace vino {
+
+std::ostream& operator<<(std::ostream& os, const ScriptToken& tok)
+{
+    switch (tok)
+    {
+    case ScriptToken::EMPTY_TOKEN: os << "EMPTY_TOKEN"; break;
+    case ScriptToken::BG: os << "BG"; break;
+    case ScriptToken::FG: os << "FG"; break;
+    case ScriptToken::TEXT_TYPE: os << "TEXT_TYPE"; break;
+    case ScriptToken::PUT: os << "PUT"; break;
+    case ScriptToken::PERSONA: os << "PERSONA"; break;
+    case ScriptToken::VAR: os << "VAR"; break;
+    case ScriptToken::NEW_LINE: os << "NEW_LINE"; break;
+    case ScriptToken::SIGN_EQ: os << "SIGN_EQ"; break;
+    case ScriptToken::BRACE_OP: os << "BRACE_OP"; break;
+    case ScriptToken::BRACE_CL: os << "BRACE_CL"; break;
+    case ScriptToken::COMMENT: os << "COMMENT"; break;
+    case ScriptToken::TEXT_LINE: os << "TEXT_LINE"; break;
+    case ScriptToken::PATH: os << "PATH"; break;
+    case ScriptToken::EXIT: os << "EXIT"; break;
+    default: throw tokenize_error("Unknown error while tokenizing\n"); break;
+    }
+    return os;
+}
 
 ScriptToken TokenScanner::is_keyword(const std::string& _str)
 {
@@ -51,23 +77,25 @@ ScriptToken TokenScanner::check_var_or_keyword(std::string& _str, char ch)
 
 ScriptToken TokenScanner::get_token()
 {
-    if (!_istream_ptr) 
-        throw tokenize_error("No input stream\n");
+    if (!_istream_ptr) throw null_ptr_exc();
 
-    ScriptToken new_token{};
+    // ScriptToken new_token{};
     std::string alnum_str{};
 
     while (char ch = _istream_ptr->get()) 
     {
         switch (ch) 
         {
+        // skip comments entirely
         case '#':
+            if (!alnum_str.empty())
+                return check_var_or_keyword(alnum_str, '#');   
             do {
                 ch = _istream_ptr->get();
                 if (ch == '\n') 
                 {
                     cur_line++;
-                    break;
+                    return ScriptToken::NEW_LINE;
                 }
             } while (_istream_ptr->good() && ch != '#');
             break;
@@ -86,9 +114,21 @@ ScriptToken TokenScanner::get_token()
             if (!alnum_str.empty()) 
                 return check_var_or_keyword(alnum_str, '}');
             return ScriptToken::BRACE_CL;
+
+        case '=':
+            if (!alnum_str.empty())
+                return check_var_or_keyword(alnum_str, '=');
+            return ScriptToken::SIGN_EQ;
+
+        case '\n':
+            if (!alnum_str.empty())
+                return check_var_or_keyword(alnum_str, '\n');
+            break;
         
         // {} for scope only initializing of prev_curline
         case '"': { 
+            if (!alnum_str.empty())
+                return check_var_or_keyword(alnum_str, '"');
             std::size_t prev_curline = cur_line;
             do {
                 ch = _istream_ptr->get();
@@ -108,17 +148,13 @@ ScriptToken TokenScanner::get_token()
 
             return ScriptToken::TEXT_LINE; 
         }
-        case '\n':
-            if (!alnum_str.empty())
-                return check_var_or_keyword(alnum_str, '\n');
-            break;
 
         default:
             if(isalnum(ch))
             {
                 alnum_str += ch;
                 break;
-            }
+            } 
             else 
                 throw tokenize_error(std::format("Unrecognized symbol"
                                     "{} at line {}\n", ch, cur_line)
@@ -133,13 +169,28 @@ ScriptToken TokenScanner::get_token()
     return ScriptToken::EXIT;
 }
 
-inline long long TokenScanner::position() noexcept
+std::vector<ScriptToken> TokenScanner::get_all_tokens(bool verbose)
 {
+    std::vector<ScriptToken> tokens_vec;
+    while (this->has_more_tokens())
+    {
+        ScriptToken new_token = get_token();
+        if (verbose) 
+            std::cout << new_token << '\n';
+        tokens_vec.push_back(new_token);
+    }
+    return tokens_vec;
+}
+
+inline long long TokenScanner::position()
+{
+    if (!_istream_ptr) throw null_ptr_exc();
     return _istream_ptr->tellg();
 }
 
-inline bool TokenScanner::has_more_tokens() noexcept
+inline bool TokenScanner::has_more_tokens()
 {
+    if (!_istream_ptr) throw null_ptr_exc();
     return !(_istream_ptr->bad() || _istream_ptr->eof());
 }
 

@@ -1,2 +1,6 @@
 # vscode
 .vscode
+*.exe
+*.out
+*.dat
+Makefile

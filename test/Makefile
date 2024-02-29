@@ -8,7 +8,7 @@ tokenscanner: ${OBJS}
 	${CXX} -o $@ $^ ${CXXFLAGS}
 
 %.o: %.cpp
-	${CXX} $< -c ${INCLUDE} ${CXXFLAGS}
+	${CXX} $< -c ${INCLUDE} ${CXXFLAGS} -o $@
 
 .PHONY: clean
 clean:

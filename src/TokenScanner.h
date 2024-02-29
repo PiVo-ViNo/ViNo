@@ -15,6 +15,7 @@
 #include <istream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 namespace vino {
 
@@ -30,9 +31,11 @@ enum class ScriptToken {
     BRACE_CL,
     COMMENT, // comment from # to either # or \n (NEW_L) 
     TEXT_LINE, // or WORD + QUOT_MARK ? what with \n and such?
-    PATH,
+    PATH, // maybe work with only TEXT_LINE?
     EXIT
 };
+
+std::ostream& operator<<(std::ostream&, const ScriptToken& tok);
 
 class TokenScanner {
 public:
@@ -71,12 +74,22 @@ public:
      */
     ScriptToken get_token();
 
-    /* @brief Get current position in the input stream
-     * @return -1 if false() is true, otherwise any integer
+    /* Get all tokens in one step in case you don't want to bother
+     * @return rvalue reference to std::vector<ScriptToken>
+     * @throw tokenize_error() or any exception within std::vector
      */
-    inline long long position() noexcept;
+    std::vector<ScriptToken> get_all_tokens(bool verbose = false);
 
-    inline bool has_more_tokens() noexcept;
+    /* Get current position in the input stream
+     * @return -1 if false() is true, otherwise any integer
+     * @throw null_ptr_exc() if the input stream isn't set
+     */
+    inline long long position();
+
+    /* 
+     * @throw null_ptr_exc() if the input stream isn't set
+     */
+    inline bool has_more_tokens();
 
     // -------------- Flags switchers ------------------------------------------
 
