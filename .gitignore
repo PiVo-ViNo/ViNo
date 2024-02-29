@@ -5,4 +5,5 @@
 *.dat
 *.o
 
+build
 CMakeCache.*
