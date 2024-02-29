@@ -80,8 +80,8 @@ ScriptToken TokenScanner::get_token()
     if (!_istream_ptr) throw null_ptr_exc();
 
     std::string alnum_str{};
-
-    while (char ch = _istream_ptr->get()) 
+    char ch = 0;
+    while ((ch = _istream_ptr->get()) && ch != -1) 
     {
         switch (ch) 
         {
@@ -123,7 +123,7 @@ ScriptToken TokenScanner::get_token()
             cur_line++;
             if (!alnum_str.empty())
                 return check_var_or_keyword(alnum_str, '\n');
-            break;
+            return ScriptToken::NEW_LINE;
         
         // {} for scope only initializing of prev_curline
         case '"': { 

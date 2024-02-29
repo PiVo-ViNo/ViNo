@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: ViNo_base
-# Configurations: 
+# Configurations: Debug
 # =============================================================================
 
 #############################################
@@ -20,6 +20,11 @@
 
 ninja_required_version = 1.5
 
+
+#############################################
+# Set configuration variable for custom commands.
+
+CONFIGURATION = Debug
 # =============================================================================
 # Include auxiliary files.
 
@@ -212,16 +217,16 @@ build ContinuousSubmit: phony CMakeFiles/ContinuousSubmit
 
 build cmake_object_order_depends_target_tokenscanner: phony || CMakeFiles/tokenscanner.dir
 
-build CMakeFiles/tokenscanner.dir/Z_/msys2/home/Andrjusha/projects/vino_base/src/TokenScanner.cpp.obj: CXX_COMPILER__tokenscanner_unscanned_ Z$:/msys2/home/Andrjusha/projects/vino_base/src/TokenScanner.cpp || cmake_object_order_depends_target_tokenscanner
+build CMakeFiles/tokenscanner.dir/Z_/msys2/home/Andrjusha/projects/vino_base/src/TokenScanner.cpp.obj: CXX_COMPILER__tokenscanner_unscanned_Debug Z$:/msys2/home/Andrjusha/projects/vino_base/src/TokenScanner.cpp || cmake_object_order_depends_target_tokenscanner
   DEP_FILE = CMakeFiles\tokenscanner.dir\Z_\msys2\home\Andrjusha\projects\vino_base\src\TokenScanner.cpp.obj.d
-  FLAGS = -std=gnu++20
+  FLAGS = -Wall -Wextra -g -std=gnu++20
   INCLUDES = -IZ:/msys2/home/Andrjusha/projects/vino_base/test/../include -IZ:/msys2/home/Andrjusha/projects/vino_base/test/../src
   OBJECT_DIR = CMakeFiles\tokenscanner.dir
   OBJECT_FILE_DIR = CMakeFiles\tokenscanner.dir\Z_\msys2\home\Andrjusha\projects\vino_base\src
 
-build CMakeFiles/tokenscanner.dir/test_TokenScanner.cpp.obj: CXX_COMPILER__tokenscanner_unscanned_ Z$:/msys2/home/Andrjusha/projects/vino_base/test/test_TokenScanner.cpp || cmake_object_order_depends_target_tokenscanner
+build CMakeFiles/tokenscanner.dir/test_TokenScanner.cpp.obj: CXX_COMPILER__tokenscanner_unscanned_Debug Z$:/msys2/home/Andrjusha/projects/vino_base/test/test_TokenScanner.cpp || cmake_object_order_depends_target_tokenscanner
   DEP_FILE = CMakeFiles\tokenscanner.dir\test_TokenScanner.cpp.obj.d
-  FLAGS = -std=gnu++20
+  FLAGS = -Wall -Wextra -g -std=gnu++20
   INCLUDES = -IZ:/msys2/home/Andrjusha/projects/vino_base/test/../include -IZ:/msys2/home/Andrjusha/projects/vino_base/test/../src
   OBJECT_DIR = CMakeFiles\tokenscanner.dir
   OBJECT_FILE_DIR = CMakeFiles\tokenscanner.dir
@@ -234,7 +239,8 @@ build CMakeFiles/tokenscanner.dir/test_TokenScanner.cpp.obj: CXX_COMPILER__token
 #############################################
 # Link the executable tokenscanner.exe
 
-build tokenscanner.exe: CXX_EXECUTABLE_LINKER__tokenscanner_ CMakeFiles/tokenscanner.dir/Z_/msys2/home/Andrjusha/projects/vino_base/src/TokenScanner.cpp.obj CMakeFiles/tokenscanner.dir/test_TokenScanner.cpp.obj
+build tokenscanner.exe: CXX_EXECUTABLE_LINKER__tokenscanner_Debug CMakeFiles/tokenscanner.dir/Z_/msys2/home/Andrjusha/projects/vino_base/src/TokenScanner.cpp.obj CMakeFiles/tokenscanner.dir/test_TokenScanner.cpp.obj
+  FLAGS = -Wall -Wextra -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\tokenscanner.dir
   POST_BUILD = cd .
