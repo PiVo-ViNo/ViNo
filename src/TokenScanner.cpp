@@ -79,7 +79,6 @@ ScriptToken TokenScanner::get_token()
 {
     if (!_istream_ptr) throw null_ptr_exc();
 
-    // ScriptToken new_token{};
     std::string alnum_str{};
 
     while (char ch = _istream_ptr->get()) 
@@ -121,6 +120,7 @@ ScriptToken TokenScanner::get_token()
             return ScriptToken::SIGN_EQ;
 
         case '\n':
+            cur_line++;
             if (!alnum_str.empty())
                 return check_var_or_keyword(alnum_str, '\n');
             break;
@@ -194,13 +194,13 @@ inline bool TokenScanner::has_more_tokens()
     return !(_istream_ptr->bad() || _istream_ptr->eof());
 }
 
-inline bool TokenScanner::set_input(std::string&& input_str)
+inline void TokenScanner::set_input(std::string&& input_str)
 {   
     _istream_ptr = 
         std::make_unique<std::istringstream>(input_str, std::ios::in);
 }
 
-inline bool TokenScanner::set_input(std::ifstream&& input_file)
+inline void TokenScanner::set_input(std::ifstream&& input_file)
 {
     _istream_ptr = 
         std::make_unique<std::ifstream>(std::move(input_file));

@@ -65,9 +65,9 @@ public:
 
     // ------------- Interface ------------------------------------------------
 
-    inline bool set_input(std::string&&);
+    inline void set_input(std::string&&);
 
-    inline bool set_input(std::ifstream&&);
+    inline void set_input(std::ifstream&&);
 
     /* @throw tokenize_error
      * @return ScriptToken (i.e. enum class)  
