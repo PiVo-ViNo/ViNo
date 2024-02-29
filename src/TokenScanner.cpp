@@ -17,6 +17,8 @@
 #include "custom_errors.h"
 #include "stuff.h"
 
+namespace vino {
+
 ScriptToken TokenScanner::is_keyword(const std::string& _str)
 {
     if (insen_str_equal(_str, "background"))
@@ -155,3 +157,5 @@ inline bool TokenScanner::set_input(std::ifstream&& input_file)
 
 void TokenScanner::add_to_hash_map(std::string&& var)
 {}
+
+}

@@ -4,13 +4,13 @@ int main() {
 
     // -------- Test Constructors ------------
 
-    TokenScanner tokenizer0{};
+    vino::TokenScanner tokenizer0{};
 
     std::ifstream _ifstream;
-    TokenScanner tokenizer1(std::move(_ifstream));
+    vino::TokenScanner tokenizer1(std::move(_ifstream));
     
     std::string _istr;
-    TokenScanner tokenizer2(std::move(_istr));
+    vino::TokenScanner tokenizer2(std::move(_istr));
 
     return 0;
 }

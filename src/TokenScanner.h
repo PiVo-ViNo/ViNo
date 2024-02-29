@@ -16,6 +16,8 @@
 #include <fstream>
 #include <sstream>
 
+namespace vino {
+
 enum class ScriptToken {
     EMPTY_TOKEN,
     // TYPE keyword
@@ -97,3 +99,5 @@ private:
     // dummy function for now
     void add_to_hash_map(std::string&& var);
 };
+
+}
