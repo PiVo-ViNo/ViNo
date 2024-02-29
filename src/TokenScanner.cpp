@@ -11,9 +11,11 @@
 
 #include <memory>
 #include <cctype>
-#include <format>
 #include <iostream>
 #include <utility>
+#if __cplusplus >= 202002L
+#include <format>
+#endif
 
 #include "TokenScanner.h"
 #include "custom_errors.h"
@@ -141,10 +143,15 @@ ScriptToken TokenScanner::get_token()
             } while (_istream_ptr->good() && ch != '"');
 
             if (_istream_ptr->bad() || _istream_ptr->eof())
+                #if __cplusplus >= 202002L
                 throw tokenize_error(std::format("No enclosing \"" 
                                     "(quotaion mark) in text on line {}\n",
                                     prev_curline)
                                     );
+                #else 
+                throw tokenize_error("No enclosing \" (quotation mark)"
+                                    "in text on line " + prev_curline + "\n");
+                #endif
 
             return ScriptToken::TEXT_LINE; 
         }
@@ -156,9 +163,15 @@ ScriptToken TokenScanner::get_token()
                 break;
             } 
             else 
+                #if __cplusplus >= 202002L
                 throw tokenize_error(std::format("Unrecognized symbol"
                                     "{} at line {}\n", ch, cur_line)
                                     );
+                #else 
+                throw tokenize_error("Unrecognized symbol" + ch +
+                                    "at line " + cur_line + "\n"
+                                    );
+                #endif
             break;
         }
     }
