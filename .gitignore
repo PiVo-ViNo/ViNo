@@ -1,2 +1,9 @@
 # vscode
 .vscode
+*.exe
+*.out
+*.dat
+*.o
+
+build
+CMakeCache.*
