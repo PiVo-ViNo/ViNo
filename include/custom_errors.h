@@ -8,6 +8,8 @@
  * (c) Andrjusha (aka SibJusha)
  *
  */
+#pragma once
+
 #include <stdexcept>
 
 namespace vino {
