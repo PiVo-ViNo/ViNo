@@ -29,6 +29,8 @@ class Parser {
         _pos(_p._pos), _line(_p._line)
     {}
 
+    void set_input(const std::vector<ScriptToken>& vec_tokens);
+
 private:
 
     std::vector<ScriptToken>    _tokens_l;
@@ -39,17 +41,15 @@ private:
 
     void script();
 
-    void stmts();
-
     void stmt();
 
     inline void inside();
 
     inline void type();
 
-    bool match(ScriptToken, bool throw_err = true);
+    inline void match(const ScriptToken&);
 
-    ScriptToken& popout();
+    inline ScriptToken& popout();
 
 };
 

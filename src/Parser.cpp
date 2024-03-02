@@ -8,6 +8,8 @@
  * (c) Andrjusha (aka SibJusha)
  *
  */
+
+#include <vector>
 #if __cplusplus >= 202002L
 #include <format>
 #endif
@@ -18,14 +20,23 @@ namespace vino {
 
 using st = ScriptToken;
 
-st& Parser::popout()
+inline st& Parser::popout()
 {
     _pos++;
     return _tokens_l.front();
 }
 
+inline void Parser::match(const st& _tok)
+{
+    st _cur_tok = popout();
+    if (_cur_tok != _tok)
+        throw parsing_error();
+}
+
 void Parser::script()
 {
+    if (_tokens_l.front() == st::NEW_LINE)
+        _pos++;
     do {
         stmt();
     } while (_tokens_l.at(_pos) != st::EXIT);
@@ -108,5 +119,9 @@ inline void Parser::type()
     #endif
 }
 
+void Parser::set_input(const std::vector<st>& vec_tokens)
+{
+    _tokens_l = vec_tokens;
+}
 
 }
