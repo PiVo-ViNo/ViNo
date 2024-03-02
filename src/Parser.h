@@ -25,9 +25,14 @@ class Parser {
 
     Parser(Parser&) = delete;
 
-    Parser(Parser&& _p) : _tokens_l(std::move(_p._tokens_l)),
-        _pos(_p._pos), _line(_p._line)
+    Parser(Parser&& _p) : _tokens_l(std::move(_p._tokens_l))
     {}
+
+    //---------------Interface-------------------------------
+
+    /* @throw parsing_error() if syntax is incorrect
+     */
+    void run(bool verbose = false);
 
     void set_input(const std::vector<ScriptToken>& vec_tokens);
 
@@ -36,6 +41,7 @@ private:
     std::vector<ScriptToken>    _tokens_l;
     std::size_t                 _pos = 0;
     std::size_t                 _line = 0;
+    bool                        _verb = false;
 
     //----------Private Methods--------------------
 

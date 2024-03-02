@@ -9,6 +9,7 @@
  *
  */
 
+#include <iostream>
 #include <vector>
 #if __cplusplus >= 202002L
 #include <format>
@@ -29,6 +30,7 @@ inline st& Parser::popout()
 inline void Parser::match(const st& _tok)
 {
     st _cur_tok = popout();
+    std::cout << _tok << " ";
     if (_cur_tok != _tok)
         throw parsing_error();
 }
@@ -64,6 +66,8 @@ void Parser::stmt()
         break;
 
     case st::TEXT_TYPE:
+        if (_verb)
+            std::cout << _tokens_l.front() << " ";
         if (_tokens_l.front() == st::SIGN_EQ)
         {
             _pos++;
@@ -122,6 +126,12 @@ inline void Parser::type()
 void Parser::set_input(const std::vector<st>& vec_tokens)
 {
     _tokens_l = vec_tokens;
+}
+
+void Parser::run(bool verbose)
+{
+    _verb = verbose;
+    script();
 }
 
 }
