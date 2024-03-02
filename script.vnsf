@@ -1,5 +1,5 @@
 persona Rin_std { dir = "./rin", foreground = "rin_rude.png", ...}
-background = bg0.png
+background = "bg0.png"
 text "I am a stupid dog"
 text = "text.txt"
 # position in [0;1]
