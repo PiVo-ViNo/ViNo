@@ -25,9 +25,9 @@ enum class ScriptToken {
     SIGN_EQ,
     BRACE_OP,
     BRACE_CL,
-    COMMA, // comment from # to either # or \n (NEW_L) 
+    COMMA,
     TEXT_LINE, // or WORD + QUOT_MARK ? what with \n and such?
-    PATH, // maybe work with only TEXT_LINE?
+    PATH, // maybe work with only TEXT_LINE? -- now it is used for directory of persona
     EXIT
 };
 
