@@ -39,7 +39,9 @@ ScriptToken TokenScanner::is_keyword(const std::string& _str)
         return ScriptToken::PATH;
     if (insen_str_equal(_str, "exit"))
         return ScriptToken::EXIT;
-
+    if (insen_str_equal(_str, "name"))
+        return ScriptToken::NAME;
+    
     return ScriptToken::EMPTY_TOKEN;
 }
 
@@ -104,6 +106,7 @@ ScriptToken TokenScanner::get_token()
             if (!alnum_str.empty())
                 return check_var_or_keyword(alnum_str, '\n');
             return ScriptToken::NEW_LINE;
+            
         case ',':
             if (!alnum_str.empty())
                 return check_var_or_keyword(alnum_str, '\n');
