@@ -26,10 +26,9 @@ enum class ScriptToken {
     BRACE_OP,
     BRACE_CL,
     COMMA,
-    // COMMENT, // comment from # to either # or \n (NEW_L) 
     NAME,
     TEXT_LINE, // or WORD + QUOT_MARK ? what with \n and such?
-    PATH, // maybe work with only TEXT_LINE?
+    PATH, // maybe work with only TEXT_LINE? -- now it is used for directory of persona
     EXIT
 };
 
@@ -50,6 +49,7 @@ std::ostream& operator<<(std::ostream& os, const ScriptToken& tok)
     case ScriptToken::BRACE_CL: os << "BRACE_CL"; break;
     case ScriptToken::COMMA: os << "COMMA"; break;
     case ScriptToken::TEXT_LINE: os << "TEXT_LINE"; break;
+    case ScriptToken::NAME: os << "NAME"; break; 
     case ScriptToken::PATH: os << "PATH"; break;
     case ScriptToken::EXIT: os << "EXIT"; break;
     default: throw tokenize_error("Unknown error while tokenizing\n"); break;
