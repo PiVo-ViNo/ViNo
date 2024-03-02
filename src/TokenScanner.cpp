@@ -35,6 +35,8 @@ ScriptToken TokenScanner::is_keyword(const std::string& _str)
         return ScriptToken::PUT;
     if (insen_str_equal(_str, "persona"))
         return ScriptToken::PERSONA;
+    if (insen_str_equal(_str, "path"))
+        return ScriptToken::PATH;
     if (insen_str_equal(_str, "exit"))
         return ScriptToken::EXIT;
 
@@ -48,7 +50,7 @@ ScriptToken TokenScanner::check_var_or_keyword(std::string& _str, char ch)
         return new_token;
 
     _istream_ptr->putback(ch);
-    add_to_hash_map(std::move(_str));
+    add_to_sym_table(std::move(_str));
 
     return ScriptToken::VAR;
 }
@@ -102,6 +104,10 @@ ScriptToken TokenScanner::get_token()
             if (!alnum_str.empty())
                 return check_var_or_keyword(alnum_str, '\n');
             return ScriptToken::NEW_LINE;
+        case ',':
+            if (!alnum_str.empty())
+                return check_var_or_keyword(alnum_str, '\n');
+            return ScriptToken::COMMA;
         
         // {} for scope only initializing of prev_curline
         case '"': { 
@@ -195,7 +201,7 @@ inline void TokenScanner::set_input(std::ifstream&& input_file)
         std::make_unique<std::ifstream>(std::move(input_file));
 } 
 
-void TokenScanner::add_to_hash_map(std::string&& var)
+void TokenScanner::add_to_sym_table(std::string&& var)
 {}
 
 }

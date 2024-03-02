@@ -21,7 +21,6 @@
 
 namespace vino {
 
-
 class TokenScanner {
 public:
 
@@ -95,7 +94,7 @@ private:
     ScriptToken check_var_or_keyword(std::string&, char);
 
     // dummy function for now
-    void add_to_hash_map(std::string&& var);
+    void add_to_sym_table(std::string&& var);
 };
 
 }
