@@ -29,6 +29,21 @@ public:
     }
 };
 
+class parsing_error : public std::exception {
+    std::string what_str;
+public:
+    parsing_error(const std::string& errstr) noexcept : what_str(errstr) {}
+
+    parsing_error() noexcept :
+        parsing_error("Error while parsing tokens;")
+    {}
+
+    const char* what() const noexcept
+    {
+        return what_str.c_str();
+    }
+};
+
 class null_ptr_exc : public std::exception {
 public:
 
