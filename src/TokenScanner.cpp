@@ -1,7 +1,7 @@
 /*
  * TokenScanner.cpp
  *
- * required : 
+ * required :
  *
  * Created on Thu Feb 29 2024
  *
@@ -9,9 +9,9 @@
  *
  */
 
-#include <memory>
 #include <cctype>
 #include <iostream>
+#include <memory>
 #include <utility>
 #if __cplusplus >= 202002L
 #include <format>
@@ -21,190 +21,193 @@
 #include "custom_errors.h"
 #include "stuff.h"
 
-namespace vino {
-
-ScriptToken TokenScanner::is_keyword(const std::string& _str)
+namespace vino
 {
-    if (insen_str_equal(_str, "background"))
-        return ScriptToken::BG;
-    if (insen_str_equal(_str, "foreground"))
-        return ScriptToken::FG;
-    if (insen_str_equal(_str, "text"))
-        return ScriptToken::TEXT_TYPE;
-    if (insen_str_equal(_str, "put"))
-        return ScriptToken::PUT;
-    if (insen_str_equal(_str, "persona"))
-        return ScriptToken::PERSONA;
-    if (insen_str_equal(_str, "path"))
-        return ScriptToken::PATH;
-    if (insen_str_equal(_str, "exit"))
-        return ScriptToken::EXIT;
-    if (insen_str_equal(_str, "name"))
-        return ScriptToken::NAME;
-    
-    return ScriptToken::EMPTY_TOKEN;
+
+ScriptToken TokenScanner::is_keyword(const std::string &_str)
+{
+	if (insen_str_equal(_str, "background"))
+		return ScriptToken::BG;
+	if (insen_str_equal(_str, "foreground"))
+		return ScriptToken::FG;
+	if (insen_str_equal(_str, "text"))
+		return ScriptToken::TEXT_TYPE;
+	if (insen_str_equal(_str, "put"))
+		return ScriptToken::PUT;
+	if (insen_str_equal(_str, "persona"))
+		return ScriptToken::PERSONA;
+	if (insen_str_equal(_str, "path"))
+		return ScriptToken::PATH;
+	if (insen_str_equal(_str, "exit"))
+		return ScriptToken::EXIT;
+	if (insen_str_equal(_str, "name"))
+		return ScriptToken::NAME;
+
+	return ScriptToken::EMPTY_TOKEN;
 }
 
-ScriptToken TokenScanner::check_var_or_keyword(std::string& _str, char ch)
+ScriptToken TokenScanner::check_var_or_keyword(std::string &_str, char ch)
 {
-    ScriptToken new_token = is_keyword(_str);
-    if (new_token != ScriptToken::EMPTY_TOKEN)
-        return new_token;
+	ScriptToken new_token = is_keyword(_str);
+	if (new_token != ScriptToken::EMPTY_TOKEN)
+		return new_token;
 
-    _istream_ptr->putback(ch);
-    add_to_sym_table(std::move(_str));
+	_istream_ptr->putback(ch);
+	add_to_sym_table(std::move(_str));
 
-    return ScriptToken::VAR;
+	return ScriptToken::VAR;
 }
 
 ScriptToken TokenScanner::get_token()
 {
-    if (!_istream_ptr) throw null_ptr_exc();
+	if (!_istream_ptr)
+		throw null_ptr_exc();
 
-    std::string alnum_str{};
-    char ch = 0;
-    while ((ch = _istream_ptr->get()) && ch != -1) 
-    {
-        switch (ch) 
-        {
-        // skip comments entirely
-        case '#':
-            if (!alnum_str.empty())
-                return check_var_or_keyword(alnum_str, '#');   
-            do {
-                ch = _istream_ptr->get();
-                if (ch == '\n') 
-                {
-                    cur_line++;
-                    return ScriptToken::NEW_LINE;
-                }
-            } while (_istream_ptr->good() && ch != '#');
-            break;
+	std::string alnum_str{};
+	char ch = 0;
+	while ((ch = _istream_ptr->get()) && ch != -1)
+	{
+		switch (ch)
+		{
+		// skip comments entirely
+		case '#':
+			if (!alnum_str.empty())
+				return check_var_or_keyword(alnum_str, '#');
+			do
+			{
+				ch = _istream_ptr->get();
+				if (ch == '\n')
+				{
+					cur_line++;
+					return ScriptToken::NEW_LINE;
+				}
+			} while (_istream_ptr->good() && ch != '#');
+			break;
 
-        case ' ':
-            if (!alnum_str.empty())
-                return check_var_or_keyword(alnum_str, ' ');
-            break;
+		case ' ':
+			if (!alnum_str.empty())
+				return check_var_or_keyword(alnum_str, ' ');
+			break;
 
-        case '{':
-            if (!alnum_str.empty()) 
-                return check_var_or_keyword(alnum_str, '{');
-            return ScriptToken::BRACE_OP;
+		case '{':
+			if (!alnum_str.empty())
+				return check_var_or_keyword(alnum_str, '{');
+			return ScriptToken::BRACE_OP;
 
-        case '}':
-            if (!alnum_str.empty()) 
-                return check_var_or_keyword(alnum_str, '}');
-            return ScriptToken::BRACE_CL;
+		case '}':
+			if (!alnum_str.empty())
+				return check_var_or_keyword(alnum_str, '}');
+			return ScriptToken::BRACE_CL;
 
-        case '=':
-            if (!alnum_str.empty())
-                return check_var_or_keyword(alnum_str, '=');
-            return ScriptToken::SIGN_EQ;
+		case '=':
+			if (!alnum_str.empty())
+				return check_var_or_keyword(alnum_str, '=');
+			return ScriptToken::SIGN_EQ;
 
-        case '\n':
-            cur_line++;
-            if (!alnum_str.empty())
-                return check_var_or_keyword(alnum_str, '\n');
-            return ScriptToken::NEW_LINE;
-            
-        case ',':
-            if (!alnum_str.empty())
-                return check_var_or_keyword(alnum_str, '\n');
-            return ScriptToken::COMMA;
-        
-        // {} for scope only initializing of prev_curline
-        case '"': { 
-            if (!alnum_str.empty())
-                return check_var_or_keyword(alnum_str, '"');
-            std::size_t prev_curline = cur_line;
-            do {
-                ch = _istream_ptr->get();
-                if (ch == '\n')
-                    cur_line++;
-                /* ... 
-                 * save raw text somewhere / what else can be done?
-                 * ...
-                 */
-            } while (_istream_ptr->good() && ch != '"');
+		case '\n':
+			cur_line++;
+			if (!alnum_str.empty())
+				return check_var_or_keyword(alnum_str, '\n');
+			return ScriptToken::NEW_LINE;
 
-            if (_istream_ptr->bad() || _istream_ptr->eof())
-                #if __cplusplus >= 202002L
-                throw tokenize_error(std::format("No enclosing \"" 
-                                    "(quotaion mark) in text on line {}\n",
-                                    prev_curline)
-                                    );
-                #else 
-                throw tokenize_error("No enclosing \" (quotation mark)"
-                                    "in text on line " + prev_curline + "\n");
-                #endif
+		case ',':
+			if (!alnum_str.empty())
+				return check_var_or_keyword(alnum_str, '\n');
+			return ScriptToken::COMMA;
 
-            return ScriptToken::TEXT_LINE; 
-        }
+		// {} for scope only initializing of prev_curline
+		case '"': {
+			if (!alnum_str.empty())
+				return check_var_or_keyword(alnum_str, '"');
+			std::size_t prev_curline = cur_line;
+			do
+			{
+				ch = _istream_ptr->get();
+				if (ch == '\n')
+					cur_line++;
+				/* ...
+				 * save raw text somewhere / what else can be done?
+				 * ...
+				 */
+			} while (_istream_ptr->good() && ch != '"');
 
-        default:
-            if(isalnum(ch))
-            {
-                alnum_str += ch;
-                break;
-            } 
-            else 
-                #if __cplusplus >= 202002L
-                throw tokenize_error(std::format("Unrecognized symbol"
-                                    "{} at line {}\n", ch, cur_line)
-                                    );
-                #else 
-                throw tokenize_error("Unrecognized symbol" + ch +
-                                    "at line " + cur_line + "\n"
-                                    );
-                #endif
-            break;
-        }
-    }
+			if (_istream_ptr->bad() || _istream_ptr->eof())
+#if __cplusplus >= 202002L
+				throw tokenize_error(std::format("No enclosing \""
+												 "(quotation mark) in text on line {}\n",
+												 prev_curline));
+#else
+				throw tokenize_error("No enclosing \" (quotation mark)"
+									 "in text on line " +
+									 prev_curline + "\n");
+#endif
 
-    if (!alnum_str.empty())
-        return check_var_or_keyword(alnum_str, 0);
+			return ScriptToken::TEXT_LINE;
+		}
 
-    return ScriptToken::EXIT;
+		default:
+			if (isalnum(ch))
+			{
+				alnum_str += ch;
+				break;
+			}
+			else
+#if __cplusplus >= 202002L
+				throw tokenize_error(std::format("Unrecognized symbol"
+												 "{} at line {}\n",
+												 ch, cur_line));
+#else
+				throw tokenize_error("Unrecognized symbol" + ch + "at line " + cur_line + "\n");
+#endif
+			break;
+		}
+	}
+
+	if (!alnum_str.empty())
+		return check_var_or_keyword(alnum_str, 0);
+
+	return ScriptToken::EXIT;
 }
 
 std::vector<ScriptToken> TokenScanner::get_all_tokens(bool verbose)
 {
-    std::vector<ScriptToken> tokens_vec;
-    while (this->has_more_tokens())
-    {
-        ScriptToken new_token = get_token();
-        if (verbose) 
-            std::cout << new_token << '\n';
-        tokens_vec.push_back(new_token);
-    }
-    return tokens_vec;
+	std::vector<ScriptToken> tokens_vec;
+	while (this->has_more_tokens())
+	{
+		ScriptToken new_token = get_token();
+		if (verbose)
+			std::cout << new_token << '\n';
+		tokens_vec.push_back(new_token);
+	}
+	return tokens_vec;
 }
 
 inline long long TokenScanner::position()
 {
-    if (!_istream_ptr) throw null_ptr_exc();
-    return _istream_ptr->tellg();
+	if (!_istream_ptr)
+		throw null_ptr_exc();
+	return _istream_ptr->tellg();
 }
 
 inline bool TokenScanner::has_more_tokens()
 {
-    if (!_istream_ptr) throw null_ptr_exc();
-    return !(_istream_ptr->bad() || _istream_ptr->eof());
+	if (!_istream_ptr)
+		throw null_ptr_exc();
+	return !(_istream_ptr->bad() || _istream_ptr->eof());
 }
 
-inline void TokenScanner::set_input(std::string&& input_str)
-{   
-    _istream_ptr = 
-        std::make_unique<std::istringstream>(input_str, std::ios::in);
-}
-
-inline void TokenScanner::set_input(std::ifstream&& input_file)
+inline void TokenScanner::set_input(std::string &&input_str)
 {
-    _istream_ptr = 
-        std::make_unique<std::ifstream>(std::move(input_file));
-} 
-
-void TokenScanner::add_to_sym_table(std::string&& var)
-{}
-
+	_istream_ptr = std::make_unique<std::istringstream>(input_str, std::ios::in);
 }
+
+inline void TokenScanner::set_input(std::ifstream &&input_file)
+{
+	_istream_ptr = std::make_unique<std::ifstream>(std::move(input_file));
+}
+
+void TokenScanner::add_to_sym_table(std::string &&var)
+{
+}
+
+} // namespace vino

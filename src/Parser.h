@@ -1,7 +1,7 @@
 /*
  * Parser.h
  *
- * required : 
+ * required :
  *
  * Created on Fri Mar 01 2024
  *
@@ -15,48 +15,49 @@
 
 #include "TokenEnum.h"
 
-namespace vino {
+namespace vino
+{
 
-class Parser {
+class Parser
+{
 
-    Parser(const std::vector<ScriptToken>& vec_tokens) :
-        _tokens_l(vec_tokens)
-    {}
+	Parser(const std::vector<ScriptToken> &vec_tokens) : _tokens_l(vec_tokens)
+	{
+	}
 
-    Parser(Parser&) = delete;
+	Parser(Parser &) = delete;
 
-    Parser(Parser&& _p) : _tokens_l(std::move(_p._tokens_l))
-    {}
+	Parser(Parser &&_p) : _tokens_l(std::move(_p._tokens_l))
+	{
+	}
 
-    //---------------Interface-------------------------------
+	//---------------Interface-------------------------------
 
-    /* @throw parsing_error() if syntax is incorrect
-     */
-    void run(bool verbose = false);
+	/* @throw parsing_error() if syntax is incorrect
+	 */
+	void run(bool verbose = false);
 
-    void set_input(const std::vector<ScriptToken>& vec_tokens);
+	void set_input(const std::vector<ScriptToken> &vec_tokens);
 
-private:
+  private:
+	std::vector<ScriptToken> _tokens_l;
+	std::size_t _pos = 0;
+	std::size_t _line = 0;
+	bool _verb = false;
 
-    std::vector<ScriptToken>    _tokens_l;
-    std::size_t                 _pos = 0;
-    std::size_t                 _line = 0;
-    bool                        _verb = false;
+	//----------Private Methods--------------------
 
-    //----------Private Methods--------------------
+	void script();
 
-    void script();
+	void stmt();
 
-    void stmt();
+	inline void inside();
 
-    inline void inside();
+	inline void type();
 
-    inline void type();
+	inline void match(const ScriptToken &);
 
-    inline void match(const ScriptToken&);
-
-    inline ScriptToken& popout();
-
+	inline ScriptToken &popout();
 };
 
-}
+} // namespace vino

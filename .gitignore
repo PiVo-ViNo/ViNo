@@ -1,9 +1,6 @@
-# vscode
-.vscode
-*.exe
-*.out
-*.dat
-*.o
-
-build
-CMakeCache.*
+.vscode/
+build/
+_deps_src/
+**/.DS_Store
+CMakeLists.txt.user
+docs/Doxyfile
