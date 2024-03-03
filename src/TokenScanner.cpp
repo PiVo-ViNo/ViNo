@@ -75,7 +75,7 @@ ScriptToken TokenScanner::get_token()
                 ch = _istream_ptr->get();
                 if (ch == '\n') 
                 {
-                    cur_line++;
+                    _cur_line++;
                     return ScriptToken::NEW_LINE;
                 }
             } while (_istream_ptr->good() && ch != '#');
@@ -102,7 +102,7 @@ ScriptToken TokenScanner::get_token()
             return ScriptToken::SIGN_EQ;
 
         case '\n':
-            cur_line++;
+            _cur_line++;
             if (!alnum_str.empty())
                 return check_var_or_keyword(alnum_str, '\n');
             return ScriptToken::NEW_LINE;
@@ -116,11 +116,11 @@ ScriptToken TokenScanner::get_token()
         case '"': { 
             if (!alnum_str.empty())
                 return check_var_or_keyword(alnum_str, '"');
-            std::size_t prev_curline = cur_line;
+            std::size_t prev_curline = _cur_line;
             do {
                 ch = _istream_ptr->get();
                 if (ch == '\n')
-                    cur_line++;
+                    _cur_line++;
                 /* ... 
                  * save raw text somewhere / what else can be done?
                  * ...
@@ -150,11 +150,11 @@ ScriptToken TokenScanner::get_token()
             else 
                 #if __cplusplus >= 202002L
                 throw tokenize_error(std::format("Unrecognized symbol"
-                                    "{} at line {}\n", ch, cur_line)
+                                    "{} at line {}\n", ch, _cur_line)
                                     );
                 #else 
                 throw tokenize_error("Unrecognized symbol" + ch +
-                                    "at line " + cur_line + "\n"
+                                    "at line " + _cur_line + "\n"
                                     );
                 #endif
             break;
@@ -196,12 +196,14 @@ inline void TokenScanner::set_input(std::string&& input_str)
 {   
     _istream_ptr = 
         std::make_unique<std::istringstream>(input_str, std::ios::in);
+    _cur_line = 0;
 }
 
 inline void TokenScanner::set_input(std::ifstream&& input_file)
 {
     _istream_ptr = 
         std::make_unique<std::ifstream>(std::move(input_file));
+    _cur_line = 0;
 } 
 
 void TokenScanner::add_to_sym_table(std::string&& var)

@@ -51,7 +51,7 @@ private:
 
     std::vector<ScriptToken>    _tokens_l;
     std::size_t                 _pos = 0;
-    std::size_t                 _line = 0;
+    std::size_t                 _cur_line = 0;
     bool                        _verb = false;
 
     //----------Private Methods----------------------------------

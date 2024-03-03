@@ -21,6 +21,11 @@
 
 namespace vino {
 
+/* @brief Divides the input stream/file into ScriptTokens.
+ * Usage: token_scanner.get_token(), token_scanner.get_all_tokens()
+ * @param _istream_ptr unique_ptr<istream>, can be string/istringstream
+ * or ifstream, constructor() or set_input() allow only rvalue reference&&.
+*/
 class TokenScanner {
 public:
 
@@ -39,6 +44,13 @@ public:
                                         std::ios::in);
     }
 
+    TokenScanner(std::istringstream&& input_strstream)
+    {
+        _istream_ptr =
+            std::make_unique<std::istringstream>(input_strstream, 
+                                                std::ios::in);
+    }
+
     TokenScanner(TokenScanner&) = delete;
 
     TokenScanner(TokenScanner&& other) :
@@ -49,6 +61,9 @@ public:
 
     // ------------- Interface ------------------------------------------------
 
+    /* @brief New input 
+     *
+     */
     inline void set_input(std::string&&);
 
     inline void set_input(std::ifstream&&);
@@ -59,7 +74,7 @@ public:
     ScriptToken get_token();
 
     /* Get all tokens in one step in case you don't want to bother
-     * @return rvalue reference to std::vector<ScriptToken>
+     * @return std::vector<ScriptToken>
      * @throw tokenize_error() or any exception within std::vector
      */
     std::vector<ScriptToken> get_all_tokens(bool verbose = false);
@@ -77,14 +92,15 @@ public:
 
     // -------------- Flags switchers ------------------------------------------
 
+    // not used for now
     void scan_strings_whole();
 
 private:
 
     std::unique_ptr<std::istream>   _prev_istream_ptr;
     std::unique_ptr<std::istream>   _istream_ptr;
-    std::size_t                     cur_line = 0;
-    bool                            scan_whole_strs = false;
+    std::size_t                     _cur_line = 0;
+    bool                            scan_whole_strs = true;
     // bool            _throw_exceptions = true; ?
 
     // -------------- Private Methods -----------------------------------------

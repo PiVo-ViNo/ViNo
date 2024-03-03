@@ -34,9 +34,9 @@ inline void Parser::match(const st& _tok)
     if (_cur_tok != _tok)
         #if __cplusplus >= 202002L
         throw parsing_error(std::format("Parsing error on line {}\n",
-                                        _line));
+                                        _cur_line));
         #else
-        throw parsing_error("Parsing error on line " + std::to_string(_line)
+        throw parsing_error("Parsing error on line " + std::to_string(_cur_line)
                             + "\n");
         #endif
 }
@@ -106,10 +106,10 @@ void Parser::inside()
     {
         #if __cplusplus >= 202002L
         throw parsing_error(std::format("Inside error at line {}\n", 
-                            _line));
+                            _cur_line));
         #else
         throw parsing_error("Inside error at line " + 
-                            std::to_string(_line) + "\n");
+                            std::to_string(_cur_line) + "\n");
         #endif
     }
 }
@@ -127,17 +127,17 @@ inline void Parser::type()
 
     #if __cplusplus >= 202002L
     throw parsing_error(std::format("Type error at line {}\n", 
-                        _line));
+                        _cur_line));
     #else
     throw parsing_error("Type error at line " + 
-                        std::to_string(_line) + "\n");
+                        std::to_string(_cur_line) + "\n");
     #endif
 }
 
 void Parser::set_input(const std::vector<st>& vec_tokens)
 {
     _tokens_l = vec_tokens;
-    _line = 0;
+    _cur_line = 0;
     _pos = 0;
 }
 
