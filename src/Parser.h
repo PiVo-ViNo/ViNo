@@ -21,7 +21,7 @@ namespace vino {
  * the input file/stream is divided by TokenScanner, is in compliance with
  * syntax rules of ViNo Scripting Language.\n 
  *
- * Soon: iteratiors instead of only vector.
+ * Soon: iterators instead of only vector.
  * Usage: parser.run()
  */
 class Parser {
