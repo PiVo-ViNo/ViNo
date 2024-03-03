@@ -1,0 +1,18 @@
+script -> stmts exit
+stmts -> stmts stmt | stmt 
+
+stmt -> (persona PERSONA | background BG | foreground FG | text TEXT) \n
+
+###############
+
+PERSONA -> VAR { inside } 
+inside -> inside0 = TEXTLINE | inside0 = textline , inside
+inside0 -> BG | FG | DIR | NAME
+NAME -> TEXTLINE
+DIR -> TEXTLINE
+BG -> TEXTLINE
+FG -> TEXTLINE
+TEXT -> = TEXTLINE | TEXTLINE 
+TEXTLINE -> "CH" | ""
+VAR -> VAR CH | CH
+CH -> a | ... | z | A | ... | Z | 0 | ... | 9 (alnum) 

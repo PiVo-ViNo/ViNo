@@ -126,6 +126,8 @@ inline void Parser::type()
 void Parser::set_input(const std::vector<st>& vec_tokens)
 {
     _tokens_l = vec_tokens;
+    _line = 0;
+    _pos = 0;
 }
 
 void Parser::run(bool verbose)

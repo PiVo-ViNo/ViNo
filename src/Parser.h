@@ -17,6 +17,13 @@
 
 namespace vino {
 
+/* @brief Parser checks whether the vector of ScriptTokens, into which 
+ * the input file/stream is divided by TokenScanner, is in compliance with
+ * syntax rules of ViNo Scripting Language.\n 
+ *
+ * Soon: iteratiors instead of only vector.
+ * Usage: parser.run()
+ */
 class Parser {
 
     Parser(const std::vector<ScriptToken>& vec_tokens) :
@@ -30,10 +37,14 @@ class Parser {
 
     //---------------Interface-------------------------------
 
-    /* @throw parsing_error() if syntax is incorrect
+    /* @brief Start parsing the tokens, checks if syntax is correct.
+     * @throw parsing_error() if syntax is incorrect
+     * @param verbose output every scanned token in std::cout or not 
      */
     void run(bool verbose = false);
 
+    /* @brief Set new input, nullifies current line.
+     */
     void set_input(const std::vector<ScriptToken>& vec_tokens);
 
 private:
@@ -43,7 +54,13 @@ private:
     std::size_t                 _line = 0;
     bool                        _verb = false;
 
-    //----------Private Methods--------------------
+    //----------Private Methods----------------------------------
+    //------------------------------------------------------------
+
+    //------------Grammar-----------------------------------------
+    /// Description: Parser is made as Context-free Grammar, basically 
+    /// it checks whether the tokens array follows the set pattern.
+    /// Checks the file grammar_ideas.txt for a more formal definition.
 
     void script();
 
@@ -53,8 +70,16 @@ private:
 
     inline void type();
 
-    inline void match(const ScriptToken&);
+    //-----------Utility Methods--------------------------------
 
+    /* @brief Checks whether the token on position _pos is equal to _tok
+     * @throw parsing_error() in case it's not equal 
+     */
+    inline void match(const ScriptToken& _tok);
+
+    /* @brief Get the token on position _pos
+     * @return ScriptToken from vector _tokens_l
+     */
     inline ScriptToken& popout();
 
 };
