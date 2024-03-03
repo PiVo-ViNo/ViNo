@@ -32,7 +32,13 @@ inline void Parser::match(const st& _tok)
     st _cur_tok = popout();
     std::cout << _tok << " ";
     if (_cur_tok != _tok)
-        throw parsing_error();
+        #if __cplusplus >= 202002L
+        throw parsing_error(std::format("Parsing error on line {}\n",
+                                        _line));
+        #else
+        throw parsing_error("Parsing error on line " + std::to_string(_line)
+                            + "\n");
+        #endif
 }
 
 void Parser::script()
@@ -111,9 +117,14 @@ void Parser::inside()
 inline void Parser::type()
 {
     st _tok = popout();
+
+    if (_verb) 
+        std::cout << _tok << " ";
+
     if (_tok == st::BG || _tok == st::FG || _tok == st::PATH
         || _tok == st::NAME)
             return;
+
     #if __cplusplus >= 202002L
     throw parsing_error(std::format("Type error at line {}\n", 
                         _line));
