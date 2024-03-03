@@ -11,6 +11,7 @@
       "binaryDir": "${sourceDir}/build/dev-linux",
       "inherits": ["dev-mode", "ci-linux", "cppcheck-unix64"],
       "cacheVariables": {
+        "BUILD_DOCS": "ON",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_SYSTEM_NAME": "Linux",
@@ -26,6 +27,7 @@
       "binaryDir": "${sourceDir}/build/dev-win64",
       "inherits": ["dev-mode", "ci-win64", "cppcheck-win64"],
       "cacheVariables": {
+        "BUILD_DOCS": "ON",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_SYSTEM_NAME": "Windows",
@@ -41,6 +43,7 @@
       "binaryDir": "${sourceDir}/build/dev-linux-to-win64",
       "inherits": ["dev-mode", "ci-win64", "cppcheck-win64"],
       "cacheVariables": {
+        "BUILD_DOCS": "ON",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_SYSTEM_NAME": "Windows",
@@ -59,6 +62,7 @@
       "binaryDir": "${sourceDir}/build/dev-win64-to-linux",
       "inherits": ["dev-mode", "ci-cygwin", "cppcheck-unix64"],
       "cacheVariables": {
+        "BUILD_DOCS": "ON",
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_SYSTEM_NAME": "Linux",

@@ -4,3 +4,4 @@ _deps_src/
 **/.DS_Store
 CMakeLists.txt.user
 docs/Doxyfile
+docs/html
