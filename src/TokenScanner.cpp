@@ -39,12 +39,12 @@ ScriptToken TokenScanner::is_keyword(const std::string &_str)
 
 ScriptToken TokenScanner::check_var_or_keyword(std::string &_str, char ch)
 {
+    _istream_ptr->putback(ch);
+ 
     ScriptToken new_token = is_keyword(_str);
     if (new_token != ScriptToken::EMPTY_TOKEN) return new_token;
 
-    _istream_ptr->putback(ch);
     add_to_sym_table(std::move(_str));
-
     return ScriptToken::VAR;
 }
 
