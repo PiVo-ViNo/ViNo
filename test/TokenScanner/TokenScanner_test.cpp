@@ -1,83 +1,57 @@
+#include <exception>
+#include <vector>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+
+#include "TokenEnum.h"
+#include "custom_errors.h"
+#include "ut.hpp"
 #include "TokenScanner.h"
 
-#include <cassert>
-#include <iostream>
-#include <vector>
+int main() {
 
-// must be redone with boost.ut
+    using namespace boost::ut;
+    using namespace boost::ut::literals;
+    using namespace boost::ut::operators::terse;
 
-int main()
-{
-    // -------- Test Constructors ------------
-    {
-        vino::TokenScanner tokenizer0{};
+	typedef vino::ScriptToken vst;
 
-        std::ifstream _ifstream;
-        vino::TokenScanner tokenizer1(std::move(_ifstream));
+    const std::string input_test = 
+    "#comment\n"
+    "background = \"bg.png\"\n"
+    "#comment\n"
+    "persona Human {path=\"./human\", background=\"bg.png\",\n"
+    "foreground = \"human0.png\", name = \"Humanio\"}\n"
+    "exit\n";
 
-        std::string _istr;
-        vino::TokenScanner tokenizer2(std::move(_istr));
-    }
+    const std::vector<vst> output_test = {
+        vst::NEW_LINE,
 
-    // ---------- Test Tokenizing ----------
-    // -------------------------------------
+        vst::BG, vst::SIGN_EQ, vst::TEXT_LINE,
+        vst::NEW_LINE,
 
-    // ----------- Test 0 ------------------
-    try {
-        std::string _istr_test =
-            "#comment\n"
-            "background ash = \"ash.png\"\n"
-            "foreground Oleg = \"olegus.jpeg\"\n"
-            "persona Chad {foreground = \"Chad.png\"}\n"
-            "text \"Hello!\"\n"
-            "text = \"hello.txt\"\n";
+        vst::NEW_LINE,
 
-        typedef vino::ScriptToken vst;
+        vst::PERSONA, vst::VAR, vst::BRACE_OP, vst::PATH,
+        vst::SIGN_EQ, vst::TEXT_LINE, vst::COMMA,
+        vst::BG, vst::SIGN_EQ, vst::TEXT_LINE,
+        vst::COMMA, vst::FG, vst::SIGN_EQ, vst::TEXT_LINE,
+        vst::COMMA, vst::NAME, vst::SIGN_EQ, vst::TEXT_LINE,
+        vst::BRACE_CL,
+        vst::NEW_LINE,
 
-        const std::vector<vst> tokens_test = {
-            vst::NEW_LINE,
+        vst::EXIT 
+    };
 
-            vst::BG,        vst::VAR,       vst::SIGN_EQ,   vst::TEXT_LINE,
-            vst::NEW_LINE,
-
-            vst::FG,        vst::VAR,       vst::SIGN_EQ,   vst::TEXT_LINE,
-            vst::NEW_LINE,
-
-            vst::PERSONA,   vst::VAR,       vst::BRACE_OP,  vst::FG,
-            vst::SIGN_EQ,   vst::TEXT_LINE, vst::BRACE_CL,  vst::NEW_LINE,
-
-            vst::TEXT_TYPE, vst::TEXT_LINE, vst::NEW_LINE,
-
-            vst::TEXT_TYPE, vst::SIGN_EQ,   vst::TEXT_LINE, vst::NEW_LINE,
-
-            vst::EXIT};
-
-        vino::TokenScanner tokenizer(std::move(_istr_test));
-        std::vector<vst> tokens_get = tokenizer.get_all_tokens();
-        for (std::size_t i = 0; i < tokens_get.size(); i++) {
-            std::cout << tokens_get[i] << '\t';
-            std::cout << tokens_test[i] << '\n';
-        }
-        assert(tokens_get == tokens_test);
-    } catch (std::exception &excp) {
-        std::cout << excp.what() << '\n';
-    }
-    // ------------------ Test 1 ------------------------
-    try {
-        std::cout << '\n';
-        std::string _istr_test = "background ash = \"ash.png\"\n";
-
-        typedef vino::ScriptToken vst;
-        std::vector<vst> tokens_test = {
-            vst::BG,  vst::VAR, vst::SIGN_EQ, vst::TEXT_LINE, vst::NEW_LINE,
-
-            vst::EXIT};
-        vino::TokenScanner tokenizer(std::move(_istr_test));
-        std::vector<vino::ScriptToken> tokens_get =
-            tokenizer.get_all_tokens(true);
-        assert(tokens_get == tokens_test);
-    } catch (std::exception &excp) {
-        std::cout << excp.what() << '\n';
-    }
+    "tokenizer_test0"_test = [&output_test, &input_test] {
+    std::vector<vst> output_tokenizer;
+    expect(nothrow([&input_test, &output_tokenizer] {
+            std::string input = input_test;
+            vino::TokenScanner tokenizer(std::move(input));
+            output_tokenizer = tokenizer.get_all_tokens(true);
+        } )); 
+        expect(output_tokenizer == output_test);
+    };
     return 0;
 }
