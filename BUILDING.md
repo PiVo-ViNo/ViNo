@@ -1,7 +1,7 @@
 # Linux
 Next packages are required:
 
-- **clang**
+- **clang** (for dev) / **gcc**
 
 - **cmake**
 
