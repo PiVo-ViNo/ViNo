@@ -23,6 +23,22 @@
       }
     },
     {
+      "name": "dev-linux-gnu",
+      "binaryDir": "${sourceDir}/build/dev-linux-gnu",
+      "inherits": ["dev-mode", "ci-linux", "cppcheck-unix64"],
+      "cacheVariables": {
+        "BUILD_DOCS": "ON",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_SYSTEM_NAME": "Linux",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "CMAKE_FIND_ROOT_PATH_MODE_PROGRAM": "NEVER",
+        "CMAKE_FIND_ROOT_PATH_MODE_LIBRARY": "ONLY",
+        "CMAKE_FIND_ROOT_PATH_MODE_INCLUDE": "ONLY"
+      }
+    },
+    {
       "name": "dev-win64",
       "binaryDir": "${sourceDir}/build/dev-win64",
       "inherits": ["dev-mode", "ci-win64", "cppcheck-win64"],
@@ -81,6 +97,11 @@
       "configuration": "Debug"
     },
     {
+      "name": "dev-linux-gnu",
+      "configurePreset" "dev-linux-gnu",
+      "configuration": "Debug"
+    },
+    {
       "name": "dev-win64",
       "configurePreset": "dev-win64",
       "configuration": "Debug"
@@ -100,6 +121,17 @@
     {
       "name": "dev-linux",
       "configurePreset": "dev-linux",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "dev-linux-gnu",
+      "configurePreset": "dev-linux-gnu",
       "configuration": "Debug",
       "output": {
         "outputOnFailure": true
