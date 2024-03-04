@@ -26,6 +26,7 @@
       "hidden": true,
       "inherits": "cmake-pedantic",
       "cacheVariables": {
+        "CMAKE_COLOR_DIAGNOSTICS": "ON",
         "ViNo_DEVELOPER_MODE": "ON",
         "CMAKE_MESSAGE_LOG_LEVEL": "TRACE"
       }

@@ -1,9 +1,17 @@
-# Microsoft C/C++ Code Style settings
+# C/C++ Code Style settings
 # https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
 Language: Cpp
-BasedOnStyle: Microsoft
-ColumnLimit: 254
+BasedOnStyle: Google 
+ColumnLimit: 80 
 Standard: c++20
+IndentWidth: 4
 TabWidth: 4
-UseTab: Always
+UseTab: Never 
+AccessModifierOffset: -4
+BreakConstructorInitializers: AfterColon
+AlignConsecutiveAssignments: true 
+PointerAlignment: Left
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
