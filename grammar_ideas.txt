@@ -7,11 +7,11 @@ stmt -> (persona PERSONA | background BG | foreground FG | text TEXT) \n
 
 PERSONA -> VAR { inside } 
 inside -> inside0 = TEXTLINE | inside0 = textline , inside
-inside0 -> BG | FG | DIR | NAME
+inside0 -> FG | DIR | NAME | VAR #VAR is used as different FGs, we could access them e.g. Oleg.angry
 NAME -> TEXTLINE
 DIR -> TEXTLINE
 BG -> TEXTLINE
-FG -> TEXTLINE
+FG -> TEXTLINE | VAR
 TEXT -> = TEXTLINE | TEXTLINE 
 TEXTLINE -> "CH" | ""
 VAR -> VAR CH | CH
