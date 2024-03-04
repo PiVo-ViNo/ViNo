@@ -15,49 +15,67 @@
 
 #include "TokenEnum.h"
 
-namespace vino
-{
+namespace vino {
 
-class Parser
-{
+/// @brief Analyzes the syntax of input vector<ScriptToken>
+/// @details Parser checks whether the vector of ScriptTokens, into which 
+/// the input file/stream is divided by TokenScanner, is in compliance with
+/// syntax rules of ViNo Scripting Language.\n 
+///
+/// Soon: iterators instead of only vector.
+/// Usage: parser.run()
+class Parser {
+public:
 
-	Parser(const std::vector<ScriptToken> &vec_tokens) : _tokens_l(vec_tokens)
-	{
-	}
+	Parser() {}
 
-	Parser(Parser &) = delete;
+    explicit Parser(const std::vector<ScriptToken> &vec_tokens) :
+        _tokens_l(vec_tokens) {}
 
-	Parser(Parser &&_p) : _tokens_l(std::move(_p._tokens_l))
-	{
-	}
+    Parser(Parser &) = delete;
 
-	//---------------Interface-------------------------------
+    Parser(Parser &&_p) : _tokens_l(std::move(_p._tokens_l)) {}
 
-	/* @throw parsing_error() if syntax is incorrect
-	 */
-	void run(bool verbose = false);
+    //---------------Interface-------------------------------
 
-	void set_input(const std::vector<ScriptToken> &vec_tokens);
+    /// @brief Start parsing the tokens, checks if syntax is correct.
+    /// @throw parsing_error() if syntax is incorrect
+    /// @param verbose true: recommended only while debugging
+    void run(bool verbose = false);
 
-  private:
-	std::vector<ScriptToken> _tokens_l;
-	std::size_t _pos = 0;
-	std::size_t _line = 0;
-	bool _verb = false;
+    /// @brief Set new input, nullifies current line.
+    /// @throw exception() if vec_tokens cannot be copied
+    void set_input(const std::vector<ScriptToken> &vec_tokens);
 
-	//----------Private Methods--------------------
+private:
+    std::vector<ScriptToken> _tokens_l{};
+    std::size_t _pos  = 0;
+    std::size_t _cur_line = 0;
+    bool _verb        = false;
 
-	void script();
+    //----------Private Methods--------------------
 
-	void stmt();
+    //------------Grammar-----------------------------------------
+    /// Description: Parser is made as Context-free Grammar, basically 
+    /// it checks whether the tokens array follows the set pattern.
+    /// Checks the file grammar_ideas.txt for a more formal definition.
 
-	inline void inside();
+    /// 
+    void script();
 
-	inline void type();
+    void stmt();
 
-	inline void match(const ScriptToken &);
+    inline void inside();
 
-	inline ScriptToken &popout();
+    inline void type();
+
+    //-----------Utility Methods--------------------------------
+
+    /// @brief Checks whether the token on position _pos is equal to _tok
+    /// @throw parsing_error() in case it's not equal 
+    inline void match(const ScriptToken &);
+
+    inline ScriptToken &popout();
 };
 
-} // namespace vino
+}  // namespace vino
