@@ -83,6 +83,8 @@ private:
 
     ScriptToken is_keyword(const std::string &);
 
+    /// @brief Strings found in input is either keyword or variable name
+    /// @param ch is the char that must be put back into istream
     ScriptToken check_var_or_keyword(std::string &, char);
 
     // dummy function for now

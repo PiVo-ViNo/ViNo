@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <vector>
 
-#if __cplusplus >= 202002L
+#if __cpp_lib_format
 #include <format>
 #endif
 
@@ -25,14 +25,14 @@ namespace vino {
 
 using st = ScriptToken;
 
-inline st &Parser::popout() {
-    return _tokens_l.at(_pos++);
-}
+inline st &Parser::popout() { return _tokens_l.at(_pos++); }
 
-inline void Parser::match(const st &_tok) {
+inline void Parser::match(const st &_tok)
+{
     st _cur_tok = popout();
     if (_verb) {
-        std::cout << "match" << "\t";
+        std::cout << "match"
+                  << "\t";
         std::cout << _tok << "\t";
         std::cout << _cur_tok << "\n";
     }
@@ -41,7 +41,8 @@ inline void Parser::match(const st &_tok) {
     }
 }
 
-void Parser::script() {
+void Parser::script()
+{
     /*if (_tokens_l.at(_pos) == st::NEW_LINE) {
         _pos++;
         _cur_line++;
@@ -54,7 +55,8 @@ void Parser::script() {
     }
 }
 
-void Parser::stmt() {
+void Parser::stmt()
+{
     st _tok = popout();
 
     if (_verb) {
@@ -94,7 +96,7 @@ void Parser::stmt() {
         case st::NEW_LINE:
             _cur_line++;
             return;
-        
+
         default:
             throw ParsingError("Stmt error\n");
             break;
@@ -104,7 +106,8 @@ void Parser::stmt() {
     _cur_line++;
 }
 
-void Parser::inside() {
+void Parser::inside()
+{
     try {
         do {
             type();
@@ -113,7 +116,7 @@ void Parser::inside() {
         } while (/*_tokens_l.at(_pos)*/ popout() == st::COMMA);
         _pos--;
     } catch (std::out_of_range &) {
-#if __cplusplus >= 202002L
+#if __cpp_lib_format
         throw ParsingError(std::format("Inside error at line {}\n", _cur_line));
 #else
         throw ParsingError("Inside error at line " + std::to_string(_cur_line) +
@@ -122,7 +125,8 @@ void Parser::inside() {
     }
 }
 
-inline void Parser::type() {
+inline void Parser::type()
+{
     st _tok = popout();
     if (_verb) {
         std::cout << _tok << "\t" << _pos << "\n";
@@ -131,18 +135,21 @@ inline void Parser::type() {
         _tok == st::NAME) {
         return;
     }
-#if __cplusplus >= 202002L
+#if __cpp_lib_format
     throw ParsingError(std::format("Type error at line {}\n", _cur_line));
 #else
-    throw ParsingError("Type error at line " + std::to_string(_cur_line) + "\n");
+    throw ParsingError("Type error at line " + std::to_string(_cur_line) +
+                       "\n");
 #endif
 }
 
-void Parser::set_input(const std::vector<st> &vec_tokens) {
+void Parser::set_input(const std::vector<st> &vec_tokens)
+{
     _tokens_l = vec_tokens;
 }
 
-void Parser::run(bool verbose) {
+void Parser::run(bool verbose)
+{
     _verb = verbose;
     if (_tokens_l.empty()) {
         throw ParsingError("Vector of tokens is not defined for this parser");

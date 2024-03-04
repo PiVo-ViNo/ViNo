@@ -13,7 +13,7 @@
 #include <iostream>
 #include <memory>
 #include <utility>
-#if __cplusplus >= 202002L
+#if __cpp_lib_format
 #include <format>
 #endif
 
@@ -52,7 +52,9 @@ ScriptToken TokenScanner::get_token()
 {
     if (!_istream_ptr) throw NullPtrExc();
 
+    /// Alphabet-numeric string, it gets all alnums from input
     std::string alnum_str{};
+
     char ch = 0;
     while ((ch = _istream_ptr->get()) && ch != -1) {
         switch (ch) {
@@ -123,7 +125,7 @@ ScriptToken TokenScanner::get_token()
                 } while (_istream_ptr->good() && ch != '"');
 
                 if (_istream_ptr->bad() || _istream_ptr->eof()) {
-#if __cplusplus >= 202002L
+#if __cpp_lib_format
                     throw TokenizeError(
                         std::format("No enclosing \""
                                     "(quotation mark) in text on line {}\n",
@@ -144,7 +146,7 @@ ScriptToken TokenScanner::get_token()
                     alnum_str += ch;
                     break;
                 } else {
-#if __cplusplus >= 202002L
+#if __cpp_lib_format
                     throw TokenizeError(
                         std::format("Unrecognized symbol"
                                     "{} at line {}\n",
@@ -169,6 +171,7 @@ ScriptToken TokenScanner::get_token()
 std::vector<ScriptToken> TokenScanner::get_all_tokens(bool verbose)
 {
     std::vector<ScriptToken> tokens_vec;
+
     while (this->has_more_tokens()) {
         ScriptToken new_token = get_token();
         if (verbose) std::cout << new_token << '\n';
