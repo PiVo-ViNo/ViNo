@@ -1,3 +1,15 @@
+# Linux
+Next packages are required:
+
+- **clang**
+
+- **cmake**
+
+- optional: [*ninja*](https://ninja-build.org/) ([generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html#manual:cmake-generators(7)): can be choosed by `cmake -G <generator>`)
+
+- optional for dev: clang-format, clang-tidy, cppcheck, doxygen, codespell
+
+
 # Required packages for native build in Windows
 To build under **Windows**, the [**MSYS2**](https://www.msys2.org/) environment is required. The following packages need to be installed in it:
 
