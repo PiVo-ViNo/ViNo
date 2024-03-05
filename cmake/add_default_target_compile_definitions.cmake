@@ -1,0 +1,10 @@
+# Функция добавления определений по умолчанию для таргета
+function(add_default_target_compile_definitions name)
+	target_compile_definitions("${name}" PRIVATE PROJECT_NAME="${PROJECT_NAME}")
+	target_compile_definitions("${name}" PRIVATE PROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR})
+	target_compile_definitions("${name}" PRIVATE PROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR})
+	target_compile_definitions("${name}" PRIVATE PROJECT_VERSION_PATCH=${PROJECT_VERSION_PATCH})
+	target_compile_definitions("${name}" PRIVATE PROJECT_VERSION_TWEAK=${PROJECT_VERSION_TWEAK})
+	target_compile_definitions("${name}" PRIVATE BASE_SOURCE_PATH="${CMAKE_SOURCE_DIR}")
+	target_compile_definitions("${name}" PRIVATE TARGET_NAME="${name}")
+endfunction()
