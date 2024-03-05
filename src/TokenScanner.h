@@ -20,6 +20,7 @@
 #include "TokenEnum.h"
 
 namespace vino {
+    
 /// @brief Divides the input stream/file into ScriptTokens.
 /// Usage: token_scanner.get_token(), token_scanner.get_all_tokens()
 /// @param _istream_ptr unique_ptr<istream>, can be string/istringstream
@@ -70,13 +71,14 @@ public:
 
     // -------------- Flags switchers ------------------------------------------
 
+    // not used for now
     void scan_strings_whole();
 
 private:
     std::unique_ptr<std::istream> _prev_istream_ptr;
     std::unique_ptr<std::istream> _istream_ptr;
     std::size_t cur_line = 0;
-    bool scan_whole_strs = false;
+    bool scan_whole_strs = true;
     // bool            _throw_exceptions = true; ?
 
     // -------------- Private Methods -----------------------------------------

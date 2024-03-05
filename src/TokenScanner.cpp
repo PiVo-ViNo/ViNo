@@ -197,11 +197,13 @@ inline void TokenScanner::set_input(std::string &&input_str)
 {
     _istream_ptr =
         std::make_unique<std::istringstream>(input_str, std::ios::in);
+    _cur_line = 0;
 }
 
 inline void TokenScanner::set_input(std::ifstream &&input_file)
 {
     _istream_ptr = std::make_unique<std::ifstream>(std::move(input_file));
+    _cur_line = 0;
 }
 
 void TokenScanner::add_to_sym_table(std::string &&var) {}

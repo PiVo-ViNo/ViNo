@@ -53,7 +53,13 @@ private:
     std::size_t _cur_line = 0;
     bool _verb        = false;
 
-    //----------Private Methods--------------------
+    //----------Private Methods----------------------------------
+    //------------------------------------------------------------
+
+    //------------Grammar-----------------------------------------
+    /// Description: Parser is made as Context-free Grammar, basically 
+    /// it checks whether the tokens array follows the set pattern.
+    /// Checks the file grammar_ideas.txt for a more formal definition.
 
     //------------Grammar-----------------------------------------
     /// Description: Parser is made as Context-free Grammar, basically 
@@ -75,6 +81,8 @@ private:
     /// @throw parsing_error() in case it's not equal 
     inline void match(const ScriptToken &);
 
+    /// @brief Get the token on position _pos
+    /// @return ScriptToken from vector _tokens_l
     inline ScriptToken &popout();
 };
 

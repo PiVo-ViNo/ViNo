@@ -30,15 +30,21 @@ inline st &Parser::popout() { return _tokens_l.at(_pos++); }
 inline void Parser::match(const st &_tok)
 {
     st _cur_tok = popout();
+
     if (_verb) {
         std::cout << "match"
                   << "\t";
         std::cout << _tok << "\t";
         std::cout << _cur_tok << "\n";
     }
-    if (_cur_tok != _tok) {
-        throw ParsingError();
-    }
+    if (_cur_tok != _tok)
+#if __cpp_lib_format
+        throw parsing_error(std::format("Parsing error on line {}\n",
+                                        _cur_line));
+#else
+        throw parsing_error("Parsing error on line " + std::to_string(_cur_line)
+                            + "\n");
+#endif
 }
 
 void Parser::script()
@@ -113,6 +119,7 @@ void Parser::inside()
             type();
             match(st::SIGN_EQ);
             match(st::TEXT_LINE);
+
         } while (/*_tokens_l.at(_pos)*/ popout() == st::COMMA);
         _pos--;
     } catch (std::out_of_range &) {
@@ -141,11 +148,14 @@ inline void Parser::type()
     throw ParsingError("Type error at line " + std::to_string(_cur_line) +
                        "\n");
 #endif
+
 }
 
 void Parser::set_input(const std::vector<st> &vec_tokens)
 {
     _tokens_l = vec_tokens;
+    _cur_line = 0;
+    _pos = 0;
 }
 
 void Parser::run(bool verbose)
