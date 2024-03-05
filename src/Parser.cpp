@@ -39,10 +39,10 @@ inline void Parser::match(const st &_tok)
     }
     if (_cur_tok != _tok)
 #if __cpp_lib_format
-        throw parsing_error(std::format("Parsing error on line {}\n",
+        throw ParsingError(std::format("Parsing error on line {}\n",
                                         _cur_line));
 #else
-        throw parsing_error("Parsing error on line " + std::to_string(_cur_line)
+        throw ParsingError("Parsing error on line " + std::to_string(_cur_line)
                             + "\n");
 #endif
 }
