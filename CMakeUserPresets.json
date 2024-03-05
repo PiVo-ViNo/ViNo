@@ -98,7 +98,7 @@
     },
     {
       "name": "dev-linux-gnu",
-      "configurePreset" "dev-linux-gnu",
+      "configurePreset": "dev-linux-gnu",
       "configuration": "Debug"
     },
     {

@@ -176,6 +176,7 @@ std::vector<ScriptToken> TokenScanner::get_all_tokens(bool verbose)
         ScriptToken new_token = get_token();
         if (verbose) std::cout << new_token << '\n';
         tokens_vec.push_back(new_token);
+        if (new_token == ScriptToken::EXIT) return tokens_vec;
     }
     return tokens_vec;
 }
