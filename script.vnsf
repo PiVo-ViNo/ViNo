@@ -1,8 +1,14 @@
-persona Rin_std { dir = "./rin", foreground = "rin_rude.png", ...}
+# foreground - is main usage of Rin_std as variable, but we can declare
+# subvariables (members)
+# ! New line only after comma
+persona Rin_std { path= "./rin", foreground = "rin_rude.png",
+                rude = "rin_rude.png", calm="rin_calm.png",
+                else="RIN_ELSE.png"}
 background = "bg0.png"
 text "I am a stupid dog"
 text = "text.txt"
-# position in [0;1]
-put Rin_std #in position# 0.454 
+foreground = Rin_std
+foreground = Rin_std.rude # the same one 
 background = "bg1.png"
+foreground = Rin_std.else 
 exit

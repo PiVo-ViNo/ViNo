@@ -10,7 +10,7 @@ TabWidth: 4
 UseTab: Never 
 AccessModifierOffset: -4
 BreakConstructorInitializers: AfterColon
-AlignConsecutiveAssignments: true 
+AlignConsecutiveDeclarations: true 
 PointerAlignment: Left
 BreakBeforeBraces: Custom
 BraceWrapping:

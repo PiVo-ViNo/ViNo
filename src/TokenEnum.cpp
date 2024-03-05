@@ -1,7 +1,4 @@
 #include "TokenEnum.h"
-
-#include <ostream>
-
 #include "custom_errors.h"
 
 std::ostream& vino::operator<<(std::ostream& os, const vino::ScriptToken& tok) {
@@ -10,6 +7,9 @@ std::ostream& vino::operator<<(std::ostream& os, const vino::ScriptToken& tok) {
     switch (tok) {
         case vst::EMPTY_TOKEN:
             os << "EMPTY_TOKEN";
+            break;
+        case vst::VAR:
+            os << "VAR";
             break;
         case vst::BG:
             os << "BG";
@@ -26,8 +26,14 @@ std::ostream& vino::operator<<(std::ostream& os, const vino::ScriptToken& tok) {
         case vst::PERSONA:
             os << "PERSONA";
             break;
-        case vst::VAR:
-            os << "VAR";
+        case vst::TEXT_LINE:
+            os << "TEXT_LINE";
+            break;
+        case vst::NAME:
+            os << "NAME";
+            break;
+        case vst::PATH:
+            os << "PATH";
             break;
         case vst::NEW_LINE:
             os << "NEW_LINE";
@@ -44,14 +50,8 @@ std::ostream& vino::operator<<(std::ostream& os, const vino::ScriptToken& tok) {
         case vst::COMMA:
             os << "COMMA";
             break;
-        case vst::TEXT_LINE:
-            os << "TEXT_LINE";
-            break;
-        case vst::NAME:
-            os << "NAME";
-            break;
-        case vst::PATH:
-            os << "PATH";
+        case vst::DOT:
+            os << "DOT";
             break;
         case vst::EXIT:
             os << "EXIT";
