@@ -9,14 +9,14 @@
             | **text** *TEXT* <br>
             | **options** *VAR* **{** *VARS* **}**<br>
             | **if** **(** *VAR* **)** **then** *stmt*<br>
-            | **goto** *VAR* | *VAR* **:**
+            | **goto** *VAR* <br>
+            | *VAR* **:**
 
 *PERSMEM* -> *VAR* **.** *VAR* **=** *TEXTLINE*
 
 *PERSONA* -> *VAR* **{** *inside* **}** 
 
-*inside* -> *type* **=** *TEXTLINE* | *type* **=** *TEXTLINE* **,** 
-*N* *inside*
+*inside* -> *N* *type* **=** *TEXTLINE* | *N* *type* **=** *TEXTLINE* **,** *inside*
 
 *N* -> \n | ∅
 
