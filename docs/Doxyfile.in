@@ -23,6 +23,9 @@ STRIP_FROM_INC_PATH =
 # We generate the HTML documentation, so we only need HTML output
 GENERATE_XML = NO
 GENERATE_HTML = YES
-GENERATE_LATEX = NO
+GENERATE_LATEX = NO 
 XML_PROGRAMLISTING = NO
 CREATE_SUBDIRS = YES
+
+# Some additional settings
+EXTRACT_PRIVATE = YES

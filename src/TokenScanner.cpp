@@ -37,7 +37,7 @@ ScriptToken TokenScanner::is_keyword(const std::string &_str)
     return ScriptToken::EMPTY_TOKEN;
 }
 
-Pair_TokenID TokenScanner::check_var_or_keyword(std::string &_str, char ch)
+PairTokenId TokenScanner::check_var_or_keyword(std::string &_str, char ch)
 {
     _istream_ptr->putback(ch);
 
@@ -50,7 +50,7 @@ Pair_TokenID TokenScanner::check_var_or_keyword(std::string &_str, char ch)
     return {ScriptToken::VAR, _str};
 }
 
-Pair_TokenID TokenScanner::get_token()
+PairTokenId TokenScanner::get_token()
 {
     if (!_istream_ptr) throw NullPtrExc();
 
@@ -175,15 +175,15 @@ Pair_TokenID TokenScanner::get_token()
     return {ScriptToken::EXIT, ""};
 }
 
-std::vector<Pair_TokenID> TokenScanner::get_all_tokens(bool verbose)
+std::vector<PairTokenId> TokenScanner::get_all_tokens(bool verbose)
 {
-    std::vector<Pair_TokenID> tokens_vec;
+    std::vector<PairTokenId> tokens_vec;
 
     while (this->has_more_tokens()) {
-        Pair_TokenID new_token_pair = get_token();
-        if (verbose) std::cout << new_token_pair.first << '\n';
+        PairTokenId new_token_pair = get_token();
+        if (verbose) std::cout << new_token_pair.token << '\n';
         tokens_vec.push_back(new_token_pair);
-        if (new_token_pair.first == ScriptToken::EXIT) return tokens_vec;
+        if (new_token_pair.token == ScriptToken::EXIT) return tokens_vec;
     }
     return tokens_vec;
 }
@@ -212,7 +212,5 @@ inline void TokenScanner::set_input(std::ifstream &&input_file)
     _istream_ptr = std::make_unique<std::ifstream>(std::move(input_file));
     _cur_line = 0;
 }
-
-void TokenScanner::add_to_sym_table(const std::string &var) {}
 
 }  // namespace vino

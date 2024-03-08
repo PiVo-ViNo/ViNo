@@ -56,12 +56,12 @@ public:
 
     /// @throw tokenize_error
     /// @return ScriptToken (i.e. enum class)
-    Pair_TokenID get_token();
+    PairTokenId get_token();
 
     /// @brief Get all tokens in one step in case you don't want to bother
     /// @return rvalue reference to std::vector<ScriptToken>
     /// @throw tokenize_error() or any exception within std::vector
-    std::vector<Pair_TokenID> get_all_tokens(bool verbose = false);
+    std::vector<PairTokenId> get_all_tokens(bool verbose = false);
 
     /// @brief Get current position in the input stream
     /// @return -1 if false() is true, otherwise any integer
@@ -89,10 +89,7 @@ private:
 
     /// @brief Strings found in input is either keyword or variable name
     /// @param ch is the char that must be put back into istream
-    Pair_TokenID check_var_or_keyword(std::string &, char);
-
-    // dummy function for now
-    void add_to_sym_table(const std::string &var);
+    PairTokenId check_var_or_keyword(std::string &, char);
 };
 
 }  // namespace vino

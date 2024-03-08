@@ -11,6 +11,7 @@ UseTab: Never
 AccessModifierOffset: -4
 BreakConstructorInitializers: AfterColon
 AlignConsecutiveDeclarations: true 
+AllowShortFunctionsOnASingleLine: Inline
 PointerAlignment: Left
 BreakBeforeBraces: Custom
 BraceWrapping:

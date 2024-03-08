@@ -4,11 +4,21 @@
 persona Rin_std { path= "./rin", foreground = "rin_rude.png",
                 rude = "rin_rude.png", calm="rin_calm.png",
                 else="RIN_ELSE.png"}
+# player input
+options ur_name {Oleg, Olegus, Olegrunidy}
+# if statement possible
+if (ur_name = Olegus) then 
+background = "the end"
+exit
+endif
 background = "bg0.png"
 text "I am a stupid dog"
 text = "text.txt"
 foreground = Rin_std
 foreground = Rin_std.rude # the same one 
 background = "bg1.png"
+# define new member of Rin_std
+Rin_std.cute = "cute.png"
+foreground = Rin_std.cute
 foreground = Rin_std.else 
 exit

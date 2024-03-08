@@ -10,7 +10,6 @@
 #pragma once
 
 #include <ostream>
-#include <utility>
 
 namespace vino {
 
@@ -38,6 +37,13 @@ enum class ScriptToken {
 
 std::ostream &operator<<(std::ostream &os, const ScriptToken &tok);
 
-typedef std::pair<ScriptToken, std::string> Pair_TokenID;
+struct PairTokenId {
+    const ScriptToken token;
+    const std::string id;
+
+    PairTokenId(const ScriptToken& token, const std::string id) :
+        token(token), id(id)
+    {}
+};
 
 }  // namespace vino

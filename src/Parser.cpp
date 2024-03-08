@@ -5,14 +5,13 @@
 //                              //  |        | |        | |        |         //
 //                              //   \__  __/   \__  __/   \__  __/          //
 //                              //|^|^|^\ \^|^|^|^/ /^|^|^|^|^\ \^|^|^|^|^|^|//
-//                              //| | | |\ \| | |/ /| | | | | | \ \ | | | | |//
-// (c) Andrjusha (aka SibJusha) //| | | / / | | |\ \| | | | | |/ /| | | | | |//
-//                              //| | | \/| | | | \/| | | | | |\/ | | | | | |//
+//                              //| | | |\ \| | |/ /| | | | | |\ \ | | | | | //
+// (c) Andrjusha (aka SibJusha) //| | |  / / | | \ \| | | | | |/ /| | | | | |//
+//                              //| | |  \/| | |  \/| | | | | |\/ | | | | | |//
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
-#include <stdexcept>
-#include <vector>
+#include <memory>
 
 #if __cpp_lib_format
 #include <format>
@@ -26,21 +25,27 @@ namespace vino {
 
 using st = ScriptToken;
 
-inline Pair_TokenID &Parser::cur_tok() { return _tokens_l.at(_pos); }
+inline void Parser::set_current_tok()
+{
+    _cur_tok = std::make_unique<PairTokenId>(get_tok_f());
+}
 
-inline Pair_TokenID &Parser::popout() { return _tokens_l.at(_pos++); }
+inline void Parser::set_next_tok()
+{
+    _next_tok = std::make_unique<PairTokenId>(get_tok_f());
+}
+// inline PairTokenId &Parser::popout() { return _tokens_l.at(_pos++); }
 
 inline void Parser::match(const ScriptToken &_tok)
 {
-    Pair_TokenID _cur_tok = popout();
-
+    set_current_tok();
     if (_verb) {
         std::cout << "match"
                   << "\t";
         std::cout << _tok << "\t";
-        std::cout << _cur_tok.first << "\n";
+        std::cout << _cur_tok->token << "\n";
     }
-    if (_cur_tok.first != _tok) {
+    if (_cur_tok->token != _tok) {
 #if __cpp_lib_format
         throw ParsingError(
             std::format("Parsing error on line {}\n", _cur_line));
@@ -51,107 +56,173 @@ inline void Parser::match(const ScriptToken &_tok)
     }
 }
 
-void Parser::script()
+inline void Parser::match_cur(const ScriptToken &_tok)
 {
     if (_verb) {
-        std::cout << "script" << _pos << " ";
+        std::cout << "match"
+                  << "\t";
+        std::cout << _tok << "\t";
+        std::cout << _next_tok->token << "\n";
     }
-    while (cur_tok().first != st::EXIT) {
-        stmt();
-    }
-}
-
-void Parser::stmt()
-{
-    Pair_TokenID _tok = popout();
-
-    if (_verb) {
-        std::cout << "stmt\t" << _pos << "\t" << _tok.first << "\n";
-    }
-
-    switch (_tok.first) {
-        case st::PERSONA:
-            match(st::VAR);
-            match(st::BRACE_OP);
-            inside();
-            match(st::BRACE_CL);
-            break;
-
-        case st::BG:
-            match(st::SIGN_EQ);
-            match(st::TEXT_LINE);
-            break;
-
-        case st::FG:
-            match(st::SIGN_EQ);
-            if (cur_tok().first == st::VAR) {
-                _pos++;
-                match(st::DOT);
-                match(st::VAR);
-            }
-            match(st::TEXT_LINE);
-            break;
-
-        case st::TEXT_TYPE:
-            if (_verb) {
-                std::cout << cur_tok().first << " ";
-            }
-            if (cur_tok().first == st::SIGN_EQ) {
-                _pos++;
-                match(st::TEXT_LINE);
-            } else {
-                match(st::TEXT_LINE);
-            }
-            break;
-
-        case st::NEW_LINE:
-            _cur_line++;
-            return;
-
-        default:
-            throw ParsingError("Stmt error\n");
-            break;
-    }
-
-    match(st::NEW_LINE);
-    _cur_line++;
-}
-
-void Parser::inside()
-{
-    try {
-        type();
-        match(st::SIGN_EQ);
-        match(st::TEXT_LINE);
-
-        while (popout().first == st::COMMA) {
-            if (cur_tok().first == st::NEW_LINE) _pos++;
-            type();
-            match(st::SIGN_EQ);
-            match(st::TEXT_LINE);
-        }
-        _pos--;
-
-    } catch (std::out_of_range &) {
+    if (_next_tok->token != _tok) {
 #if __cpp_lib_format
         throw ParsingError(
-            std::format("Inside braces error at line {}\n", _cur_line));
+            std::format("Parsing error on line {}\n", _cur_line));
 #else
-        throw ParsingError("Inside braces error at line " +
+        throw ParsingError("Parsing error on line " +
                            std::to_string(_cur_line) + "\n");
 #endif
     }
 }
-// changes : now BG can't be tied to PERSONA, but different VARs as subs can
-inline void Parser::type()
+
+inline ScriptAst Parser::script()
 {
-    Pair_TokenID _tok = popout();
+    ScriptAst ast;
+
     if (_verb) {
-        std::cout << _tok.first << "\t" << _pos << "\n";
+        std::cout << "script\t";
     }
-    if (_tok.first == st::FG || _tok.first == st::PATH ||
-        _tok.first == st::NAME || _tok.first == st::VAR) {
-        return;
+
+    std::shared_ptr<StmtAst> cur_stmt;
+    cur_stmt = std::make_shared<StmtAst>(stmt());
+    ast.stmt = cur_stmt;
+    cur_stmt = cur_stmt->next_stmt;
+    while (_cur_tok->token != st::EXIT) {
+        // exchange cur_stmt
+        cur_stmt = std::make_shared<StmtAst>(stmt());
+        cur_stmt = cur_stmt->next_stmt;
+    }
+    ExitAst exit;
+    cur_stmt = std::make_shared<StmtAst>();
+    // ast.ex = std::make_unique<ExitAst>();
+    return ast;
+}
+
+StmtAst Parser::stmt()
+{
+    set_current_tok();
+    while (_cur_tok->token == st::NEW_LINE) set_current_tok();
+    StmtAst main_stmt;
+
+    if (_verb) {
+        std::cout << "stmt\t" << _cur_tok->token << "\n";
+    }
+
+    switch (_cur_tok->token) {
+        case st::PERSONA: {
+            match(st::VAR);
+            PersonaAst persona_stmt(_cur_tok->id);
+            match(st::BRACE_OP);
+            persona_stmt.inside = std::make_unique<InsideAst>(inside());
+            match(st::BRACE_CL);
+            main_stmt.expr = std::make_unique<BasicAst>(persona_stmt);
+            break;
+        }
+        case st::VAR: {
+            const std::string p_name = _cur_tok->id;
+            match(st::DOT);
+            match(st::VAR);
+            const std::string memb_name = _cur_tok->id;
+            match(st::SIGN_EQ);
+            match(st::TEXT_LINE);
+            PersonaVarAst pers_var(std::move(p_name), std::move(memb_name),
+                                   std::move(_cur_tok->id));
+            main_stmt.expr = std::make_unique<BasicAst>(pers_var);
+            break;
+        }
+        case st::BG: {
+            match(st::SIGN_EQ);
+            match(st::TEXT_LINE);
+            BackFileAst bg(_cur_tok->id);
+            main_stmt.expr = std::make_unique<BasicAst>(bg);
+            break;
+        }
+        case st::FG: {
+            match(st::SIGN_EQ);
+            set_current_tok();
+            if (_cur_tok->token == st::VAR) {
+                const std::string p_name(std::move(_cur_tok->id));
+                set_current_tok();
+                if (_cur_tok->token == st::DOT) {
+                    match(st::VAR);
+                    ForePersonaAst fg_pers(std::move(p_name),
+                                           std::move(_cur_tok->id));
+                    main_stmt.expr = std::make_unique<BasicAst>(fg_pers);
+                    break;
+                }
+                match_cur(st::NEW_LINE);
+                ForePersonaAst fg_pers(std::move(p_name), "foreground");
+                main_stmt.expr = std::make_unique<BasicAst>(fg_pers);
+                return main_stmt;
+            }
+            match(st::TEXT_LINE);
+            ForeFileAst fg_file(std::move(_cur_tok->id));
+            main_stmt.expr = std::make_unique<BasicAst>(fg_file);
+            break;
+        }
+        case st::TEXT_TYPE: {
+            set_current_tok();
+            if (_cur_tok->token == st::SIGN_EQ) {
+                match(st::TEXT_LINE);
+                TextFileAst txt_file(std::move(_cur_tok->id));
+                main_stmt.expr = std::make_unique<BasicAst>(txt_file);
+            } else {
+                match_cur(st::TEXT_LINE);
+                TextLineAst txt_data(std::move(_cur_tok->id));
+                main_stmt.expr = std::make_unique<BasicAst>(txt_data);
+            }
+            break;
+        }
+        case st::EXIT: {
+            main_stmt.expr = std::make_unique<ExitAst>();
+            return main_stmt;
+        }
+        default:
+            throw ParsingError("Stmt error on line" +
+                               std::to_string(_cur_line));
+    }
+
+    match(st::NEW_LINE);
+    _cur_line++;
+    return main_stmt;
+}
+
+InsideAst Parser::inside()
+{
+    InsideAst main_inside;
+    set_current_tok();
+    if (_cur_tok->token == st::NEW_LINE) set_current_tok();
+    main_inside.memb_type = std::make_unique<InsTypeAst>(type());
+    match(st::SIGN_EQ);
+    match(st::TEXT_LINE);
+    main_inside.memb_type->str_param = std::move(_cur_tok->id);
+
+    std::shared_ptr<InsideAst> cur_inside = main_inside.next;
+    set_current_tok();
+    while (_cur_tok->token == st::COMMA) {
+        set_current_tok();
+        if (_cur_tok->token == st::NEW_LINE) set_current_tok();
+        cur_inside->memb_type = std::make_unique<InsTypeAst>(type());
+        match(st::SIGN_EQ);
+        match(st::TEXT_LINE);
+        cur_inside->memb_type->str_param = std::move(_cur_tok->id);
+
+        cur_inside = cur_inside->next;
+        set_current_tok();
+    }
+    
+    return main_inside;
+}
+// changes : now BG can't be tied to PERSONA, but different VARs as subs can
+// also it checks not next, but current token
+inline InsTypeAst Parser::type()
+{
+    if (_verb) {
+        std::cout << _cur_tok->token << "\t";
+    }
+    if (_cur_tok->token == st::FG || _cur_tok->token == st::PATH ||
+        _cur_tok->token == st::NAME || _cur_tok->token == st::VAR) {
+        return InsTypeAst(std::move(*_cur_tok));
     }
 #if __cpp_lib_format
     throw ParsingError(
@@ -166,20 +237,16 @@ inline void Parser::type()
 #endif
 }
 
-void Parser::set_input(const std::vector<Pair_TokenID> &vec_tokens)
+void Parser::set_input(func_type get_token_function)
 {
-    _tokens_l = vec_tokens;
+    get_tok_f = get_token_function;
     _cur_line = 0;
-    _pos = 0;
 }
 
-void Parser::run(bool verbose)
+ScriptAst Parser::run(bool verbose)
 {
     _verb = verbose;
-    if (_tokens_l.empty()) {
-        throw ParsingError("Vector of tokens is not defined for this parser\n");
-    }
-    script();
+    return script();
 }
 
 }  // namespace vino

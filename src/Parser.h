@@ -11,60 +11,77 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
 #include <vector>
 
+#include "AST.h"
 #include "TokenEnum.h"
 
 namespace vino {
 
 /**
- @brief Analyzes the syntax of input vector<ScriptToken>
- @details Parser checks whether the vector of ScriptTokens, into which
- the input file/stream is divided by TokenScanner, is in compliance with
+ @brief Analyzes the syntax of input `vector<ScriptToken>`
+ @details Parser checks whether the vector of `ScriptTokens`, into which
+ the input file/stream is divided by `TokenScanner`, is in compliance with
  syntax rules of ViNo Scripting Language.\n
-
  Soon: iterators instead of only vector.
- Usage: parser.run()
+ Usage: `parser.run()`
+ @param get_token `std::function<PairTokenId>` which provide interface to get
+ single token, it must not throw error if the end of input is reached, but
+ simply give EXIT
 */
 class Parser {
 public:
-    Parser() {}
+    using func_type = std::function<PairTokenId()>;
+    using token_ptr = std::unique_ptr<PairTokenId>;
 
-    explicit Parser(const std::vector<Pair_TokenID> &vec_tokens) :
-        _tokens_l(vec_tokens)
+    explicit Parser(func_type get_token_function) :
+        get_tok_f(get_token_function)
     {
     }
 
     Parser(Parser &) = delete;
 
-    Parser(Parser &&_p) : _tokens_l(std::move(_p._tokens_l)) {}
+    Parser(Parser &&_p) :
+        _cur_tok(std::move(_p._cur_tok)),
+        _next_tok(std::move(_p._next_tok)),
+        get_tok_f(std::move(_p.get_tok_f))
+    {
+    }
+
+    Parser &operator=(const Parser &) = delete;
 
     //---------------Interface-------------------------------
 
     /**
     @brief Start parsing the tokens, checks if syntax is correct.
+    @return AbstractSyntaxTree (root)
     @throw parsing_error() if syntax is incorrect
     @param verbose true: recommended only while debugging
     @warning in case PERSONA's braces have a new line symbol inside,
     Parser will delete them as it is just one line :
-        persona {\n} --> persona {}
+        @code persona {\n} --> persona {} @endcode
     */
-    void run(bool verbose = false);
+    ScriptAst run(bool verbose = false);
 
     /**
     @brief Set new input, nullifies current line.
-    @throw exception() if vec_tokens cannot be copied
+    @throw exception() if `vec_tokens` cannot be copied
     */
-    void set_input(const std::vector<Pair_TokenID> &vec_tokens);
+    void set_input(func_type get_token_function);
 
 private:
-    std::vector<Pair_TokenID> _tokens_l{};
-    std::size_t               _pos = 0;
-    std::size_t               _cur_line = 0;
-    bool                      _verb = false;
+    token_ptr   _cur_tok{};
+    token_ptr   _next_tok{};
+    func_type   get_tok_f;
+    std::size_t _cur_line = 0;
+    bool        _verb = false;
 
     //----------Private Methods----------------------------------
     //------------------------------------------------------------
+
+    void actual_run(bool sym_table_set, bool verbose);
 
     /**
     @defgroup grammar Context-free Grammar constructions
@@ -73,35 +90,40 @@ private:
     it checks whether the tokens array follows the set pattern.
     Checks the file grammar_ideas.txt for a more formal definition.
     */
-    void script();
+    inline ScriptAst script();
 
-    void stmt();
+    StmtAst stmt();
 
-    inline void inside();
+    InsideAst inside();
 
-    inline void type();
+    inline InsTypeAst type();
     /** @} */
 
     //-----------Utility Methods--------------------------------
 
     /**
-    @brief Checks whether the token on position _pos is equal to _tok
+    @brief Checks whether the token on position `_pos` is equal to `_tok` and
+    increase `_pos`
+    @return `{ScriptToken, ID}` of the matched token
     @throw parsing_error() in case it's not equal
     */
     inline void match(const ScriptToken &);
 
-    /**
-    @brief Get the token on current position (_pos)
-    @return ScriptToken from vector _tokens_l
-    */
-    inline Pair_TokenID &cur_tok();
+    inline void match_cur(const ScriptToken &);
 
     /**
-    @brief Get the token on current position (_pos) and
-    move _pos on next token (_pos+1)
-    @return ScriptToken from vector _tokens_l
+    @brief Get the token on current position (`_pos`)
+    @return ScriptToken from vector `_tokens_l`
     */
-    inline Pair_TokenID &popout();
+    inline void set_current_tok();
+    inline void set_next_tok();
+
+    /**
+    @brief Get the token on current position (`_pos`) and
+    move `_pos` on next token (`_pos+1`)
+    @return ScriptToken from vector `_tokens_l`
+    */
+    inline PairTokenId &popout();
 };
 
 }  // namespace vino
