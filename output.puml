@@ -1,0 +1,503 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+namespace vino {
+	class NullPtrExc {
+		+what() : char* {query}
+	}
+
+	class Parser {
+		+Parser(function<PairTokenId ( )> get_token_function)
+		+Parser(Parser&& _p)
+		-type() : InsTypeAst
+		-inside() : InsideAst
+		+run(bool verbose) : ScriptAst
+		-script() : ScriptAst
+		-stmt() : StmtAst
+		-_verb : bool
+		-get_tok_f : function<PairTokenId ( )>
+		-_cur_line : std::size_t
+		-actual_run(bool sym_table_set, bool verbose) : void
+		-match(const ScriptToken &) : void
+		-match_cur(const ScriptToken &) : void
+		-set_current_tok() : void
+		+set_input(function<PairTokenId ( )> get_token_function) : void
+	}
+
+	class ParsingError {
+		+ParsingError(const std::string& errstr)
+		+ParsingError()
+		+what() : char* {query}
+		-what_str : std::string
+	}
+
+	class Persona {
+		+Persona(const std::string& name, const std::string& path)
+		+Persona(const std::string& name)
+		+Persona()
+		+Persona(const Persona& other)
+		+Persona(Persona&& other)
+		+~Persona()
+		+add_fg_var(const std::string& member_name, const std::string& path_value) : bool
+		+add_fg_var(std::string&& member_name, std::string&& path_value) : bool
+		+set_main_fg(const std::string &) : bool
+		+set_name(const std::string &) : bool
+		+set_path(const std::string &) : bool
+		-_main_fg : std::string
+		-_name : std::string
+		-_path : std::string
+		+get_fg(const std::string& id) : std::string {query}
+		+get_name() : std::string {query}
+		+get_path() : std::string {query}
+		+rm_fg_var(const std::string &) : void
+	}
+
+	class SemanticAnalyzer {
+		+SemanticAnalyzer(SymbolTableEnv& symb_table, const ScriptAst& ast)
+		+SemanticAnalyzer(SymbolTableEnv&& symb_table, ScriptAst&& ast)
+		-_ast : ScriptAst
+		-_env : SymbolTableEnv&
+		-_verbose : bool
+		+run_analysis(bool verbose) : void
+		+set_ast(const ScriptAst &) : void
+		+set_ast(ScriptAst& &) : void
+		+set_symbol_table(const SymbolTableEnv &) : void
+		+set_symbol_table(SymbolTableEnv& &) : void
+	}
+
+	class SemanticError {
+		+SemanticError(const std::string& errstr)
+		+SemanticError()
+		+what() : char* {query}
+		-what_str : std::string
+	}
+
+	class SymbolTableEnv {
+		+SymbolTableEnv()
+		+SymbolTableEnv(const SymbolTableEnv& other)
+		+add_persona(const std::string &) : Persona&
+		+get_persona(const std::string& persona_id) : Persona&
+		+add_info_to(const std::string& persona_id, const std::string& member_id, const std::string& member_parameter) : bool
+		+exists(const std::string &) : bool
+		-_chain_env : std::deque<SymbolTable>
+	}
+
+	class TokenScanner {
+		+TokenScanner()
+		+TokenScanner(std::ifstream&& in_filestream)
+		+TokenScanner(std::string&& input_string)
+		+TokenScanner(TokenScanner&& other)
+		-check_var_or_keyword(std::string &, char) : PairTokenId
+		+get_token() : PairTokenId
+		-is_keyword(const std::string &) : ScriptToken
+		+has_more_tokens() : bool
+		-scan_whole_strs : bool
+		-_cur_line : std::size_t
+		+position() : std::size_t
+		-_istream_ptr : std::unique_ptr<std::istream>
+		-_prev_istream_ptr : std::unique_ptr<std::istream>
+		+get_all_tokens(bool verbose) : std::vector<PairTokenId>
+		+scan_strings_whole() : void
+		+set_input(std::string& &) : void
+		+set_input(std::ifstream& &) : void
+	}
+
+	class TokenizeError {
+		+TokenizeError(std::string errstr)
+		+TokenizeError()
+		+what() : char* {query}
+		-what_str : std::string
+	}
+
+	enum ScriptToken {
+		BG
+		BRACE_CL
+		BRACE_OP
+		COMMA
+		DOT
+		EMPTY_TOKEN
+		EXIT
+		FG
+		NAME
+		NEW_LINE
+		PATH
+		PERSONA
+		PUT
+		SIGN_EQ
+		TEXT_LINE
+		TEXT_TYPE
+		VAR
+	}
+
+	class BackFileAst {
+		+BackFileAst(const std::string& path_to_bg)
+		+BackFileAst(std::string&& path_to_bg)
+		+path_bg : const std::string
+		+accept(const Visitor& visitor) : void
+	}
+
+	abstract class BasicAst {
+		+{abstract} accept(const Visitor& visitor) : void
+	}
+
+	class ExitAst {
+		+accept(const Visitor& visitor) : void
+	}
+
+	class ForeFileAst {
+		+ForeFileAst(const std::string& path_to_fg)
+		+ForeFileAst(std::string&& path_to_fg)
+		+path_fg : const std::string
+		+accept(const Visitor& visitor) : void
+	}
+
+	class ForePersonaAst {
+		+ForePersonaAst(const std::string& persona_name, const std::string& member_name)
+		+ForePersonaAst(std::string&& persona_name, std::string&& member_name)
+		+memb_name : const std::string
+		+p_id : const std::string
+		+accept(const Visitor& visitor) : void
+	}
+
+	class InsTypeAst {
+		+InsTypeAst(const PairTokenId& token, const std::string& parameter)
+		+InsTypeAst(PairTokenId&& token)
+		+InsTypeAst(PairTokenId&& token, std::string&& parameter)
+		+lexem : PairTokenId
+		+str_param : std::string
+		+accept(const Visitor& visitor) : void
+	}
+
+	class InsideAst {
+		+InsideAst()
+		+next : std::shared_ptr<InsideAst>
+		+memb_type : std::unique_ptr<InsTypeAst>
+		+accept(const Visitor& visitor) : void
+	}
+
+	class PairTokenId {
+		+PairTokenId(const ScriptToken& token, const std::string id)
+		+token : const ScriptToken
+		+id : const std::string
+	}
+
+	class PersonaAst {
+		+PersonaAst(const std::string& persona_name_var)
+		+p_id : const std::string
+		+inside : std::shared_ptr<InsideAst>
+		+accept(const Visitor& visitor) : void
+	}
+
+	class PersonaVarAst {
+		+PersonaVarAst(const std::string& persona_name, const std::string& member_name, const std::string& textline)
+		+PersonaVarAst(std::string&& persona_name, std::string&& member_name, std::string&& textline)
+		+memb_id : const std::string
+		+p_id : const std::string
+		+param : const std::string
+		+accept(const Visitor& visitor) : void
+	}
+
+	class ScriptAst {
+		+ScriptAst()
+		+ScriptAst(StmtAst* nextAst)
+		+stmt : std::shared_ptr<StmtAst>
+		+accept(const Visitor& visitor) : void
+	}
+
+	class StmtAst {
+		+StmtAst()
+		+StmtAst(BasicAst* stmt_expr)
+		+next_stmt : std::shared_ptr<StmtAst>
+		+expr : std::unique_ptr<BasicAst>
+		+accept(const Visitor& visitor) : void
+	}
+
+	class TextFileAst {
+		+TextFileAst(const std::string& path_to_txt)
+		+TextFileAst(std::string&& path_to_txt)
+		+path_txt : const std::string
+		+accept(const Visitor& visitor) : void
+	}
+
+	class TextLineAst {
+		+TextLineAst(const std::string& text)
+		+TextLineAst(std::string&& text)
+		+text : const std::string
+		+accept(const Visitor& visitor) : void
+	}
+
+	class Visitor {
+		+Visitor(SymbolTableEnv& symb_table_env)
+		+env_reference : SymbolTableEnv&
+		+analyze(ExitAst*) : void {query}
+		+analyze(ScriptAst*) : void {query}
+		+analyze(StmtAst*) : void {query}
+		+analyze(PersonaAst*) : void {query}
+		+analyze(InsideAst*) : void {query}
+		+analyze(InsTypeAst*) : void {query}
+		+analyze(PersonaVarAst*) : void {query}
+		+analyze(BackFileAst*) : void {query}
+		+analyze(ForeFileAst*) : void {query}
+		+analyze(ForePersonaAst*) : void {query}
+		+analyze(TextLineAst*) : void {query}
+		+analyze(TextFileAst*) : void {query}
+		+true_analyze(InsTypeAst*, Persona &) : void {query}
+	}
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+vino.BasicAst <|-- vino.BackFileAst
+
+
+vino.BasicAst <|-- vino.ExitAst
+
+
+vino.BasicAst <|-- vino.ForeFileAst
+
+
+vino.BasicAst <|-- vino.ForePersonaAst
+
+
+vino.BasicAst <|-- vino.InsTypeAst
+
+
+vino.BasicAst <|-- vino.InsideAst
+
+
+vino.BasicAst <|-- vino.PersonaAst
+
+
+vino.BasicAst <|-- vino.PersonaVarAst
+
+
+vino.BasicAst <|-- vino.ScriptAst
+
+
+vino.BasicAst <|-- vino.StmtAst
+
+
+vino.BasicAst <|-- vino.TextFileAst
+
+
+vino.BasicAst <|-- vino.TextLineAst
+
+
+
+
+
+/' Aggregation relationships '/
+
+vino.InsTypeAst *-- vino.PairTokenId
+
+
+vino.InsideAst *-- vino.InsTypeAst
+
+
+vino.InsideAst *-- vino.InsideAst
+
+
+vino.PairTokenId *-- vino.ScriptToken
+
+
+vino.Parser *-- vino.PairTokenId
+
+
+vino.PersonaAst *-- vino.InsideAst
+
+
+vino.ScriptAst *-- vino.StmtAst
+
+
+vino.SemanticAnalyzer *-- vino.ScriptAst
+
+
+vino.SemanticAnalyzer *-- vino.SymbolTableEnv
+
+
+vino.StmtAst *-- vino.BasicAst
+
+
+vino.StmtAst *-- vino.StmtAst
+
+
+vino.Visitor *-- vino.SymbolTableEnv
+
+
+
+
+
+
+/' Dependency relationships '/
+
+vino.BackFileAst <.. vino.Visitor
+
+
+vino.BasicAst <.. vino.StmtAst
+
+
+vino.ExitAst <.. vino.Visitor
+
+
+vino.ForeFileAst <.. vino.Visitor
+
+
+vino.InsTypeAst <.. vino.Visitor
+
+
+vino.InsTypeAst <.. vino.Visitor
+
+
+vino.InsideAst <.. vino.Visitor
+
+
+vino.PairTokenId <.. vino.InsTypeAst
+
+
+vino.PairTokenId <.. vino.InsTypeAst
+
+
+vino.PairTokenId <.. vino.InsTypeAst
+
+
+vino.PairTokenId <.. vino.Parser
+
+
+vino.PairTokenId <.. vino.Parser
+
+
+vino.Parser <.. vino.Parser
+
+
+vino.Persona <.. vino.Persona
+
+
+vino.Persona <.. vino.Persona
+
+
+vino.Persona <.. vino.Visitor
+
+
+vino.PersonaAst <.. vino.Visitor
+
+
+vino.PersonaAst <.. vino.Visitor
+
+
+vino.PersonaVarAst <.. vino.Visitor
+
+
+vino.ScriptAst <.. vino.SemanticAnalyzer
+
+
+vino.ScriptAst <.. vino.SemanticAnalyzer
+
+
+vino.ScriptAst <.. vino.SemanticAnalyzer
+
+
+vino.ScriptAst <.. vino.SemanticAnalyzer
+
+
+vino.ScriptAst <.. vino.Visitor
+
+
+vino.ScriptToken <.. vino.PairTokenId
+
+
+vino.ScriptToken <.. vino.Parser
+
+
+vino.ScriptToken <.. vino.Parser
+
+
+vino.StmtAst <.. vino.ScriptAst
+
+
+vino.StmtAst <.. vino.Visitor
+
+
+vino.SymbolTableEnv <.. vino.SemanticAnalyzer
+
+
+vino.SymbolTableEnv <.. vino.SemanticAnalyzer
+
+
+vino.SymbolTableEnv <.. vino.SemanticAnalyzer
+
+
+vino.SymbolTableEnv <.. vino.SemanticAnalyzer
+
+
+vino.SymbolTableEnv <.. vino.SymbolTableEnv
+
+
+vino.SymbolTableEnv <.. vino.Visitor
+
+
+vino.TextFileAst <.. vino.Visitor
+
+
+vino.TextLineAst <.. vino.Visitor
+
+
+vino.TokenScanner <.. vino.TokenScanner
+
+
+vino.Visitor <.. vino.BackFileAst
+
+
+vino.Visitor <.. vino.BasicAst
+
+
+vino.Visitor <.. vino.ExitAst
+
+
+vino.Visitor <.. vino.ForeFileAst
+
+
+vino.Visitor <.. vino.ForePersonaAst
+
+
+vino.Visitor <.. vino.InsTypeAst
+
+
+vino.Visitor <.. vino.InsideAst
+
+
+vino.Visitor <.. vino.PersonaAst
+
+
+vino.Visitor <.. vino.PersonaVarAst
+
+
+vino.Visitor <.. vino.ScriptAst
+
+
+vino.Visitor <.. vino.StmtAst
+
+
+vino.Visitor <.. vino.TextFileAst
+
+
+vino.Visitor <.. vino.TextLineAst
+
+
+
+
+
+
+/' Nested objects '/
+
+
+
+@enduml
