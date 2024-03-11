@@ -1,30 +1,69 @@
-#include "Persona.h"
-
 #include <string>
 
+#include "Persona.h"
 
 namespace vino {
 
-constexpr bool Persona::operator==(const Persona& rhs)
+std::string Persona::get_name() const noexcept
 {
-    return (this->_name == rhs._name);
+    return _name;
 }
 
-inline std::string Persona::get_name() const noexcept { return _name; }
-
-void Persona::add_fg_var(const std::string& title_key,
-                         const std::string& path_value)
+std::string Persona::get_path() const noexcept
 {
-    _fgs_title_path.emplace(title_key, path_value);
+    return _path;
 }
 
-void Persona::add_fg_var(std::string&& title_key, std::string&& path_value) 
+bool Persona::set_path(const std::string& path) noexcept
 {
-    _fgs_title_path.emplace(title_key, path_value);
+    if (!_path.empty()) {
+        return false;
+    }
+    _path = path;
+    return true;
 }
 
-void Persona::rm_fg_var(const std::string& title_key) {
-    _fgs_title_path.erase(title_key);
+bool Persona::set_name(const std::string& name) noexcept
+{
+    if (_name.empty()) {
+        _name = name;
+        return true;
+    }
+    return false;
 }
 
+bool Persona::set_main_fg(const std::string& main_fg_path) noexcept
+{
+    if (_main_fg.empty()) {
+        _main_fg = main_fg_path;
+        return true;
+    }
+    return false;
+}
+
+bool Persona::add_fg_var(const std::string& member_name,
+                                const std::string& path_value)
+{
+    return _fgs_member_path.emplace(member_name, path_value).second;
+}
+
+bool Persona::add_fg_var(std::string&& member_name,
+                                std::string&& path_value)
+{
+    return _fgs_member_path.emplace(member_name, path_value).second;
+}
+
+void Persona::rm_fg_var(const std::string& member_name)
+{
+    _fgs_member_path.erase(member_name);
+}
+
+std::string Persona::get_fg(const std::string& id) const noexcept
+{
+    auto fg_it = _fgs_member_path.find(id);
+    if (fg_it == _fgs_member_path.end()) {
+        return "";
+    }
+    return fg_it->second;
+}
 }  // namespace vino

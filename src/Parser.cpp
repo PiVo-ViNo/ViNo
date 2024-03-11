@@ -101,7 +101,9 @@ inline ScriptAst Parser::script()
 StmtAst Parser::stmt()
 {
     set_current_tok();
-    while (_cur_tok->token == st::NEW_LINE) set_current_tok();
+    while (_cur_tok->token == st::NEW_LINE) {
+        set_current_tok();
+    }
     StmtAst main_stmt;
 
     if (_verb) {
@@ -191,26 +193,38 @@ InsideAst Parser::inside()
 {
     InsideAst main_inside;
     set_current_tok();
-    if (_cur_tok->token == st::NEW_LINE) set_current_tok();
+    if (_cur_tok->token == st::BRACE_CL) {
+        return main_inside;
+    }
+    if (_cur_tok->token == st::NEW_LINE) {
+        set_current_tok();
+    }
+
     main_inside.memb_type = std::make_unique<InsTypeAst>(type());
+
     match(st::SIGN_EQ);
     match(st::TEXT_LINE);
     main_inside.memb_type->str_param = std::move(_cur_tok->id);
 
-    std::shared_ptr<InsideAst> cur_inside = main_inside.next;
+    std::shared_ptr<InsideAst> cur_inside(&main_inside);
+
     set_current_tok();
     while (_cur_tok->token == st::COMMA) {
+        cur_inside->next = std::make_shared<InsideAst>();
+        cur_inside = cur_inside->next;
+
         set_current_tok();
-        if (_cur_tok->token == st::NEW_LINE) set_current_tok();
+        if (_cur_tok->token == st::NEW_LINE) {
+            set_current_tok();
+        }
         cur_inside->memb_type = std::make_unique<InsTypeAst>(type());
         match(st::SIGN_EQ);
         match(st::TEXT_LINE);
         cur_inside->memb_type->str_param = std::move(_cur_tok->id);
 
-        cur_inside = cur_inside->next;
         set_current_tok();
     }
-    
+
     return main_inside;
 }
 // changes : now BG can't be tied to PERSONA, but different VARs as subs can

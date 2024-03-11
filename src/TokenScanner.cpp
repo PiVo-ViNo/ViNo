@@ -45,8 +45,6 @@ PairTokenId TokenScanner::check_var_or_keyword(std::string &_str, char ch)
     if (new_token != ScriptToken::EMPTY_TOKEN) {
         return {new_token, ""};
     }
-    // it must be done a few levels higher in callstack
-    // add_to_sym_table(_str);
     return {ScriptToken::VAR, _str};
 }
 

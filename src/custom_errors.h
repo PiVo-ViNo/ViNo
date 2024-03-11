@@ -22,7 +22,9 @@ public:
     explicit TokenizeError(std::string errstr) noexcept : what_str(errstr) {}
 
     TokenizeError() noexcept :
-        TokenizeError("Error while tokenizing script file;") {}
+        TokenizeError("Error while tokenizing script file;\n")
+    {
+    }
 
     const char *what() const noexcept { return what_str.c_str(); }
 };
@@ -31,8 +33,9 @@ class ParsingError : public std::exception {
     std::string what_str;
 
 public:
-    explicit ParsingError(const std::string &errstr) noexcept :
-        what_str(errstr) {}
+    explicit ParsingError(const std::string &errstr) noexcept : what_str(errstr)
+    {
+    }
 
     ParsingError() noexcept : ParsingError("Error while parsing tokens;") {}
 
@@ -41,9 +44,24 @@ public:
 
 class NullPtrExc : public std::exception {
 public:
-    const char *what() const noexcept {
-        return "Error: dereferencing nullptr\n";
+    const char *what() const noexcept
+    {
+        return "Error: dereferencing nullptr;\n";
     }
+};
+
+class SemanticError : public std::exception {
+    std::string what_str;
+
+public:
+    explicit SemanticError(const std::string &errstr) noexcept :
+        what_str(errstr)
+    {
+    }
+
+    SemanticError() noexcept : SemanticError("Error in semantics;\n") {}
+
+    const char *what() const noexcept { return what_str.c_str(); }
 };
 
 }  // namespace vino
