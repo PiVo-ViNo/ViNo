@@ -10,28 +10,26 @@
 #include "SemanticAnalyzer.h"
 
 #include <iostream>
-#include <memory>
-
 
 namespace vino {
 
-inline void SemanticAnalyzer::set_symbol_table(
+void SemanticAnalyzer::set_symbol_table(
     const SymbolTableEnv& symb_table_env)
 {
     _env = symb_table_env;
 }
 
-inline void SemanticAnalyzer::set_symbol_table(SymbolTableEnv&& symb_table_env)
+void SemanticAnalyzer::set_symbol_table(SymbolTableEnv&& symb_table_env)
 {
     _env = symb_table_env;
 }
 
-inline void SemanticAnalyzer::set_ast(const ScriptAst& ast)
+void SemanticAnalyzer::set_ast(const ScriptAst& ast)
 {
     _ast = ast;
 }
 
-inline void SemanticAnalyzer::set_ast(ScriptAst&& ast)
+void SemanticAnalyzer::set_ast(ScriptAst&& ast)
 {
     _ast = ast;
 }
@@ -45,12 +43,8 @@ void SemanticAnalyzer::run_analysis(bool verbose)
 
     _verbose = verbose;
 
-    std::shared_ptr<StmtAst> cur_stmt = _ast.stmt;
-    cur_stmt->analyze();
-    while (cur_stmt->next_stmt != nullptr) {
-        cur_stmt = cur_stmt->next_stmt;
-        cur_stmt->analyze();
-    }
+    Visitor anal_visitor(this->_env);
+    anal_visitor.analyze(&_ast);
 
     _verbose = false;
 }

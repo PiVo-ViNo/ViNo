@@ -86,15 +86,3 @@ private:
 };
 
 }  // namespace vino
-
-namespace std {
-
-template <>
-struct hash<vino::Persona> {
-    std::size_t operator()(const vino::Persona& persona) const noexcept
-    {
-        return std::hash<std::string>{}(persona.get_name());
-    }
-};
-
-}  // namespace std

@@ -33,14 +33,14 @@ struct Visitor {
     {
     }
 
-    void analyze(ExitAst*) const;        //
-    void analyze(ScriptAst*) const;      //
-    void analyze(StmtAst*) const;        //
-    void analyze(PersonaAst*) const;     //
-    void analyze(InsideAst*) const;      //
-    void analyze(InsTypeAst*) const;     //
-    void analyze(PersonaVarAst*) const;  //
-    void analyze(BackFileAst*) const;    //
+    void analyze(ExitAst*) const;        
+    void analyze(ScriptAst*) const;      
+    void analyze(StmtAst*) const;        
+    void analyze(PersonaAst*) const;     
+    void analyze(InsideAst*) const;      
+    void analyze(InsTypeAst*) const;     
+    void analyze(PersonaVarAst*) const;  
+    void analyze(BackFileAst*) const;    
     void analyze(ForeFileAst*) const;
     void analyze(ForePersonaAst*) const;
     void analyze(TextLineAst*) const;
@@ -130,7 +130,7 @@ struct InsideAst : public BasicAst {
 
 struct PersonaAst : public BasicAst {
     const std::string          p_id;
-    std::unique_ptr<InsideAst> inside;
+    std::shared_ptr<InsideAst> inside;
 
     explicit PersonaAst(const std::string& persona_name_var) :
         p_id(persona_name_var), inside()

@@ -13,6 +13,8 @@ namespace fs = std::filesystem;
 
 void Visitor::analyze(ScriptAst* mn_script_ptr) const
 {
+    // Q: will all be deleted, because smart ptr call destructor?
+    // A: no, because it's shared and it's 2nd ownership
     std::shared_ptr<StmtAst> cur_stmt_ptr = mn_script_ptr->stmt;
     cur_stmt_ptr->accept(*this);
 
@@ -42,8 +44,7 @@ void Visitor::analyze(PersonaAst* mn_persona_ptr) const
         return;
     }
 
-    std::shared_ptr<InsideAst> cur_inside_ptr =
-        std::make_shared<InsideAst>(mn_persona_ptr->inside);
+    std::shared_ptr<InsideAst> cur_inside_ptr = mn_persona_ptr->inside;
 
     // analyze(cur_inside_ptr.get());
     if (cur_inside_ptr->memb_type == nullptr &&

@@ -45,7 +45,6 @@ public:
 
     Parser(Parser &&_p) :
         _cur_tok(std::move(_p._cur_tok)),
-        _next_tok(std::move(_p._next_tok)),
         get_tok_f(std::move(_p.get_tok_f))
     {
     }
@@ -73,7 +72,6 @@ public:
 
 private:
     token_ptr   _cur_tok{};
-    token_ptr   _next_tok{};
     func_type   get_tok_f;
     std::size_t _cur_line = 0;
     bool        _verb = false;
@@ -90,40 +88,32 @@ private:
     it checks whether the tokens array follows the set pattern.
     Checks the file grammar_ideas.txt for a more formal definition.
     */
-    inline ScriptAst script();
+    ScriptAst script();
 
     StmtAst stmt();
 
     InsideAst inside();
 
-    inline InsTypeAst type();
+    InsTypeAst type();
     /** @} */
 
     //-----------Utility Methods--------------------------------
 
     /**
-    @brief Checks whether the token on position `_pos` is equal to `_tok` and
-    increase `_pos`
-    @return `{ScriptToken, ID}` of the matched token
-    @throw parsing_error() in case it's not equal
+    @brief Checks whether the next token is equal to `tok`
+    @throw ParsingError() in case it's not equal
     */
-    inline void match(const ScriptToken &);
-
-    inline void match_cur(const ScriptToken &);
+    void match(const ScriptToken &);
+    /**
+    @brief Checks whether the current token is equal to `tok`
+    @throw ParsingError() in case it's not equal
+    */
+    void match_cur(const ScriptToken &);
 
     /**
-    @brief Get the token on current position (`_pos`)
-    @return ScriptToken from vector `_tokens_l`
+    @brief Get the next token with `get_token()` 
     */
-    inline void set_current_tok();
-    inline void set_next_tok();
-
-    /**
-    @brief Get the token on current position (`_pos`) and
-    move `_pos` on next token (`_pos+1`)
-    @return ScriptToken from vector `_tokens_l`
-    */
-    inline PairTokenId &popout();
+    void set_current_tok();
 };
 
 }  // namespace vino
