@@ -14,6 +14,11 @@ std::string Persona::get_path() const noexcept
     return _path;
 }
 
+std::string Persona::get_main_fg() const noexcept
+{
+    return _main_fg;
+}
+
 bool Persona::set_path(const std::string& path) noexcept
 {
     if (!_path.empty()) {

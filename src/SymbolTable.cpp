@@ -8,7 +8,9 @@
  */
 
 #include "SymbolTable.h"
+
 #include <stdexcept>
+#include <utility>
 
 namespace vino {
 
@@ -23,12 +25,14 @@ bool SymbolTableEnv::exists(const std::string& persona_id) noexcept
 Persona& SymbolTableEnv::add_persona(const std::string& persona_id) noexcept
 {
     auto persona = _chain_env.front().find(persona_id);
-    if (persona != _chain_env.front().end()) {
-        return _chain_env.front().emplace(persona_id).first->second;
+    if (persona == _chain_env.front().end()) {
+        auto it = _chain_env.front().emplace(persona_id, Persona());
+        return it.first->second;
     }
     _chain_env.emplace_front(_chain_env.front());
     _chain_env.front().extract(persona_id);
-    return _chain_env.front().emplace(persona_id).first->second;
+    auto it = _chain_env.front().emplace(persona_id, Persona());
+    return it.first->second;
 }
 
 bool SymbolTableEnv::add_info_to(const std::string& persona_id,

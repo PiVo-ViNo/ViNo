@@ -31,13 +31,16 @@ namespace vino {
 */
 class SymbolTableEnv {
 public:
-    using SymbolTable = std::unordered_map<const std::string, Persona>;
+    using SymbolTable = std::unordered_map<std::string, Persona>;
 
-    SymbolTableEnv() : _chain_env() {}
-
-    SymbolTableEnv(const SymbolTableEnv& other) : _chain_env(other._chain_env)
+    SymbolTableEnv() : _chain_env() 
     {
+        _chain_env.emplace_back();
     }
+
+    /*SymbolTableEnv(const SymbolTableEnv& other) : _chain_env(other._chain_env)
+    {
+    }*/
 
     /// Check if there is persona with such an id in Env
     bool exists(const std::string&) noexcept;
@@ -54,6 +57,7 @@ public:
     @details Creates new link in Env chain if such member already exists
     @return `false` if there is no such persona in Env
     */
+    // optimize usage: we don't need to create new link to add totally new var
     bool add_info_to(const std::string& persona_id,
                      const std::string& member_id,
                      const std::string& member_parameter) noexcept;

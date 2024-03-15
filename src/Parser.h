@@ -21,11 +21,10 @@
 namespace vino {
 
 /**
- @brief Analyzes the syntax of input `vector<ScriptToken>`
- @details Parser checks whether the vector of `ScriptTokens`, into which
+ @brief Analyzes the syntax of input tokens 
+ @details Parser checks whether the input of `ScriptTokens`, into which
  the input file/stream is divided by `TokenScanner`, is in compliance with
  syntax rules of ViNo Scripting Language.\n
- Soon: iterators instead of only vector.
  Usage: `parser.run()`
  @param get_token `std::function<PairTokenId>` which provide interface to get
  single token, it must not throw error if the end of input is reached, but
@@ -64,29 +63,24 @@ public:
     */
     ScriptAst run(bool verbose = false);
 
-    /**
-    @brief Set new input, nullifies current line.
-    @throw exception() if `vec_tokens` cannot be copied
-    */
+    /// Set new input, nullifies current line.
     void set_input(func_type get_token_function);
 
 private:
     token_ptr   _cur_tok{};
     func_type   get_tok_f;
-    std::size_t _cur_line = 0;
+    std::size_t _cur_line = 1;
     bool        _verb = false;
 
     //----------Private Methods----------------------------------
     //------------------------------------------------------------
-
-    void actual_run(bool sym_table_set, bool verbose);
-
+    
     /**
     @defgroup grammar Context-free Grammar constructions
     @{
     @details Parser is made as Context-free Grammar, basically
-    it checks whether the tokens array follows the set pattern.
-    Checks the file grammar_ideas.txt for a more formal definition.
+    it checks whether the tokens input follows the set pattern.
+    Checks the file GRAMMAR.md for a more formal definition.
     */
     ScriptAst script();
 

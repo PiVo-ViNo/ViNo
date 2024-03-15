@@ -28,35 +28,38 @@ struct TextFileAst;
     @param env_reference
 */
 struct Visitor {
-    explicit Visitor(SymbolTableEnv& symb_table_env) :
-        env_reference(symb_table_env)
+    explicit Visitor(SymbolTableEnv& symb_table_env, bool verb) :
+        env_reference(symb_table_env), verbal(verb)
     {
     }
 
-    void analyze(ExitAst*) const;        
-    void analyze(ScriptAst*) const;      
-    void analyze(StmtAst*) const;        
-    void analyze(PersonaAst*) const;     
-    void analyze(InsideAst*) const;      
-    void analyze(InsTypeAst*) const;     
-    void analyze(PersonaVarAst*) const;  
-    void analyze(BackFileAst*) const;    
-    void analyze(ForeFileAst*) const;
-    void analyze(ForePersonaAst*) const;
-    void analyze(TextLineAst*) const;
-    void analyze(TextFileAst*) const;
+    void analyze(const ExitAst*) const;        
+    void analyze(const ScriptAst*) const;      
+    void analyze(const StmtAst*) const;        
+    void analyze(const PersonaAst*) const;     
+    void analyze(const InsideAst*) const;      
+    void analyze(const InsTypeAst*) const;     
+    void analyze(const PersonaVarAst*) const;  
+    void analyze(const BackFileAst*) const;    
+    void analyze(const ForeFileAst*) const;
+    void analyze(const ForePersonaAst*) const;
+    void analyze(const TextLineAst*) const;
+    void analyze(const TextFileAst*) const;
 
-    void true_analyze(InsTypeAst*, Persona&) const;
+    void true_analyze(const InsTypeAst*, Persona&) const;
     // referece instead of ptr, because no null possible (and must be)
     SymbolTableEnv& env_reference;
+    bool verbal;
 };
 
 struct BasicAst {
-    virtual void accept(const Visitor& visitor) = 0;
+    virtual void accept(const Visitor& visitor) const = 0;
+
+    virtual ~BasicAst() {}
 };
 
 struct ExitAst : public BasicAst {
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -64,21 +67,21 @@ struct ExitAst : public BasicAst {
 
 struct StmtAst : public BasicAst {
     // PairTokenId               token;
-    std::shared_ptr<StmtAst>  next_stmt;
+    std::unique_ptr<StmtAst>  next_stmt;
     std::unique_ptr<BasicAst> expr;
 
     explicit StmtAst() : next_stmt(nullptr), expr(nullptr) {}
 
     explicit StmtAst(BasicAst* stmt_expr) : expr(stmt_expr) {}
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
 };
 
 struct ScriptAst : public BasicAst {
-    std::shared_ptr<StmtAst> stmt;
+    std::unique_ptr<StmtAst> stmt;
     // std::unique_ptr<ExitAst> ex;
 
     ScriptAst() : stmt(nullptr) {}
@@ -88,7 +91,7 @@ struct ScriptAst : public BasicAst {
     {
     }
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -103,6 +106,8 @@ struct InsTypeAst : public BasicAst {
     {
     }
 
+    explicit InsTypeAst(const PairTokenId& token) : InsTypeAst(token, "") {}
+
     explicit InsTypeAst(PairTokenId&& token) : InsTypeAst(token, "") {}
 
     InsTypeAst(PairTokenId&& token, std::string&& parameter) :
@@ -110,7 +115,7 @@ struct InsTypeAst : public BasicAst {
     {
     }
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -118,11 +123,11 @@ struct InsTypeAst : public BasicAst {
 
 struct InsideAst : public BasicAst {
     std::unique_ptr<InsTypeAst> memb_type;
-    std::shared_ptr<InsideAst>  next;
+    std::unique_ptr<InsideAst>  next;
 
     InsideAst() : memb_type(nullptr), next(nullptr) {}
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -130,14 +135,14 @@ struct InsideAst : public BasicAst {
 
 struct PersonaAst : public BasicAst {
     const std::string          p_id;
-    std::shared_ptr<InsideAst> inside;
+    std::unique_ptr<InsideAst> inside;
 
     explicit PersonaAst(const std::string& persona_name_var) :
         p_id(persona_name_var), inside()
     {
     }
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -164,7 +169,7 @@ struct PersonaVarAst : public BasicAst {
     {
     }
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -177,7 +182,7 @@ struct BackFileAst : public BasicAst {
 
     explicit BackFileAst(std::string&& path_to_bg) : path_bg(path_to_bg) {}
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -190,7 +195,7 @@ struct ForeFileAst : public BasicAst {
 
     explicit ForeFileAst(std::string&& path_to_fg) : path_fg(path_to_fg) {}
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -213,7 +218,7 @@ struct ForePersonaAst : public BasicAst {
     {
     }
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -226,7 +231,7 @@ struct TextLineAst : public BasicAst {
 
     explicit TextLineAst(std::string&& text) : text(text) {}
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }
@@ -241,7 +246,7 @@ struct TextFileAst : public BasicAst {
 
     explicit TextFileAst(std::string&& path_to_txt) : path_txt(path_to_txt) {}
 
-    inline void accept(const Visitor& visitor) override
+    inline void accept(const Visitor& visitor) const override
     {
         return visitor.analyze(this);
     }

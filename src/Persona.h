@@ -14,19 +14,22 @@
 
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 namespace vino {
 
 class Persona {
 public:
-    Persona(const std::string& name, const std::string& path) :
-        _name(name), _path(path)
+    Persona(std::string name, std::string path, std::string main_fg_path) :
+        _name(std::move(name)),
+        _path(std::move(path)),
+        _main_fg(std::move(main_fg_path))
     {
     }
 
-    explicit Persona(const std::string& name) : Persona(name, "") {}
+    explicit Persona(std::string name) : Persona(std::move(name), "", "") {}
 
-    Persona() : Persona("", "") {}
+    Persona() : Persona("", "", "") {}
 
     Persona(const Persona& other) :
         _name(other._name),
@@ -44,8 +47,22 @@ public:
 
     ~Persona() = default;
 
-    std::string get_name() const noexcept;
-    std::string get_path() const noexcept;
+    Persona& operator=(const Persona& other)
+    {
+        if (this == &other) {
+            return *this;
+        }
+
+        _name = other._name;
+        _main_fg = other._main_fg;
+        _path = other._path;
+        _fgs_member_path = other._fgs_member_path;
+        return *this;
+    }
+
+    [[nodiscard]] std::string get_name() const noexcept;
+    [[nodiscard]] std::string get_path() const noexcept;
+    [[nodiscard]] std::string get_main_fg() const noexcept;
 
     /// Set path in case it wasn't set in construction
     /**
@@ -68,7 +85,7 @@ public:
     /// must be used in pair with Env chain to create new instance of Persona
     /// with new variable value
     bool add_fg_var(const std::string& member_name,
-                           const std::string& path_value);
+                    const std::string& path_value);
     bool add_fg_var(std::string&& member_name, std::string&& path_value);
 
     /// Remove foreground variable, not really intended to use
@@ -82,7 +99,7 @@ private:
     std::string _path;
     std::string _main_fg;
     /// Hashmap with `[key=title, value=path/to/img]` foregrounds (members)
-    std::unordered_map<const std::string, const std::string> _fgs_member_path{};
+    std::unordered_map<std::string, std::string> _fgs_member_path;
 };
 
 }  // namespace vino

@@ -12,11 +12,13 @@
 
 #include <iostream>
 #include <memory>
+#include <version>
 
 #if __cpp_lib_format
 #include <format>
 #endif
 
+#include "AST.h"
 #include "Parser.h"
 #include "TokenEnum.h"
 #include "custom_errors.h"
@@ -34,38 +36,26 @@ void Parser::match(const ScriptToken &tok)
 {
     set_current_tok();
     if (_verb) {
-        std::cout << "match"
-                  << "\t";
+        std::cout << "match\t";
         std::cout << tok << "\t";
         std::cout << _cur_tok->token << "\n";
     }
     if (_cur_tok->token != tok) {
-#if __cpp_lib_format
-        throw ParsingError(
-            std::format("Parsing error on line {}\n", _cur_line));
-#else
         throw ParsingError("Parsing error on line " +
                            std::to_string(_cur_line) + "\n");
-#endif
     }
 }
 
 void Parser::match_cur(const ScriptToken &tok)
 {
     if (_verb) {
-        std::cout << "match"
-                  << "\t";
+        std::cout << "match cur\t";
         std::cout << tok << "\t";
         std::cout << _cur_tok->token << "\n";
     }
     if (_cur_tok->token != tok) {
-#if __cpp_lib_format
-        throw ParsingError(
-            std::format("Parsing error on line {}\n", _cur_line));
-#else
         throw ParsingError("Parsing error on line " +
                            std::to_string(_cur_line) + "\n");
-#endif
     }
 }
 
@@ -77,16 +67,14 @@ ScriptAst Parser::script()
         std::cout << "script\t";
     }
 
-    std::shared_ptr<StmtAst> cur_stmt = std::make_shared<StmtAst>(stmt());
-    ast.stmt = cur_stmt;
-    cur_stmt = cur_stmt->next_stmt;
+    ast.stmt = std::make_unique<StmtAst>(stmt());
+    StmtAst *ptrStmtCur = ast.stmt.get();
+
     while (_cur_tok->token != st::EXIT) {
         // exchange cur_stmt
-        cur_stmt = std::make_shared<StmtAst>(stmt());
-        cur_stmt = cur_stmt->next_stmt;
+        ptrStmtCur->next_stmt = std::make_unique<StmtAst>(stmt());
+        ptrStmtCur = ptrStmtCur->next_stmt.get();
     }
-    ExitAst exit;
-    cur_stmt = std::make_shared<StmtAst>(&exit);
     return ast;
 }
 
@@ -106,12 +94,17 @@ StmtAst Parser::stmt()
     switch (_cur_tok->token) {
         case st::PERSONA: {
             match(st::VAR);
-            PersonaAst persona_stmt(_cur_tok->id);
+            auto ptr_persona_stmt = std::make_unique<PersonaAst>(_cur_tok->id);
+            if (_verb) {
+                // std::cout << "\nPersona&: " << ptr_persona_stmt << '\n';
+            }
             match(st::BRACE_OP);
-            persona_stmt.inside = std::make_shared<InsideAst>(inside());
-            match(st::BRACE_CL);
-            std::unique_ptr<BasicAst> temp_expr(&persona_stmt);
-            main_stmt.expr = std::move(temp_expr);
+            ptr_persona_stmt->inside = std::make_unique<InsideAst>(inside());
+            match_cur(st::BRACE_CL);
+            main_stmt.expr = std::move(ptr_persona_stmt);
+            if (_verb) {
+                // std::cout << "\nPersona&: " << main_stmt.expr << '\n';
+            }
             break;
         }
         case st::VAR: {
@@ -121,18 +114,15 @@ StmtAst Parser::stmt()
             const std::string memb_name = _cur_tok->id;
             match(st::SIGN_EQ);
             match(st::TEXT_LINE);
-            PersonaVarAst pers_var(std::move(p_name), std::move(memb_name),
-                                   std::move(_cur_tok->id));
-            std::unique_ptr<BasicAst> temp_expr(&pers_var);
-            main_stmt.expr = std::move(temp_expr); 
+            main_stmt.expr = std::make_unique<PersonaVarAst>(
+                std::move(p_name), std::move(memb_name),
+                std::move(_cur_tok->id));
             break;
         }
         case st::BG: {
             match(st::SIGN_EQ);
             match(st::TEXT_LINE);
-            BackFileAst bg(_cur_tok->id);
-            std::unique_ptr<BasicAst> temp_expr(&bg);
-            main_stmt.expr = std::move(temp_expr); 
+            main_stmt.expr = std::make_unique<BackFileAst>(_cur_tok->id);
             break;
         }
         case st::FG: {
@@ -143,36 +133,30 @@ StmtAst Parser::stmt()
                 set_current_tok();
                 if (_cur_tok->token == st::DOT) {
                     match(st::VAR);
-                    ForePersonaAst fg_pers(std::move(p_name),
-                                           std::move(_cur_tok->id));
-                    std::unique_ptr<BasicAst> temp_expr(&fg_pers);
-                    main_stmt.expr = std::move(temp_expr);
+                    main_stmt.expr = std::make_unique<ForePersonaAst>(
+                        std::move(p_name), std::move(_cur_tok->id));
                     break;
                 }
                 match_cur(st::NEW_LINE);
-                ForePersonaAst fg_pers(std::move(p_name), "foreground");
-                std::unique_ptr<BasicAst> temp_expr(&fg_pers);
-                main_stmt.expr = std::move(temp_expr);
+                main_stmt.expr = std::make_unique<ForePersonaAst>(
+                    std::move(p_name), "foreground");
                 return main_stmt;
             }
-            match(st::TEXT_LINE);
-            ForeFileAst fg_file(std::move(_cur_tok->id));
-            std::unique_ptr<BasicAst> temp_expr(&fg_file);
-            main_stmt.expr = std::move(temp_expr);
+            match_cur(st::TEXT_LINE);
+            main_stmt.expr =
+                std::make_unique<ForeFileAst>(std::move(_cur_tok->id));
             break;
         }
         case st::TEXT_TYPE: {
             set_current_tok();
             if (_cur_tok->token == st::SIGN_EQ) {
                 match(st::TEXT_LINE);
-                TextFileAst txt_file(std::move(_cur_tok->id));
-                std::unique_ptr<BasicAst> temp_expr(&txt_file);
-                main_stmt.expr = std::move(temp_expr);
+                main_stmt.expr =
+                    std::make_unique<TextFileAst>(std::move(_cur_tok->id));
             } else {
                 match_cur(st::TEXT_LINE);
-                TextLineAst txt_data(std::move(_cur_tok->id));
-                std::unique_ptr<BasicAst> temp_expr(&txt_data);
-                main_stmt.expr = std::move(temp_expr);
+                main_stmt.expr =
+                    std::make_unique<TextLineAst>(std::move(_cur_tok->id));
             }
             break;
         }
@@ -198,6 +182,7 @@ InsideAst Parser::inside()
         return main_inside;
     }
     if (_cur_tok->token == st::NEW_LINE) {
+        _cur_line++;
         set_current_tok();
     }
 
@@ -207,22 +192,23 @@ InsideAst Parser::inside()
     match(st::TEXT_LINE);
     main_inside.memb_type->str_param = std::move(_cur_tok->id);
 
-    std::shared_ptr<InsideAst> cur_inside(&main_inside);
+    InsideAst* ptrInsideCur = &main_inside;
 
     set_current_tok();
     while (_cur_tok->token == st::COMMA) {
-        cur_inside->next = std::make_shared<InsideAst>();
-        cur_inside = cur_inside->next;
+        ptrInsideCur->next = std::make_unique<InsideAst>();
 
         set_current_tok();
-        if (_cur_tok->token == st::NEW_LINE) {
+        while (_cur_tok->token == st::NEW_LINE) { // maybe add counter?
+            _cur_line++;
             set_current_tok();
         }
-        cur_inside->memb_type = std::make_unique<InsTypeAst>(type());
+        ptrInsideCur->next->memb_type = std::make_unique<InsTypeAst>(type());
         match(st::SIGN_EQ);
         match(st::TEXT_LINE);
-        cur_inside->memb_type->str_param = std::move(_cur_tok->id);
+        ptrInsideCur->next->memb_type->str_param = std::move(_cur_tok->id);
 
+        ptrInsideCur = ptrInsideCur->next.get();
         set_current_tok();
     }
 
@@ -237,7 +223,7 @@ InsTypeAst Parser::type()
     }
     if (_cur_tok->token == st::FG || _cur_tok->token == st::PATH ||
         _cur_tok->token == st::NAME || _cur_tok->token == st::VAR) {
-        return InsTypeAst(std::move(*_cur_tok));
+        return InsTypeAst(*_cur_tok);
     }
 #if __cpp_lib_format
     throw ParsingError(
@@ -255,13 +241,15 @@ InsTypeAst Parser::type()
 void Parser::set_input(func_type get_token_function)
 {
     get_tok_f = get_token_function;
-    _cur_line = 0;
+    _cur_line = 1;
 }
 
 ScriptAst Parser::run(bool verbose)
 {
     _verb = verbose;
-    return script();
+    ScriptAst script = this->script();
+    _verb = false;
+    return script;
 }
 
 }  // namespace vino
