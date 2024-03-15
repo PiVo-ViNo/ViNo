@@ -10,8 +10,11 @@ TabWidth: 4
 UseTab: Never 
 AccessModifierOffset: -4
 BreakConstructorInitializers: AfterColon
-AlignConsecutiveAssignments: true 
+AlignConsecutiveDeclarations: true 
+AllowShortFunctionsOnASingleLine: Inline
 PointerAlignment: Left
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterFunction: true
+  AfterControlStatement: MultiLine
+BreakBeforeBinaryOperators: NonAssignment

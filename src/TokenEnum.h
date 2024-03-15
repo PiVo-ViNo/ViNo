@@ -11,30 +11,39 @@
 
 #include <ostream>
 
-namespace vino
-{
+namespace vino {
 
-enum class ScriptToken
-{
-	EMPTY_TOKEN,
-	// TYPE keyword
-	BG,
-	FG,
-	TEXT_TYPE,
-	PUT,
-	PERSONA,
-	//
-	VAR,
-	NEW_LINE,
-	SIGN_EQ,
-	BRACE_OP,
-	BRACE_CL,
-	COMMA,
-	NAME,
-	TEXT_LINE, // or WORD + QUOT_MARK ? what with \n and such?
-	PATH,	   // maybe work with only TEXT_LINE? -- now it is used for directory of persona
-	EXIT
+enum class ScriptToken {
+    EMPTY_TOKEN,
+    VAR,
+    // TYPE keyword
+    BG,
+    FG,
+    TEXT_TYPE,
+    PUT,
+    PERSONA,
+    NAME,   // name in game dialogue
+    TEXT_LINE,// generic string of characters, could be path
+    PATH,  // path to directory of PERSONA files
+    //
+    NEW_LINE,
+    SIGN_EQ,
+    BRACE_OP,
+    BRACE_CL,
+    COMMA,
+    DOT,
+    EXIT
 };
 
 std::ostream &operator<<(std::ostream &os, const ScriptToken &tok);
-} // namespace vino
+
+struct PairTokenId {
+    const ScriptToken token;
+    const std::string id;
+
+    PairTokenId(const ScriptToken& token, const std::string id) :
+        token(token), id(id)
+    {}
+};
+
+}  // namespace vino

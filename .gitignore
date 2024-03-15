@@ -5,4 +5,6 @@ _deps_src/
 CMakeLists.txt.user
 docs/Doxyfile
 docs/html
+docs/latex
+docs/xml
 .cache/

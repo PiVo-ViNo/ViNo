@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.20)
 # ---- Проверяем, что сборка пойдет не в каталог проекта ----
 include(cmake/prelude.cmake)
 
+set(CMAKE_CXX_STANDARD_REQUIRED 20)
+
 project(
 	ViNo
 	VERSION 0.0.1
@@ -18,7 +20,15 @@ include(cmake/variables.cmake)
 include(cmake/add_default_target_compile_definitions.cmake)
 
 # ---- Объявлям библиотеку основного функционала ----
-add_library(ViNo_lib OBJECT src/Parser.cpp src/TokenScanner.cpp src/TokenEnum.cpp)
+add_library(ViNo_lib OBJECT 
+	src/Parser.cpp 
+	src/TokenScanner.cpp 
+	src/TokenEnum.cpp
+	src/SymbolTable.cpp 
+	src/AST.cpp 
+	src/Persona.cpp 
+	src/SemanticAnalyzer.cpp 
+)
 
 target_include_directories(
 	ViNo_lib ${warning_guard} PUBLIC

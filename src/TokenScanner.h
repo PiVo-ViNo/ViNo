@@ -20,7 +20,7 @@
 #include "TokenEnum.h"
 
 namespace vino {
-    
+
 /// @brief Divides the input stream/file into ScriptTokens.
 /// Usage: token_scanner.get_token(), token_scanner.get_all_tokens()
 /// @param _istream_ptr unique_ptr<istream>, can be string/istringstream
@@ -29,20 +29,22 @@ class TokenScanner {
 public:
     TokenScanner() {}
 
-    explicit TokenScanner(std::ifstream &&in_filestream) {
+    explicit TokenScanner(std::ifstream &&in_filestream)
+    {
         _istream_ptr =
             std::make_unique<std::ifstream>(std::move(in_filestream));
     }
 
-    explicit TokenScanner(std::string &&input_string) {
+    explicit TokenScanner(std::string &&input_string)
+    {
         _istream_ptr =
             std::make_unique<std::istringstream>(input_string, std::ios::in);
     }
 
     TokenScanner(TokenScanner &) = delete;
 
-    TokenScanner(TokenScanner &&other) :
-        scan_whole_strs(other.scan_whole_strs) {
+    TokenScanner(TokenScanner &&other) : scan_whole_strs(other.scan_whole_strs)
+    {
         _istream_ptr = std::move(other._istream_ptr);
     }
 
@@ -54,12 +56,12 @@ public:
 
     /// @throw tokenize_error
     /// @return ScriptToken (i.e. enum class)
-    ScriptToken get_token();
+    PairTokenId get_token();
 
     /// @brief Get all tokens in one step in case you don't want to bother
     /// @return rvalue reference to std::vector<ScriptToken>
     /// @throw tokenize_error() or any exception within std::vector
-    std::vector<ScriptToken> get_all_tokens(bool verbose = false);
+    std::vector<PairTokenId> get_all_tokens(bool verbose = false);
 
     /// @brief Get current position in the input stream
     /// @return -1 if false() is true, otherwise any integer
@@ -77,8 +79,8 @@ public:
 private:
     std::unique_ptr<std::istream> _prev_istream_ptr;
     std::unique_ptr<std::istream> _istream_ptr;
-    std::size_t cur_line = 0;
-    bool scan_whole_strs = true;
+    std::size_t                   _cur_line = 0;
+    bool                          scan_whole_strs = true;
     // bool            _throw_exceptions = true; ?
 
     // -------------- Private Methods -----------------------------------------
@@ -87,10 +89,7 @@ private:
 
     /// @brief Strings found in input is either keyword or variable name
     /// @param ch is the char that must be put back into istream
-    ScriptToken check_var_or_keyword(std::string &, char);
-
-    // dummy function for now
-    void add_to_sym_table(std::string &&var);
+    PairTokenId check_var_or_keyword(std::string &, char);
 };
 
 }  // namespace vino
