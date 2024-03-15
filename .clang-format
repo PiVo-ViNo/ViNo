@@ -16,3 +16,5 @@ PointerAlignment: Left
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterFunction: true
+  AfterControlStatement: MultiLine
+BreakBeforeBinaryOperators: NonAssignment
