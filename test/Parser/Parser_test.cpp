@@ -8,14 +8,50 @@
 #include "custom_errors.h"
 #include "ut.hpp"
 
+//! IMPORTANT: create test.txt test.png and dir (directory) where testing binary is
+//! or change parameters in TestTokenizer::test_get_token()
+class TestTokenizer {
+public:
+    explicit TestTokenizer(const std::vector<vino::ScriptToken>& tokens) :
+        tokens_vec(tokens)
+    {
+    }
+
+    vino::PairTokenId test_get_token()
+    {
+        if (tokens_vec[pos] == vino::ScriptToken::PATH) {
+            previous_is_path = true;
+        } else if (tokens_vec[pos] == vino::ScriptToken::TEXT_TYPE) {
+            previous_is_text_type = true;
+        }
+        if (previous_is_text_type && tokens_vec[pos] == vino::ScriptToken::TEXT_LINE) {
+            previous_is_text_type = false;
+            return vino::PairTokenId(tokens_vec[pos++], "./test.txt");
+        }
+        if (previous_is_path && tokens_vec[pos] == vino::ScriptToken::TEXT_LINE) {
+            previous_is_path = false;
+            return vino::PairTokenId(tokens_vec[pos++], "./dir/");
+        }
+        return vino::PairTokenId(tokens_vec[pos++], "./test.png");
+    }
+
+private:
+    size_t pos = 0;
+    bool previous_is_path = false;
+    bool previous_is_text_type = false;
+
+    const std::vector<vino::ScriptToken>& tokens_vec;
+};
+
 int main() {
 
     using namespace boost::ut;
     using namespace boost::ut::literals;
     using namespace boost::ut::operators::terse;
 
-	typedef vino::ScriptToken vst;
+    typedef vino::ScriptToken vst;
 
+// clang-format off
     /* Input:
      * #comment
      * background = "bg.png"
@@ -75,6 +111,8 @@ int main() {
     };
 
     const std::vector<vst> tokens_empty = {};
+
+// clang-format on
 
     "parser_empty"_test = [] {
         expect(throws<vino::ParsingError>([] { 
