@@ -3,8 +3,8 @@
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(
 		FATAL_ERROR
-		"Сборка в каталог, где размещен исходный код проекта не поддерживается."
-		"Пожалуйста, ознакомьтесь с BUILDING.md, прежде чем пытаться собрать этот проект таким образом. "
-		"Возможно, вам придется удалить в каталоге сборки 'CMakeCache.txt' и 'CMakeFiles/'."
+		"In-source builds are not supported. "
+      	"Please read the BUILDING document before trying to build this project. "
+      	"You may need to delete 'CMakeCache.txt' and 'CMakeFiles/' first."
 	)
 endif()

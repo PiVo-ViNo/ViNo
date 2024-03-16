@@ -1,19 +1,19 @@
-# ---- Режим разработчика ----
+# ---- Developer mode ----
 
-# Режим разработчика включает цели и пути кода в сценариях CMake,
-# которые актуальны только для разработчиков этого проекта.
-# Цели, необходимые для сборки проекта, должны быть предоставлены безоговорочно,
-# чтобы потребители могли легко собрать и упаковать проект.
+# Developer mode enables targets and code paths in the CMake scripts that are
+# only relevant for the developer(s) of ViNo
+# Targets necessary to build the project must be provided unconditionally, so
+# consumers can trivially build and package the project
 if(PROJECT_IS_TOP_LEVEL)
 	option(ViNo_DEVELOPER_MODE "Enable developer mode" OFF)
 endif()
 
-# ---- Проверка на достустимость использования режима разработчика ----
+# ---- Warning guard ----
 
-# target_include_directories с модификатором SYSTEM будет требовать от компилятора
-# исключить предупреждения из предоставленных путей, если компилятор поддерживает это.
-# Это сделано для того, чтобы обеспечить взаимодействие с пользователем, аналогичное
-# find_package, когда add_subdirectory или FetchContent используется для этого проекта.
+# target_include_directories with the SYSTEM modifier will request the compiler
+# to omit warnings from the provided paths, if the compiler supports that
+# This is to provide a user experience similar to find_package when
+# add_subdirectory or FetchContent is used to consume this project
 set(warning_guard "")
 if(NOT PROJECT_IS_TOP_LEVEL)
 	option(ViNo_INCLUDES_WITH_SYSTEM "Use SYSTEM modifier for ViNo's includes, disabling warnings" ON)

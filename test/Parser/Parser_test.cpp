@@ -6,7 +6,7 @@
 #include "Parser.h"
 #include "TokenEnum.h"
 #include "custom_errors.h"
-#include "ut.hpp"
+#include "boost/ut.hpp"
 
 //! IMPORTANT: create test.txt test.png and dir (directory) where testing binary is
 //! or change parameters in TestTokenizer::test_get_token()
@@ -70,7 +70,7 @@ int main() {
 
         vst::PERSONA, vst::VAR, vst::BRACE_OP, vst::PATH,
         vst::SIGN_EQ, vst::TEXT_LINE, vst::COMMA,
-        vst::BG, vst::SIGN_EQ, vst::TEXT_LINE,
+        vst::NAME, vst::SIGN_EQ, vst::TEXT_LINE,
         vst::COMMA, vst::FG, vst::SIGN_EQ, vst::TEXT_LINE,
         vst::COMMA, vst::NAME, vst::SIGN_EQ, vst::TEXT_LINE,
         vst::BRACE_CL,

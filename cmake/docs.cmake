@@ -1,8 +1,8 @@
-# ---- Проверяем, установлен ли Doxygen ----
+# ---- Checking if Doxygen is installed ----
 find_package(Doxygen)
 
 if(DOXYGEN_FOUND)
-	# ---- Объявяем цель для создания документации ----
+	# ---- Declare documentation target ----
 	set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/docs/Doxyfile.in)
 	set(DOXYGEN_OUT ${PROJECT_SOURCE_DIR}/docs/Doxyfile)
 	configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)

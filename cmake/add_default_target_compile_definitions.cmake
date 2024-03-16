@@ -1,4 +1,4 @@
-# Функция добавления определений по умолчанию для таргета
+# The function of adding default definitions to the target
 function(add_default_target_compile_definitions name)
 	target_compile_definitions("${name}" PRIVATE PROJECT_NAME="${PROJECT_NAME}")
 	target_compile_definitions("${name}" PRIVATE PROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR})

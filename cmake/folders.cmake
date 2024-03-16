@@ -1,8 +1,9 @@
 set_property(GLOBAL PROPERTY USE_FOLDERS YES)
 
-# Вызовите эту функцию в конце области каталога, чтобы назначить папку таргетам, созданным в этом каталоге.
-# Таргеты будут назначены в папку UtilityTargets, в противном случае в папку ${name}Targets.
-# Если таргету уже назначена папка, то этот таргет будет пропущен.
+# Call this function at the end of a directory scope to assign a folder to
+# targets created in that directory. Utility targets will be assigned to the
+# UtilityTargets folder, otherwise to the ${name}Targets folder. If a target
+# already has a folder assigned, then that target will be skipped.
 function(add_folders name)
 	get_property(
 		targets

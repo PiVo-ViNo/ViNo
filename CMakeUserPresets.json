@@ -47,10 +47,8 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_SYSTEM_NAME": "Windows",
-        "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++",
         "CMAKE_FIND_ROOT_PATH_MODE_PROGRAM": "NEVER",
-        "CMAKE_FIND_ROOT_PATH_MODE_LIBRARY": "ONLY",
         "CMAKE_FIND_ROOT_PATH_MODE_INCLUDE": "ONLY"
       }
     },
