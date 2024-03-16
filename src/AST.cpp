@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 
 #include "custom_errors.h"
 
@@ -10,7 +11,7 @@ namespace vino {
 
 namespace fs = std::filesystem;
 
-void Visitor::analyze(const ScriptAst* mn_script_ptr) const
+void Visitor::analyze_script(const ScriptAst* mn_script_ptr) const
 {
     // Q: will all be deleted, because smart ptr call destructor?
     // A: no, because it's shared and it's 2nd ownership
@@ -24,7 +25,7 @@ void Visitor::analyze(const ScriptAst* mn_script_ptr) const
     }
 }
 
-void Visitor::analyze(const StmtAst* mn_stmt_ptr) const
+void Visitor::analyze_stmt(const StmtAst* mn_stmt_ptr) const
 {
     if (mn_stmt_ptr->expr == nullptr) {
         throw SemanticError(
@@ -33,7 +34,7 @@ void Visitor::analyze(const StmtAst* mn_stmt_ptr) const
     mn_stmt_ptr->expr->accept(*this);
 }
 
-void Visitor::analyze(const PersonaAst* mn_persona_ptr) const
+void Visitor::analyze_persona(const PersonaAst* mn_persona_ptr) const
 {
     // add to Env (if there is a persona with the same name: new link in Env)
     Persona& persona = env_reference.add_persona(mn_persona_ptr->p_id);
@@ -53,7 +54,7 @@ void Visitor::analyze(const PersonaAst* mn_persona_ptr) const
     if (ptrCurInside->memb_type == nullptr && ptrCurInside->next != nullptr) {
         throw SemanticError("Error: empty InsideAst node;\n");
     }
-    true_analyze(ptrCurInside->memb_type.get(), persona);
+    analyze_ins_type(ptrCurInside->memb_type.get(), persona);
 
     while (ptrCurInside->next != nullptr) {
         ptrCurInside = ptrCurInside->next.get();
@@ -61,20 +62,12 @@ void Visitor::analyze(const PersonaAst* mn_persona_ptr) const
         {
             throw SemanticError("Error: empty InsideAst node;\n");
         }
-        true_analyze(ptrCurInside->memb_type.get(), persona);
+        analyze_ins_type(ptrCurInside->memb_type.get(), persona);
     }
 }
 
-void Visitor::analyze(const InsideAst* mn_inside_ptr) const
-{
-    if (mn_inside_ptr->memb_type == nullptr && mn_inside_ptr->next != nullptr) {
-        throw SemanticError("Error: empty InsideAst node;\n");
-    }
-    analyze(mn_inside_ptr->memb_type.get());
-}
-
-void Visitor::true_analyze(const InsTypeAst* mn_ins_type_ptr,
-                           Persona&          persona) const
+void Visitor::analyze_ins_type(const InsTypeAst* mn_ins_type_ptr,
+                               Persona&          persona) const
 {
     using st = ScriptToken;
 
@@ -145,12 +138,7 @@ void Visitor::true_analyze(const InsTypeAst* mn_ins_type_ptr,
     }
 }
 
-void Visitor::analyze(const InsTypeAst* mn_ins_type_ptr) const
-{
-    throw SemanticError("Error: analyze(InsTypeAst) must never be called;\n");
-}
-
-void Visitor::analyze(const PersonaVarAst* mn_p_var_ptr) const
+void Visitor::analyze_persona_var(const PersonaVarAst* mn_p_var_ptr) const
 {
     if (verbal) {
         std::cout << "personavar\n" << std::flush;
@@ -170,7 +158,7 @@ void Visitor::analyze(const PersonaVarAst* mn_p_var_ptr) const
     }
 }
 
-void Visitor::analyze(const BackFileAst* mn_bg_ptr) const
+void Visitor::analyze_bg_file(const BackFileAst* mn_bg_ptr) const
 {
     if (verbal) {
         std::cout << "bgfile\n" << std::flush;
@@ -182,7 +170,7 @@ void Visitor::analyze(const BackFileAst* mn_bg_ptr) const
     }
 }
 
-void Visitor::analyze(const ForeFileAst* mn_fg_f_ptr) const
+void Visitor::analyze_fg_file(const ForeFileAst* mn_fg_f_ptr) const
 {
     if (verbal) {
         std::cout << "fgfile\n" << std::flush;
@@ -194,7 +182,7 @@ void Visitor::analyze(const ForeFileAst* mn_fg_f_ptr) const
     }
 }
 
-void Visitor::analyze(const ForePersonaAst* fg_pers_ptr) const
+void Visitor::analyze_fg_persona(const ForePersonaAst* fg_pers_ptr) const
 {
     if (verbal) {
         std::cout << "fgpersona\t" << fg_pers_ptr->p_id << std::endl;
@@ -219,7 +207,7 @@ void Visitor::analyze(const ForePersonaAst* fg_pers_ptr) const
     // const propagation?
 }
 
-void Visitor::analyze(const TextLineAst* txt_line_ptr) const
+void Visitor::analyze_txt_line() const
 {
     if (verbal) {
         std::cout << "txtline\n" << std::flush;
@@ -227,7 +215,7 @@ void Visitor::analyze(const TextLineAst* txt_line_ptr) const
     return;
 }
 
-void Visitor::analyze(const TextFileAst* txt_file_ptr) const
+void Visitor::analyze_txt_file(const TextFileAst* txt_file_ptr) const
 {
     if (verbal) {
         std::cout << "txtfile\n" << std::flush;
@@ -239,12 +227,17 @@ void Visitor::analyze(const TextFileAst* txt_file_ptr) const
     }
 }
 
-void Visitor::analyze(const ExitAst* cur_ast) const
+void Visitor::analyze_exit() const
 {
     if (verbal) {
         std::cout << "exit\n" << std::flush;
     }
     return;
+}
+
+void Visitor::error() const
+{
+    throw SemanticError("Program error: calling deprecated visitor method\n");
 }
 
 }  // namespace vino

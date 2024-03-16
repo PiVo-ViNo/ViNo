@@ -33,27 +33,30 @@ struct Visitor {
     {
     }
 
-    void analyze(const ExitAst*) const;        
-    void analyze(const ScriptAst*) const;      
-    void analyze(const StmtAst*) const;        
-    void analyze(const PersonaAst*) const;     
-    void analyze(const InsideAst*) const;      
-    void analyze(const InsTypeAst*) const;     
-    void analyze(const PersonaVarAst*) const;  
-    void analyze(const BackFileAst*) const;    
-    void analyze(const ForeFileAst*) const;
-    void analyze(const ForePersonaAst*) const;
-    void analyze(const TextLineAst*) const;
-    void analyze(const TextFileAst*) const;
+    void analyze_exit() const;        
+    void analyze_script(const ScriptAst*) const;      
+    void analyze_stmt(const StmtAst*) const;        
+    void analyze_persona(const PersonaAst*) const;     
+    void analyze_ins_type(const InsTypeAst*, Persona&) const;
+    void analyze_persona_var(const PersonaVarAst*) const;  
+    void analyze_bg_file(const BackFileAst*) const;    
+    void analyze_fg_file(const ForeFileAst*) const;
+    void analyze_fg_persona(const ForePersonaAst*) const;
+    void analyze_txt_line() const;
+    void analyze_txt_file(const TextFileAst*) const;
 
-    void true_analyze(const InsTypeAst*, Persona&) const;
+    void error() const;
+
     // referece instead of ptr, because no null possible (and must be)
     SymbolTableEnv& env_reference;
     bool verbal;
 };
 
 struct BasicAst {
-    virtual void accept(const Visitor& visitor) const = 0;
+    virtual void accept(const Visitor& visitor) const 
+    {
+        visitor.error();
+    }
 
     virtual ~BasicAst() {}
 };
@@ -61,7 +64,7 @@ struct BasicAst {
 struct ExitAst : public BasicAst {
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_exit();
     }
 };
 
@@ -76,7 +79,7 @@ struct StmtAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_stmt(this);
     }
 };
 
@@ -93,7 +96,7 @@ struct ScriptAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_script(this);
     }
 };
 
@@ -114,11 +117,6 @@ struct InsTypeAst : public BasicAst {
         lexem(token), str_param(parameter)
     {
     }
-
-    inline void accept(const Visitor& visitor) const override
-    {
-        return visitor.analyze(this);
-    }
 };
 
 struct InsideAst : public BasicAst {
@@ -126,11 +124,6 @@ struct InsideAst : public BasicAst {
     std::unique_ptr<InsideAst>  next;
 
     InsideAst() : memb_type(nullptr), next(nullptr) {}
-
-    inline void accept(const Visitor& visitor) const override
-    {
-        return visitor.analyze(this);
-    }
 };
 
 struct PersonaAst : public BasicAst {
@@ -144,7 +137,7 @@ struct PersonaAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_persona(this);
     }
 };
 
@@ -171,7 +164,7 @@ struct PersonaVarAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_persona_var(this);
     }
 };
 
@@ -184,7 +177,7 @@ struct BackFileAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_bg_file(this);
     }
 };
 
@@ -197,7 +190,7 @@ struct ForeFileAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_fg_file(this);
     }
 };
 
@@ -220,7 +213,7 @@ struct ForePersonaAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_fg_persona(this);
     }
 };
 
@@ -233,7 +226,7 @@ struct TextLineAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_txt_line();
     }
 };
 
@@ -248,7 +241,7 @@ struct TextFileAst : public BasicAst {
 
     inline void accept(const Visitor& visitor) const override
     {
-        return visitor.analyze(this);
+        return visitor.analyze_txt_file(this);
     }
 };
 

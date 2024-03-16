@@ -34,7 +34,7 @@ void SemanticAnalyzer::run_analysis(bool verbose)
     _verbose = verbose;
 
     Visitor anal_visitor(this->_env, true);
-    anal_visitor.analyze(_ast.get());
+    anal_visitor.analyze_script(_ast.get());
 
     _verbose = false;
 }

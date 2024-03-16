@@ -54,7 +54,7 @@ PairTokenId TokenScanner::get_token()
     std::string alnum_str{};
 
     char ch = 0;
-    while ((ch = _istream_ptr->get()) && ch != -1) {
+    while ((ch = static_cast<char>(_istream_ptr->get())) && ch != -1) {
         switch (ch) {
             // skip comments entirely
             case '#':
@@ -62,7 +62,7 @@ PairTokenId TokenScanner::get_token()
                     return check_var_or_keyword(alnum_str, '#');
                 }
                 do {
-                    ch = _istream_ptr->get();
+                    ch = static_cast<char>(_istream_ptr->get());
                     if (ch == '\n') {
                         _cur_line++;
                         return {ScriptToken::NEW_LINE, ""};
@@ -119,12 +119,12 @@ PairTokenId TokenScanner::get_token()
                     return check_var_or_keyword(alnum_str, '"');
                 }
                 std::size_t prev_curline = _cur_line;
-                ch = _istream_ptr->get();
+                ch = static_cast<char>(_istream_ptr->get());
                 while (_istream_ptr->good() && ch != '"') {
                     if (ch == '\n') _cur_line++;
                     // for now we just store text in Id
                     alnum_str += ch;
-                    ch = _istream_ptr->get();
+                    ch = static_cast<char>(_istream_ptr->get());
                 }
 
                 if (_istream_ptr->bad() || _istream_ptr->eof()) {
