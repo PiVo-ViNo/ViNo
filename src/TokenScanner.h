@@ -27,7 +27,7 @@ namespace vino {
 /// or ifstream, constructor() or set_input() allow only rvalue reference&&.
 class TokenScanner {
 public:
-    TokenScanner() {}
+    TokenScanner() = default;
 
     explicit TokenScanner(std::ifstream &&in_filestream)
     {
@@ -66,7 +66,7 @@ public:
     /// @brief Get current position in the input stream
     /// @return -1 if false() is true, otherwise any integer
     /// @throw null_ptr_exc() if the input stream isn't set
-    inline std::size_t position();
+    inline long position();
 
     /// @throw null_ptr_exc() if the input stream isn't set
     inline bool has_more_tokens();

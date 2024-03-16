@@ -10,16 +10,12 @@
 //                              //| | |  \/| | |  \/| | | | | |\/ | | | | | |//
 ///////////////////////////////////////////////////////////////////////////////
 
+#include "Parser.h"
+
 #include <iostream>
 #include <memory>
-#include <version>
-
-#if __cpp_lib_format
-#include <format>
-#endif
 
 #include "AST.h"
-#include "Parser.h"
 #include "TokenEnum.h"
 #include "custom_errors.h"
 
@@ -41,8 +37,8 @@ void Parser::match(const ScriptToken &tok)
         std::cout << _cur_tok->token << "\n";
     }
     if (_cur_tok->token != tok) {
-        throw ParsingError("Parsing error on line " +
-                           std::to_string(_cur_line) + "\n");
+        throw ParsingError("Parsing error on line " + std::to_string(_cur_line)
+                           + "\n");
     }
 }
 
@@ -54,8 +50,8 @@ void Parser::match_cur(const ScriptToken &tok)
         std::cout << _cur_tok->token << "\n";
     }
     if (_cur_tok->token != tok) {
-        throw ParsingError("Parsing error on line " +
-                           std::to_string(_cur_line) + "\n");
+        throw ParsingError("Parsing error on line " + std::to_string(_cur_line)
+                           + "\n");
     }
 }
 
@@ -165,8 +161,8 @@ StmtAst Parser::stmt()
             return main_stmt;
         }
         default:
-            throw ParsingError("Stmt error on line" +
-                               std::to_string(_cur_line));
+            throw ParsingError("Stmt error on line"
+                               + std::to_string(_cur_line));
     }
 
     match(st::NEW_LINE);
@@ -192,14 +188,14 @@ InsideAst Parser::inside()
     match(st::TEXT_LINE);
     main_inside.memb_type->str_param = std::move(_cur_tok->id);
 
-    InsideAst* ptrInsideCur = &main_inside;
+    InsideAst *ptrInsideCur = &main_inside;
 
     set_current_tok();
     while (_cur_tok->token == st::COMMA) {
         ptrInsideCur->next = std::make_unique<InsideAst>();
 
         set_current_tok();
-        while (_cur_tok->token == st::NEW_LINE) { // maybe add counter?
+        while (_cur_tok->token == st::NEW_LINE) {  // maybe add counter?
             _cur_line++;
             set_current_tok();
         }
@@ -221,21 +217,15 @@ InsTypeAst Parser::type()
     if (_verb) {
         std::cout << _cur_tok->token << "\t";
     }
-    if (_cur_tok->token == st::FG || _cur_tok->token == st::PATH ||
-        _cur_tok->token == st::NAME || _cur_tok->token == st::VAR) {
+    if (_cur_tok->token == st::FG || _cur_tok->token == st::PATH
+        || _cur_tok->token == st::NAME || _cur_tok->token == st::VAR)
+    {
         return InsTypeAst(*_cur_tok);
     }
-#if __cpp_lib_format
-    throw ParsingError(
-        std::format("Error in 'persona' at line {}:\n-Only 'background', "
-                    "'foreground', 'path' and variable allowed inside\n",
-                    _cur_line));
-#else
     throw ParsingError("Error in 'persona' at line " +
                        std::to_string(_cur_line) +
-                       ":\n-Only 'background', 'foreground', 'path' and "
+                       ":\n-Only 'name', 'foreground', 'path' and "
                        "variable are allowed inside\n");
-#endif
 }
 
 void Parser::set_input(func_type get_token_function)

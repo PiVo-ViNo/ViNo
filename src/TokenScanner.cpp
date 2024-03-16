@@ -9,16 +9,13 @@
  *
  */
 
+#include "TokenScanner.h"
+
 #include <cctype>
 #include <iostream>
 #include <memory>
 #include <utility>
-#include <version>
-#if __cpp_lib_format
-#include <format>
-#endif
 
-#include "TokenScanner.h"
 #include "custom_errors.h"
 #include "stuff.h"
 
@@ -131,21 +128,13 @@ PairTokenId TokenScanner::get_token()
                 }
 
                 if (_istream_ptr->bad() || _istream_ptr->eof()) {
-#if __cpp_lib_format
-                    throw TokenizeError(
-                        std::format("No enclosing \""
-                                    "(quotation mark) in text on line {}\n",
-                                    prev_curline));
-#else
                     throw TokenizeError(
                         "No enclosing \" (quotation mark)"
-                        "in text on line " +
-                        std::to_string(prev_curline) + "\n");
-#endif
+                        "in text on line "
+                        + std::to_string(prev_curline) + "\n");
                 }
                 // move(alnum_str) as it will be deleted anyways
-                return {ScriptToken::TEXT_LINE,
-                                      std::move(alnum_str)};
+                return {ScriptToken::TEXT_LINE, std::move(alnum_str)};
             }
 
             default:
@@ -153,16 +142,9 @@ PairTokenId TokenScanner::get_token()
                     alnum_str += ch;
                     break;
                 } else {
-#if __cpp_lib_format
-                    throw TokenizeError(
-                        std::format("Unrecognized symbol"
-                                    "{} at line {}\n",
-                                    ch, _cur_line));
-#else
-                    throw TokenizeError("Unrecognized symbol" +
-                                        std::to_string(ch) + "at line " +
-                                        std::to_string(_cur_line) + "\n");
-#endif
+                    throw TokenizeError("Unrecognized symbol"
+                                        + std::to_string(ch) + "at line "
+                                        + std::to_string(_cur_line) + "\n");
                 }
                 break;
         }
@@ -187,7 +169,7 @@ std::vector<PairTokenId> TokenScanner::get_all_tokens(bool verbose)
     return tokens_vec;
 }
 
-inline std::size_t TokenScanner::position()
+inline long TokenScanner::position()
 {
     if (!_istream_ptr) throw NullPtrExc();
     return _istream_ptr->tellg();
