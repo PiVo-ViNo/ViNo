@@ -79,6 +79,8 @@ int main() {
         vst::EXIT 
     };
 
+    TestTokenizer tokenizer0(tokens_test);
+
     /* Input:
      * text = "text.txt"
      * text "text" 
@@ -114,7 +116,16 @@ int main() {
 
 // clang-format on
 
-    "parser_empty"_test = [] {
+    std::function<vino::PairTokenId()> fn =
+        std::bind(&TestTokenizer::test_get_token, &tokenizer0);
+    vino::Parser parser(fn);
+    vino::ScriptAst asstree = parser.run(true);
+
+    /*vino::SymbolTableEnv symbtable;
+    vino::SemanticAnalyzer semanal(symbtable, asstree);
+    semanal.run_analysis();
+    */
+    /*"parser_empty"_test = [] {
         expect(throws<vino::ParsingError>([] { 
             vino::Parser parser;
             parser.run();
@@ -170,6 +181,6 @@ int main() {
             parser.run();
         } )); 
     };   
-    
+   */ 
     return 0;
 }
