@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <filesystem>
 
 #include "TokenEnum.h"
 #include "custom_errors.h"
@@ -15,7 +16,8 @@ int main() {
     using namespace boost::ut::literals;
     using namespace boost::ut::operators::terse;
 
-	typedef vino::ScriptToken vst;
+    using vst = vino::ScriptToken;
+    using vpt = vino::PairTokenId;
 
     const std::string input_test = 
     "#comment\n"
@@ -46,15 +48,15 @@ int main() {
         vst::EXIT 
     };
 
-    /*"tokenizer_test0"_test = [&output_test, &input_test] {
+    "tokenizer_test0"_test = [&output_test, &input_test] {
         std::vector<vst> output_tokenizer;
         expect(nothrow([&input_test, &output_tokenizer] {
             std::string input = input_test;
             vino::TokenScanner tokenizer(std::move(input));
-            output_tokenizer = tokenizer.get_all_tokens(true);
+            output_tokenizer = tokenizer.get_raw_tokens(true);
         } )); 
         expect(output_tokenizer == output_test);
     };
-    */
+    
     return 0;
 }

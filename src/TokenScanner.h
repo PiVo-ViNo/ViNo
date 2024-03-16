@@ -59,14 +59,18 @@ public:
     PairTokenId get_token();
 
     /// @brief Get all tokens in one step in case you don't want to bother
-    /// @return rvalue reference to std::vector<ScriptToken>
+    /// @return `std::vector<vino::PairTokenId>`
     /// @throw tokenize_error() or any exception within std::vector
     std::vector<PairTokenId> get_all_tokens(bool verbose = false);
+
+    /// @brief Get all tokens without `id`
+    /// @return `std::vector<vino::ScriptToken>` 
+    std::vector<ScriptToken> get_raw_tokens(bool verbose = false);
 
     /// @brief Get current position in the input stream
     /// @return -1 if false() is true, otherwise any integer
     /// @throw null_ptr_exc() if the input stream isn't set
-    inline long position();
+    inline long long position();
 
     /// @throw null_ptr_exc() if the input stream isn't set
     inline bool has_more_tokens();

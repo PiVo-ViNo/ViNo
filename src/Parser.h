@@ -13,6 +13,7 @@
 
 #include <functional>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "AST.h"
@@ -36,7 +37,7 @@ public:
     using token_ptr = std::unique_ptr<PairTokenId>;
 
     explicit Parser(func_type get_token_function) :
-        get_tok_f(get_token_function)
+        get_tok_f(std::move(get_token_function))
     {
     }
 

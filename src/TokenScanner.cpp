@@ -169,7 +169,20 @@ std::vector<PairTokenId> TokenScanner::get_all_tokens(bool verbose)
     return tokens_vec;
 }
 
-inline long TokenScanner::position()
+std::vector<ScriptToken> TokenScanner::get_raw_tokens(bool verbose)
+{
+    std::vector<ScriptToken> tokens_vec;
+
+    while (this->has_more_tokens()) {
+        ScriptToken new_raw_token = get_token().token;
+        if (verbose) std::cout << new_raw_token << '\n';
+        tokens_vec.push_back(new_raw_token);
+        if (new_raw_token == ScriptToken::EXIT) return tokens_vec;
+    }
+    return tokens_vec;
+}
+
+inline long long TokenScanner::position()
 {
     if (!_istream_ptr) throw NullPtrExc();
     return _istream_ptr->tellg();
