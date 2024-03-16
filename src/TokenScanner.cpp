@@ -203,13 +203,13 @@ inline void TokenScanner::set_input(std::string &&input_str)
 {
     _istream_ptr =
         std::make_unique<std::istringstream>(input_str, std::ios::in);
-    cur_line = 0;
+    _cur_line = 0;
 }
 
 inline void TokenScanner::set_input(std::ifstream &&input_file)
 {
     _istream_ptr = std::make_unique<std::ifstream>(std::move(input_file));
-    cur_line = 0;
+    _cur_line = 0;
 }
 
 }  // namespace vino
