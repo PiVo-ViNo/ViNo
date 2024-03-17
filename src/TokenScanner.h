@@ -64,7 +64,7 @@ public:
     std::vector<PairTokenId> get_all_tokens(bool verbose = false);
 
     /// @brief Get all tokens without `id`
-    /// @return `std::vector<vino::ScriptToken>` 
+    /// @return `std::vector<vino::ScriptToken>`
     std::vector<ScriptToken> get_raw_tokens(bool verbose = false);
 
     /// @brief Get current position in the input stream
@@ -85,6 +85,7 @@ private:
     std::unique_ptr<std::istream> _istream_ptr;
     std::size_t                   _cur_line = 0;
     bool                          scan_whole_strs = true;
+    bool                          _verb = false;
     // bool            _throw_exceptions = true; ?
 
     // -------------- Private Methods -----------------------------------------
@@ -92,7 +93,7 @@ private:
     ScriptToken is_keyword(const std::string &);
 
     /// @brief Strings found in input is either keyword or variable name
-    /// @param ch is the char that must be put back into istream
+    /// @param `ch` is the char that must be put back into istream
     PairTokenId check_var_or_keyword(std::string &, char);
 };
 

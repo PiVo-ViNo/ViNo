@@ -18,13 +18,14 @@ namespace fs = std::filesystem;
 
 namespace test_utils {
 
-class TestTokenizer {
-    fs::path tmp{std::filesystem::temp_directory_path()};
+class Tester {
+    fs::path tmp{std::filesystem::temp_directory_path() / "test_parser"};
 
 public:
-    explicit TestTokenizer(const std::vector<vino::ScriptToken>& tokens) :
+    explicit Tester(const std::vector<vino::ScriptToken>& tokens) :
         tokens_vec(tokens)
     {
+        fs::create_directory(tmp);
         fs::create_directory(tmp / "dir");
         std::ofstream ostrm(tmp / "test.png", std::ios::binary | std::ios::out);
         ostrm.put('a');
@@ -37,7 +38,7 @@ public:
     vino::PairTokenId test_get_token()
     {
         if (pos >= tokens_vec.size()) {
-            return vino::PairTokenId(vino::ScriptToken::EXIT, "");
+            return {vino::ScriptToken::EXIT, ""};
         }
         if (tokens_vec[pos] == vino::ScriptToken::PATH) {
             previous_is_path = true;
@@ -48,22 +49,19 @@ public:
             && tokens_vec[pos] == vino::ScriptToken::TEXT_LINE)
         {
             previous_is_text_type = false;
-            return vino::PairTokenId(tokens_vec[pos++],
-                                     tmp.string() + "/test.txt");
+            return {tokens_vec[pos++], tmp.string() + "/test.txt"};
         }
         if (previous_is_path && tokens_vec[pos] == vino::ScriptToken::TEXT_LINE)
         {
             previous_is_path = false;
-            return vino::PairTokenId(tokens_vec[pos++], tmp.string() + "/dir");
+            return {tokens_vec[pos++], tmp.string() + "/dir"};
         }
-        return vino::PairTokenId(tokens_vec[pos++], tmp.string() + "/test.png");
+        return {tokens_vec[pos++], tmp.string() + "/test.png"};
     }
 
-    ~TestTokenizer()
+    ~Tester()
     {
-        fs::remove(tmp / "dir");
-        fs::remove(tmp / "test.png");
-        fs::remove(tmp / "test.txt");
+        fs::remove_all(tmp);
     }
 
 private:
@@ -152,20 +150,11 @@ int main()
 
     // clang-format on
 
-    /*std::function<vino::PairTokenId()> fn =
-        std::bind(&test_utils::TestTokenizer::test_get_token, &tokenizer0);
-    vino::Parser    parser(fn);
-    vino::ScriptAst asstree = parser.run(true);
-
-    vino::SymbolTableEnv   symbtable;
-    vino::SemanticAnalyzer semanal(symbtable, asstree);
-    semanal.run_analysis();
-    */
     "parser_empty"_test = [&tokens_empty] {
         expect(nothrow([&tokens_empty] {
-            test_utils::TestTokenizer tokenizer(tokens_empty);
-            std::function<vpt()>      fn = std::bind(
-                &test_utils::TestTokenizer::test_get_token, &tokenizer);
+            test_utils::Tester   tokenizer(tokens_empty);
+            std::function<vpt()> fn =
+                std::bind(&test_utils::Tester::test_get_token, &tokenizer);
             vino::Parser parser(fn);
             parser.run(true);
         }));
@@ -173,19 +162,19 @@ int main()
 
     "parser_not_empty"_test = [&tokens_test] {
         expect(nothrow([&tokens_test] {
-            test_utils::TestTokenizer tokenizer(tokens_test);
-            std::function<vpt()>      fn = std::bind(
-                &test_utils::TestTokenizer::test_get_token, &tokenizer);
+            test_utils::Tester   tokenizer(tokens_test);
+            std::function<vpt()> fn =
+                std::bind(&test_utils::Tester::test_get_token, &tokenizer);
             vino::Parser parser(fn);
             parser.run(true);
         }));
     };
-    
+
     "parser_input_set_on_init"_test = [&tokens_text] {
         expect(nothrow([&tokens_text] {
-            test_utils::TestTokenizer tokenizer(tokens_text);
-            std::function<vpt()>      fn = std::bind(
-                &test_utils::TestTokenizer::test_get_token, &tokenizer);
+            test_utils::Tester   tokenizer(tokens_text);
+            std::function<vpt()> fn =
+                std::bind(&test_utils::Tester::test_get_token, &tokenizer);
             vino::Parser parser(fn);
             parser.run(true);
         }));
@@ -193,9 +182,9 @@ int main()
 
     "parser_input_texts"_test = [&tokens_exit] {
         expect(nothrow([&tokens_exit] {
-            test_utils::TestTokenizer tokenizer(tokens_exit);
-            std::function<vpt()>      fn = std::bind(
-                &test_utils::TestTokenizer::test_get_token, &tokenizer);
+            test_utils::Tester   tokenizer(tokens_exit);
+            std::function<vpt()> fn =
+                std::bind(&test_utils::Tester::test_get_token, &tokenizer);
             vino::Parser parser(fn);
             parser.run(true);
         }));
@@ -203,32 +192,32 @@ int main()
 
     "parser_persona_only"_test = [&WRONGtokens_0] {
         expect(throws<vino::ParsingError>([&WRONGtokens_0] {
-            test_utils::TestTokenizer tokenizer(WRONGtokens_0);
-            std::function<vpt()>      fn = std::bind(
-                &test_utils::TestTokenizer::test_get_token, &tokenizer);
+            test_utils::Tester   tokenizer(WRONGtokens_0);
+            std::function<vpt()> fn =
+                std::bind(&test_utils::Tester::test_get_token, &tokenizer);
             vino::Parser parser(fn);
             parser.run();
-        } ));
+        }));
     };
 
     "parser_unclosed_persona"_test = [&WRONGtokens_1] {
         expect(throws<vino::ParsingError>([&WRONGtokens_1] {
-            test_utils::TestTokenizer tokenizer(WRONGtokens_1);
-            std::function<vpt()>      fn = std::bind(
-                &test_utils::TestTokenizer::test_get_token, &tokenizer);
+            test_utils::Tester   tokenizer(WRONGtokens_1);
+            std::function<vpt()> fn =
+                std::bind(&test_utils::Tester::test_get_token, &tokenizer);
             vino::Parser parser(fn);
             parser.run();
-        } ));
+        }));
     };
 
     "parser_no_tokens"_test = [&tokens_empty] {
         expect(nothrow([&tokens_empty] {
-            test_utils::TestTokenizer tokenizer(tokens_empty);
-            std::function<vpt()>      fn = std::bind(
-                &test_utils::TestTokenizer::test_get_token, &tokenizer);
+            test_utils::Tester   tokenizer(tokens_empty);
+            std::function<vpt()> fn =
+                std::bind(&test_utils::Tester::test_get_token, &tokenizer);
             vino::Parser parser(fn);
             parser.run();
-        } ));
+        }));
     };
 
     return 0;

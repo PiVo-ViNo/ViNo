@@ -76,6 +76,18 @@ PairTokenId TokenScanner::get_token()
                 }
                 break;
 
+            case '\r':
+                if (!alnum_str.empty()) {
+                    return check_var_or_keyword(alnum_str, ' ');
+                }
+                break;
+
+            case '\t':
+                if (!alnum_str.empty()) {
+                    return check_var_or_keyword(alnum_str, ' ');
+                }
+                break;
+
             case '{':
                 if (!alnum_str.empty()) {
                     return check_var_or_keyword(alnum_str, '{');
@@ -121,7 +133,9 @@ PairTokenId TokenScanner::get_token()
                 std::size_t prev_curline = _cur_line;
                 ch = static_cast<char>(_istream_ptr->get());
                 while (_istream_ptr->good() && ch != '"') {
-                    if (ch == '\n') _cur_line++;
+                    if (ch == '\n') {
+                        _cur_line++;
+                    }
                     // for now we just store text in Id
                     alnum_str += ch;
                     ch = static_cast<char>(_istream_ptr->get());
@@ -142,8 +156,8 @@ PairTokenId TokenScanner::get_token()
                     alnum_str += ch;
                     break;
                 } else {
-                    throw TokenizeError("Unrecognized symbol"
-                                        + std::to_string(ch) + "at line "
+                    throw TokenizeError("Unrecognized symbol "
+                                        + std::to_string(ch) + " at line "
                                         + std::to_string(_cur_line) + "\n");
                 }
                 break;
@@ -158,27 +172,31 @@ PairTokenId TokenScanner::get_token()
 
 std::vector<PairTokenId> TokenScanner::get_all_tokens(bool verbose)
 {
+    _verb = verbose;
     std::vector<PairTokenId> tokens_vec;
 
     while (this->has_more_tokens()) {
         PairTokenId new_token_pair = get_token();
-        if (verbose) std::cout << new_token_pair.token << '\n';
+        if (_verb) std::cout << new_token_pair.token << '\n';
         tokens_vec.push_back(new_token_pair);
         if (new_token_pair.token == ScriptToken::EXIT) return tokens_vec;
     }
+    _verb = false; 
     return tokens_vec;
 }
 
 std::vector<ScriptToken> TokenScanner::get_raw_tokens(bool verbose)
 {
+    _verb = verbose;
     std::vector<ScriptToken> tokens_vec;
 
     while (this->has_more_tokens()) {
         ScriptToken new_raw_token = get_token().token;
-        if (verbose) std::cout << new_raw_token << '\n';
+        if (_verb) std::cout << new_raw_token << '\n';
         tokens_vec.push_back(new_raw_token);
         if (new_raw_token == ScriptToken::EXIT) return tokens_vec;
     }
+    _verb = false;
     return tokens_vec;
 }
 
