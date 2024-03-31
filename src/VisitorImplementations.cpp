@@ -1,17 +1,22 @@
-#include "AST.hpp"
+#include "VisitorImplementations.hpp"
 
+#include "AST.hpp"
+#include "custom_errors.hpp"
 #include <filesystem>
 #include <iostream>
-#include <memory>
-#include <stdexcept>
-
-#include "custom_errors.hpp"
 
 namespace vino {
 
 namespace fs = std::filesystem;
 
-void Visitor::analyze_script(const ScriptAst* mn_script_ptr) const
+void SemanticVisitor::visit_exit() const
+{
+    if (_verb) {
+        std::cout << "exit\n" << std::flush;
+    }
+}
+
+void SemanticVisitor::visit_script(const ScriptAst* mn_script_ptr) const
 {
     // Q: will all be deleted, because smart ptr call destructor?
     // A: no, because it's shared and it's 2nd ownership
@@ -25,7 +30,7 @@ void Visitor::analyze_script(const ScriptAst* mn_script_ptr) const
     }
 }
 
-void Visitor::analyze_stmt(const StmtAst* mn_stmt_ptr) const
+void SemanticVisitor::visit_stmt(const StmtAst* mn_stmt_ptr) const
 {
     if (mn_stmt_ptr->expr == nullptr) {
         throw SemanticError(
@@ -34,10 +39,10 @@ void Visitor::analyze_stmt(const StmtAst* mn_stmt_ptr) const
     mn_stmt_ptr->expr->accept(*this);
 }
 
-void Visitor::analyze_persona(const PersonaAst* mn_persona_ptr) const
+void SemanticVisitor::visit_persona(const PersonaAst* mn_persona_ptr) const
 {
     // add to Env (if there is a persona with the same name: new link in Env)
-    Persona& persona = env_reference.add_persona(mn_persona_ptr->p_id);
+    Persona& persona = _env_reference.add_persona(mn_persona_ptr->p_id);
     // if possible, don't use recursion, because insides could be very long,
     // use stack/cycle
     if (mn_persona_ptr->inside == nullptr) {
@@ -45,7 +50,7 @@ void Visitor::analyze_persona(const PersonaAst* mn_persona_ptr) const
         return;
     }
 
-    if (verbal) {
+    if (_verb) {
         std::cout << "persona\t" << mn_persona_ptr->p_id << '\n' << std::flush;
     }
 
@@ -54,7 +59,7 @@ void Visitor::analyze_persona(const PersonaAst* mn_persona_ptr) const
     if (ptrCurInside->memb_type == nullptr && ptrCurInside->next != nullptr) {
         throw SemanticError("Error: empty InsideAst node;\n");
     }
-    analyze_ins_type(ptrCurInside->memb_type.get(), persona);
+    visit_ins_type(ptrCurInside->memb_type.get(), persona);
 
     while (ptrCurInside->next != nullptr) {
         ptrCurInside = ptrCurInside->next.get();
@@ -62,18 +67,18 @@ void Visitor::analyze_persona(const PersonaAst* mn_persona_ptr) const
         {
             throw SemanticError("Error: empty InsideAst node;\n");
         }
-        analyze_ins_type(ptrCurInside->memb_type.get(), persona);
+        visit_ins_type(ptrCurInside->memb_type.get(), persona);
     }
 }
 
-void Visitor::analyze_ins_type(const InsTypeAst* mn_ins_type_ptr,
-                               Persona&          persona) const
+void SemanticVisitor::visit_ins_type(const InsTypeAst* mn_ins_type_ptr,
+                                     Persona&          persona) const
 {
     using st = ScriptToken;
 
     switch (mn_ins_type_ptr->lexem.token) {
         case st::PATH: {
-            if (verbal) {
+            if (_verb) {
                 std::cout << "\tpath\t" << mn_ins_type_ptr->str_param << '\n'
                           << std::flush;
             }
@@ -89,7 +94,7 @@ void Visitor::analyze_ins_type(const InsTypeAst* mn_ins_type_ptr,
                                 + " is not a directory;\n");
         }
         case st::VAR: {
-            if (verbal) {
+            if (_verb) {
                 std::cout << "\tvar\t" << mn_ins_type_ptr->lexem.id << '\n'
                           << std::flush;
             }
@@ -118,7 +123,7 @@ void Visitor::analyze_ins_type(const InsTypeAst* mn_ins_type_ptr,
         case st::FG: {
             std::cout << "\tfg\t" << std::flush;
             if (persona.set_main_fg(mn_ins_type_ptr->str_param)) {
-                if (verbal) {
+                if (_verb) {
                     std::cout << persona.get_main_fg() << std::endl;
                 }
                 fs::path temp_path(mn_ins_type_ptr->str_param);
@@ -138,9 +143,9 @@ void Visitor::analyze_ins_type(const InsTypeAst* mn_ins_type_ptr,
     }
 }
 
-void Visitor::analyze_persona_var(const PersonaVarAst* mn_p_var_ptr) const
+void SemanticVisitor::visit_persona_var(const PersonaVarAst* mn_p_var_ptr) const
 {
-    if (verbal) {
+    if (_verb) {
         std::cout << "personavar\n" << std::flush;
     }
     // param must be valid path
@@ -150,17 +155,17 @@ void Visitor::analyze_persona_var(const PersonaVarAst* mn_p_var_ptr) const
                             + " doesn't exist or not a .png;\n");
     }
     // persona must be initialized
-    if (!env_reference.add_info_to(mn_p_var_ptr->p_id, mn_p_var_ptr->memb_id,
-                                   mn_p_var_ptr->param))
+    if (!_env_reference.add_info_to(mn_p_var_ptr->p_id, mn_p_var_ptr->memb_id,
+                                    mn_p_var_ptr->param))
     {
         throw SemanticError("Error: persona " + mn_p_var_ptr->p_id
                             + " wasn't initialized;\n");
     }
 }
 
-void Visitor::analyze_bg_file(const BackFileAst* mn_bg_ptr) const
+void SemanticVisitor::visit_bg_file(const BackFileAst* mn_bg_ptr) const
 {
-    if (verbal) {
+    if (_verb) {
         std::cout << "bgfile\n" << std::flush;
     }
     fs::path temp_path(mn_bg_ptr->path_bg);
@@ -170,9 +175,9 @@ void Visitor::analyze_bg_file(const BackFileAst* mn_bg_ptr) const
     }
 }
 
-void Visitor::analyze_fg_file(const ForeFileAst* mn_fg_f_ptr) const
+void SemanticVisitor::visit_fg_file(const ForeFileAst* mn_fg_f_ptr) const
 {
-    if (verbal) {
+    if (_verb) {
         std::cout << "fgfile\n" << std::flush;
     }
     fs::path temp_path(mn_fg_f_ptr->path_fg);
@@ -182,21 +187,21 @@ void Visitor::analyze_fg_file(const ForeFileAst* mn_fg_f_ptr) const
     }
 }
 
-void Visitor::analyze_fg_persona(const ForePersonaAst* fg_pers_ptr) const
+void SemanticVisitor::visit_fg_persona(const ForePersonaAst* fg_pers_ptr) const
 {
-    if (verbal) {
+    if (_verb) {
         std::cout << "fgpersona\t" << fg_pers_ptr->p_id << std::endl;
     }
     // Persona with such id must have been initialized in Env before
-    if (!env_reference.exists(fg_pers_ptr->p_id)) {
+    if (!_env_reference.exists(fg_pers_ptr->p_id)) {
         throw SemanticError("Error: persona " + fg_pers_ptr->p_id
                             + " wasn't initialized;\n");
     }
     std::string fg_path;
     if (fg_pers_ptr->memb_name == "foreground") {
-        fg_path = env_reference.get_persona(fg_pers_ptr->p_id).get_main_fg();
+        fg_path = _env_reference.get_persona(fg_pers_ptr->p_id).get_main_fg();
     } else {
-        fg_path = env_reference.get_persona(fg_pers_ptr->p_id)
+        fg_path = _env_reference.get_persona(fg_pers_ptr->p_id)
                       .get_fg(fg_pers_ptr->memb_name);
     }
     if (fg_path.empty()) {
@@ -204,20 +209,19 @@ void Visitor::analyze_fg_persona(const ForePersonaAst* fg_pers_ptr) const
                             + " of persona " + fg_pers_ptr->p_id
                             + " wasn't initialized;\n");
     }
-    // const propagation?
 }
 
-void Visitor::analyze_txt_line() const
+void SemanticVisitor::visit_txt_line() const
 {
-    if (verbal) {
+    if (_verb) {
         std::cout << "txtline\n" << std::flush;
     }
     return;
 }
 
-void Visitor::analyze_txt_file(const TextFileAst* txt_file_ptr) const
+void SemanticVisitor::visit_txt_file(const TextFileAst* txt_file_ptr) const
 {
-    if (verbal) {
+    if (_verb) {
         std::cout << "txtfile\n" << std::flush;
     }
     fs::path temp_path(txt_file_ptr->path_txt);
@@ -227,17 +231,16 @@ void Visitor::analyze_txt_file(const TextFileAst* txt_file_ptr) const
     }
 }
 
-void Visitor::analyze_exit() const
-{
-    if (verbal) {
-        std::cout << "exit\n" << std::flush;
-    }
-    return;
-}
-
-void Visitor::error() const
-{
-    throw SemanticError("Program error: calling deprecated visitor method\n");
-}
+void FlatterVisitor::visit_exit() const {}
+void FlatterVisitor::visit_script(const ScriptAst*) const {}
+void FlatterVisitor::visit_stmt(const StmtAst*) const {}
+void FlatterVisitor::visit_persona(const PersonaAst*) const {}
+void FlatterVisitor::visit_ins_type(const InsTypeAst*, Persona&) const {}
+void FlatterVisitor::visit_persona_var(const PersonaVarAst*) const {}
+void FlatterVisitor::visit_bg_file(const BackFileAst*) const {}
+void FlatterVisitor::visit_fg_file(const ForeFileAst*) const {}
+void FlatterVisitor::visit_fg_persona(const ForePersonaAst*) const {}
+void FlatterVisitor::visit_txt_line() const {}
+void FlatterVisitor::visit_txt_file(const TextFileAst*) const {}
 
 }  // namespace vino

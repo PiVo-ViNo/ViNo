@@ -22,13 +22,14 @@ include(cmake/add_default_target_compile_definitions.cmake)
 
 # ---- The core library ----
 add_library(ViNo_lib OBJECT 
-	src/AST.cpp
 	src/Parser.cpp
 	src/Persona.cpp
 	src/SemanticAnalyzer.cpp
 	src/SymbolTable.cpp
 	src/TokenEnum.cpp
 	src/TokenScanner.cpp
+	src/IVisitor.cpp
+	src/VisitorImplementations.cpp
 )
 
 target_include_directories(

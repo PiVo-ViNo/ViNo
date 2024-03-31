@@ -9,6 +9,7 @@
 
 #include "SemanticAnalyzer.hpp"
 
+#include "VisitorImplementations.hpp"
 #include <iostream>
 
 namespace vino {
@@ -33,8 +34,8 @@ void SemanticAnalyzer::run_analysis(bool verbose)
 
     _verbose = verbose;
 
-    Visitor anal_visitor(this->_env, true);
-    anal_visitor.analyze_script(_ast.get());
+    SemanticVisitor anal_visitor(this->_env, true);
+    anal_visitor.visit_script(_ast.get());
 
     _verbose = false;
 }
