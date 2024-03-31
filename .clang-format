@@ -18,3 +18,5 @@ BraceWrapping:
   AfterFunction: true
   AfterControlStatement: MultiLine
 BreakBeforeBinaryOperators: NonAssignment
+IncludeBlocks: Preserve
+SortIncludes: Never
