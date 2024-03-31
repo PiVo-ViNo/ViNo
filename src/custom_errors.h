@@ -64,4 +64,15 @@ public:
     const char *what() const noexcept { return what_str.c_str(); }
 };
 
+class ArgsError : public std::exception {
+    std::string what_str;
+public:
+    explicit ArgsError(std::string errstr) noexcept :
+        what_str(std::move(errstr))
+    {
+    }
+
+    const char *what() const noexcept { return what_str.c_str(); }
+};
+
 }  // namespace vino

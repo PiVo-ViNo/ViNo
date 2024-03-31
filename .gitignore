@@ -9,3 +9,5 @@ docs/latex
 docs/xml
 .cache/
 .clangd
+Testing/
+compile_commands.json
