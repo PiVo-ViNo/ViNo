@@ -1,4 +1,9 @@
-#include "Parser.h"
+#include "Parser.hpp"
+
+#include "SemanticAnalyzer.hpp"
+#include "TokenEnum.hpp"
+#include "boost/ut.hpp"
+#include "custom_errors.hpp"
 
 #include <exception>
 #include <filesystem>
@@ -8,11 +13,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-
-#include "SemanticAnalyzer.h"
-#include "TokenEnum.h"
-#include "boost/ut.hpp"
-#include "custom_errors.h"
 
 namespace fs = std::filesystem;
 

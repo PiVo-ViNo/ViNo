@@ -1,5 +1,5 @@
 /*
- * SemanticAnalyzer.h
+ * SemanticAnalyzer.hpp
  *
  * Created on Sun Mar 10 2024
  *
@@ -9,11 +9,10 @@
 
 #pragma once
 
+#include "custom_errors.hpp"
+#include "AST.hpp"
+#include "SymbolTable.hpp"
 #include <filesystem>
-
-#include "AST.h"
-#include "SymbolTable.h"
-#include "custom_errors.h"
 
 namespace vino {
 

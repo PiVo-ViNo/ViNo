@@ -1,5 +1,5 @@
 /*
- * Parser.h
+ * Parser.hpp
  *
  * required :
  *
@@ -14,10 +14,9 @@
 #include <functional>
 #include <memory>
 #include <utility>
-#include <vector>
 
-#include "AST.h"
-#include "TokenEnum.h"
+#include "AST.hpp"
+#include "TokenEnum.hpp"
 
 namespace vino {
 

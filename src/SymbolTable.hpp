@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// SymbolTable.h                //    /^--^\     /^--^\     /^--^\           //
+// SymbolTable.hpp                //    /^--^\     /^--^\     /^--^\           //
 //                              //    \____/     \____/     \____/           //
 // Created on Sat Mar 05 2024   //   /      \   /      \   /      \          //
 //                              //  |        | |        | |        |         //
@@ -21,7 +21,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Persona.h"
+#include "Persona.hpp"
 
 namespace vino {
 

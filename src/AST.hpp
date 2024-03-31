@@ -4,8 +4,8 @@
 #include <memory>
 #include <string>
 
-#include "SymbolTable.h"
-#include "TokenEnum.h"
+#include "SymbolTable.hpp"
+#include "TokenEnum.hpp"
 
 namespace vino {
 

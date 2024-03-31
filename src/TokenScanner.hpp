@@ -1,5 +1,5 @@
 /*
- * TokenScanner.h
+ * TokenScanner.hpp
  *
  * required :
  *
@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "TokenEnum.h"
+#include "TokenEnum.hpp"
 
 namespace vino {
 

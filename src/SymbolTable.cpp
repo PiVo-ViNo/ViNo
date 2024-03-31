@@ -7,7 +7,7 @@
  *
  */
 
-#include "SymbolTable.h"
+#include "SymbolTable.hpp"
 
 #include <stdexcept>
 #include <utility>

@@ -7,19 +7,18 @@
  *
  */
 
-#include <bitset>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <ostream>
 
-#include "Parser.h"
-#include "SemanticAnalyzer.h"
-#include "SymbolTable.h"
-#include "TokenEnum.h"
-#include "TokenScanner.h"
-#include "custom_errors.h"
+#include "Parser.hpp"
+#include "SemanticAnalyzer.hpp"
+#include "SymbolTable.hpp"
+#include "TokenEnum.hpp"
+#include "TokenScanner.hpp"
+#include "custom_errors.hpp"
 
 namespace fs = std::filesystem;
 

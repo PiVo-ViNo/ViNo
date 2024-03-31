@@ -1,11 +1,11 @@
-#include "AST.h"
+#include "AST.hpp"
 
 #include <filesystem>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 
-#include "custom_errors.h"
+#include "custom_errors.hpp"
 
 namespace vino {
 
