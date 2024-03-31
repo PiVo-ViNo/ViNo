@@ -7,7 +7,7 @@
  *
  */
 
-#include "SemanticAnalyzer.h"
+#include "SemanticAnalyzer.hpp"
 
 #include <iostream>
 

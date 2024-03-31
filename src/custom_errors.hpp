@@ -1,5 +1,5 @@
 /*
- * custom_errors.h
+ * custom_errors.hpp
  *
  * required :
  *

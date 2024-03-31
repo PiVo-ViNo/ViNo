@@ -1,5 +1,5 @@
-#include "TokenEnum.h"
-#include "custom_errors.h"
+#include "TokenEnum.hpp"
+#include "custom_errors.hpp"
 
 std::ostream& vino::operator<<(std::ostream& os, const vino::ScriptToken& tok) {
     using vst = vino::ScriptToken;

@@ -9,15 +9,15 @@
  *
  */
 
-#include "TokenScanner.h"
+#include "TokenScanner.hpp"
 
 #include <cctype>
 #include <iostream>
 #include <memory>
 #include <utility>
 
-#include "custom_errors.h"
-#include "stuff.h"
+#include "custom_errors.hpp"
+#include "stuff.hpp"
 
 namespace vino {
 

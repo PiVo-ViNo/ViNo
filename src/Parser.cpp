@@ -10,14 +10,14 @@
 //                              //| | |  \/| | |  \/| | | | | |\/ | | | | | |//
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "Parser.h"
+#include "Parser.hpp"
 
 #include <iostream>
 #include <memory>
 
-#include "AST.h"
-#include "TokenEnum.h"
-#include "custom_errors.h"
+#include "AST.hpp"
+#include "TokenEnum.hpp"
+#include "custom_errors.hpp"
 
 namespace vino {
 

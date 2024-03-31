@@ -1,4 +1,4 @@
-#include "TokenScanner.h"
+#include "TokenScanner.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "TokenEnum.h"
+#include "TokenEnum.hpp"
 #include "boost/ut.hpp"
 
 namespace fs = std::filesystem;
