@@ -1,0 +1,8 @@
+#comment
+background = "bg.png"
+#comment
+persona Human {path="./human",
+                foreground = "human0.png", name = "Humanio"}
+persona Olegus {path= "./olegus", name="Olegus", troll="Olegus_troll.png"}
+background = "bg1.png"
+exit
