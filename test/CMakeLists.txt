@@ -64,4 +64,27 @@ target_link_libraries(
 )
 
 add_test(NAME ViNo-Token-Scanner_test COMMAND ViNo-Token-Scanner_test)
+
+# ---- Full Compiler test ----
+add_executable(ViNo-FullCompiler_test FullCompiler/FullCompiler_test.cpp)
+
+target_include_directories(
+	ViNo-FullCompiler_test
+	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+	PUBLIC "$<BUILD_INTERFACE:${boost.ut_SOURCE_DIR}/include>"
+)
+
+target_compile_features(ViNo-FullCompiler_test PRIVATE cxx_std_20)
+
+add_default_target_compile_definitions(ViNo-FullCompiler_test)
+
+target_link_libraries(
+	ViNo-FullCompiler_test
+	PRIVATE ViNo_lib
+)
+
+file(COPY "${CMAKE_SOURCE_DIR}/test/FullCompiler/resources" DESTINATION "${CMAKE_BINARY_DIR}/test")
+
+add_test(NAME ViNo-FullCompiler_test COMMAND ViNo-FullCompiler_test)
+
 add_folders(Test)

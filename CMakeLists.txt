@@ -30,6 +30,7 @@ add_library(ViNo_lib OBJECT
 	src/TokenScanner.cpp
 	src/IVisitor.cpp
 	src/VisitorImplementations.cpp
+	src/MainCompiler.cpp
 )
 
 target_include_directories(

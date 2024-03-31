@@ -150,7 +150,7 @@ void SemanticVisitor::visit_persona_var(const PersonaVarAst* mn_p_var_ptr) const
     }
     // param must be valid path
     fs::path temp_path(mn_p_var_ptr->param);
-    if (!fs::exists(temp_path) && temp_path.extension() != ".png") {
+    if (!fs::exists(temp_path) || temp_path.extension() != ".png") {
         throw SemanticError("Error: " + mn_p_var_ptr->param
                             + " doesn't exist or not a .png;\n");
     }
@@ -169,7 +169,7 @@ void SemanticVisitor::visit_bg_file(const BackFileAst* mn_bg_ptr) const
         std::cout << "bgfile\n" << std::flush;
     }
     fs::path temp_path(mn_bg_ptr->path_bg);
-    if (!fs::exists(temp_path) && temp_path.extension() != ".png") {
+    if (!fs::exists(temp_path) || temp_path.extension() != ".png") {
         throw SemanticError("Error: " + temp_path.string()
                             + " doesn't exist or not a .png;\n");
     }
@@ -181,7 +181,7 @@ void SemanticVisitor::visit_fg_file(const ForeFileAst* mn_fg_f_ptr) const
         std::cout << "fgfile\n" << std::flush;
     }
     fs::path temp_path(mn_fg_f_ptr->path_fg);
-    if (!fs::exists(temp_path) && temp_path.extension() != ".png") {
+    if (!fs::exists(temp_path) || temp_path.extension() != ".png") {
         throw SemanticError("Error: " + temp_path.string()
                             + " doesn't exist or not a .png;\n");
     }
@@ -225,7 +225,7 @@ void SemanticVisitor::visit_txt_file(const TextFileAst* txt_file_ptr) const
         std::cout << "txtfile\n" << std::flush;
     }
     fs::path temp_path(txt_file_ptr->path_txt);
-    if (!fs::exists(temp_path) && temp_path.extension() != ".txt") {
+    if (!fs::exists(temp_path) || temp_path.extension() != ".txt") {
         throw SemanticError("Error: " + txt_file_ptr->path_txt
                             + " doesn't exist or not a .txt;\n");
     }
