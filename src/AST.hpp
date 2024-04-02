@@ -9,16 +9,13 @@
 namespace vino {
 
 struct BasicAst {
-    virtual void accept(const IVisitor& visitor) const 
-    {
-        visitor.error();
-    }
+    virtual void accept(IVisitor& visitor) const { visitor.error(); }
 
     virtual ~BasicAst() {}
 };
 
 struct ExitAst : public BasicAst {
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_exit();
     }
@@ -33,7 +30,7 @@ struct StmtAst : public BasicAst {
 
     explicit StmtAst(BasicAst* stmt_expr) : expr(stmt_expr) {}
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_stmt(this);
     }
@@ -50,7 +47,7 @@ struct ScriptAst : public BasicAst {
     {
     }
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_script(this);
     }
@@ -91,7 +88,7 @@ struct PersonaAst : public BasicAst {
     {
     }
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_persona(this);
     }
@@ -118,7 +115,7 @@ struct PersonaVarAst : public BasicAst {
     {
     }
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_persona_var(this);
     }
@@ -131,7 +128,7 @@ struct BackFileAst : public BasicAst {
 
     explicit BackFileAst(std::string&& path_to_bg) : path_bg(path_to_bg) {}
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_bg_file(this);
     }
@@ -144,7 +141,7 @@ struct ForeFileAst : public BasicAst {
 
     explicit ForeFileAst(std::string&& path_to_fg) : path_fg(path_to_fg) {}
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_fg_file(this);
     }
@@ -167,7 +164,7 @@ struct ForePersonaAst : public BasicAst {
     {
     }
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_fg_persona(this);
     }
@@ -180,9 +177,9 @@ struct TextLineAst : public BasicAst {
 
     explicit TextLineAst(std::string&& text) : text(text) {}
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
-        return visitor.visit_txt_line();
+        return visitor.visit_txt_line(this);
     }
 };
 
@@ -195,7 +192,7 @@ struct TextFileAst : public BasicAst {
 
     explicit TextFileAst(std::string&& path_to_txt) : path_txt(path_to_txt) {}
 
-    inline void accept(const IVisitor& visitor) const override
+    inline void accept(IVisitor& visitor) const override
     {
         return visitor.visit_txt_file(this);
     }

@@ -41,10 +41,10 @@ public:
     // void set_ast(const ScriptAst&);
     // void set_ast(ScriptAst&&);
 
-    void run_analysis(bool verbose = false);
+    void run(bool verbose = false);
 
 private:
-    SymbolTableEnv&                  _env;  // reference&, because SemAnal exchange info with it
+    SymbolTableEnv& _env;  // reference&, because SemAnal exchange info with it
     std::unique_ptr<const ScriptAst> _ast;  // SemAnal take whole AST
     bool                             _verbose = false;
     bool                             _moved_ast;

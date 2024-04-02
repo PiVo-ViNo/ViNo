@@ -5,4 +5,7 @@ persona Human {path="./resources/human",
                 foreground = "./resources/human0.png", name = "Humanio"}
 persona Olegus {path= "./resources/olegus", name="Olegus", troll="./resources/Olegus_troll.png"}
 background = "./resources/bg1.png"
+text "I am Olegus"
+foreground = Human
+foreground = Olegus.troll
 exit

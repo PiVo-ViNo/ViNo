@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SymbolTable.hpp"
+#include "custom_errors.hpp"
 
 namespace vino {
 
@@ -31,19 +32,22 @@ public:
 
     virtual ~IVisitor() = default;
 
-    virtual void visit_exit() const = 0;
-    virtual void visit_script(const ScriptAst*) const = 0;
-    virtual void visit_stmt(const StmtAst*) const = 0;
-    virtual void visit_persona(const PersonaAst*) const = 0;
-    virtual void visit_ins_type(const InsTypeAst*, Persona&) const = 0;
-    virtual void visit_persona_var(const PersonaVarAst*) const = 0;
-    virtual void visit_bg_file(const BackFileAst*) const = 0;
-    virtual void visit_fg_file(const ForeFileAst*) const = 0;
-    virtual void visit_fg_persona(const ForePersonaAst*) const = 0;
-    virtual void visit_txt_line() const = 0;
-    virtual void visit_txt_file(const TextFileAst*) const = 0;
+    virtual void visit_exit() = 0;
+    virtual void visit_script(const ScriptAst*) = 0;
+    virtual void visit_stmt(const StmtAst*) = 0;
+    virtual void visit_persona(const PersonaAst*) = 0;
+    virtual void visit_ins_type(const InsTypeAst*, Persona&) = 0;
+    virtual void visit_persona_var(const PersonaVarAst*) = 0;
+    virtual void visit_bg_file(const BackFileAst*) = 0;
+    virtual void visit_fg_file(const ForeFileAst*) = 0;
+    virtual void visit_fg_persona(const ForePersonaAst*) = 0;
+    virtual void visit_txt_line(const TextLineAst*) = 0;
+    virtual void visit_txt_file(const TextFileAst*) = 0;
 
-    void error() const;
+    void error() const
+    {
+        throw SemanticError("Program error: calling deprecated visitor method\n");
+    }
 
 protected:
     // referece instead of ptr, because no null possible (and must be)

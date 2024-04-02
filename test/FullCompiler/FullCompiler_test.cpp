@@ -13,10 +13,19 @@ int main()
     using namespace boost::ut::literals;
     using namespace boost::ut::operators::terse;
 
+
     "positive_basic"_test = [] {
         expect(nothrow([] {
             const char *ptr_argv_loc[] = {"", "--path",
                                           "./resources/test.vnsf"};
+            m_comp::compilation_main(3, ptr_argv_loc);
+        }));
+    };
+
+    "negative_no_persona"_test = [] {
+        expect(throws<vino::SemanticError>([] {
+            const char *ptr_argv_loc[] = {"", "--path",
+                                          "./resources/short.vnsf"};
             m_comp::compilation_main(3, ptr_argv_loc);
         }));
     };

@@ -28,9 +28,9 @@ add_library(ViNo_lib OBJECT
 	src/SymbolTable.cpp
 	src/TokenEnum.cpp
 	src/TokenScanner.cpp
-	src/IVisitor.cpp
 	src/VisitorImplementations.cpp
 	src/MainCompiler.cpp
+	src/CodeGen.cpp
 )
 
 target_include_directories(

@@ -25,7 +25,7 @@ void SemanticAnalyzer::set_symbol_table(SymbolTableEnv&& symb_table_env)
     _env = symb_table_env;
 }
 
-void SemanticAnalyzer::run_analysis(bool verbose)
+void SemanticAnalyzer::run(bool verbose)
 {
     if (_ast->stmt == nullptr) {
         std::cout << "Input AST was empty: correct semantics for sure x_x\n";

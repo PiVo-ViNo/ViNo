@@ -10,11 +10,14 @@
 
 #include <cstring>
 #include <exception>
+#include <filesystem>
 #include <fstream>
+#include <ios>
 #include <iostream>
 #include <ostream>
 #include <stdexcept>
 
+#include "CodeGen.hpp"
 #include "AST.hpp"
 #include "Parser.hpp"
 #include "SemanticAnalyzer.hpp"
@@ -30,6 +33,7 @@ const std::string short_arg_path = "-p";
 
 bool path_integrity(const char *path) noexcept
 {
+    std::cout << fs::current_path() << std::endl;
     fs::path src_path(path);
     if (fs::exists(src_path) && src_path.extension().string() == ".vnsf") {
         return true;
@@ -77,7 +81,7 @@ void compilation_main(int loc_argc, const char **loc_argv)
 
     using vpair = vino::PairTokenId;
 
-    std::ifstream main_script{script_path, std::ios::binary};
+    std::ifstream main_script{script_path, std::ios::in | std::ios::binary};
     if (!main_script.good()) {
         std::runtime_error("Bad file " + script_path.string());
     }
@@ -87,15 +91,21 @@ void compilation_main(int loc_argc, const char **loc_argv)
         return main_tok_scanner.get_token();
     };
 
-    vino::ScriptAst main_ast;
     vino::Parser    main_parser(f_get_tokens);
-    main_ast = main_parser.run();
+    vino::ScriptAst main_ast = main_parser.run(true);
     std::cout << "Successful parsing\n" << std::flush;
 
     vino::SymbolTableEnv   main_symb_env;
     vino::SemanticAnalyzer main_sem_anal(main_symb_env, main_ast);
-    main_sem_anal.run_analysis();
+    main_sem_anal.run(true);
     std::cout << "Successful semantic analysis\n" << std::flush;
+
+    vino::CodeGen main_code_gen;
+    fs::create_directory("./finalVN");
+    std::fstream out_fbin("./finalVN/m_vm_inst.bin",
+                          std::ios::trunc | std::ios::out | std::ios::binary);
+    main_code_gen.run(&main_ast, out_fbin, true);
+    std::cout << "Successful code generation\n" << std::flush;
 }
 
 }  // namespace m_comp

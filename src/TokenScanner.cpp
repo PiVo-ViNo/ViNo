@@ -54,7 +54,9 @@ PairTokenId TokenScanner::get_token()
     std::string alnum_str{};
 
     char ch = 0;
-    while ((ch = static_cast<char>(_istream_ptr->get())) && ch != -1) {
+    while ((ch = static_cast<char>(_istream_ptr->get()))
+           && _istream_ptr->good())
+    {
         switch (ch) {
             // skip comments entirely
             case '#':
@@ -78,7 +80,7 @@ PairTokenId TokenScanner::get_token()
 
             case '\r':
                 if (!alnum_str.empty()) {
-                    return check_var_or_keyword(alnum_str, ' ');
+                    return check_var_or_keyword(alnum_str, '\r');
                 }
                 break;
 
@@ -181,7 +183,7 @@ std::vector<PairTokenId> TokenScanner::get_all_tokens(bool verbose)
         tokens_vec.push_back(new_token_pair);
         if (new_token_pair.token == ScriptToken::EXIT) return tokens_vec;
     }
-    _verb = false; 
+    _verb = false;
     return tokens_vec;
 }
 
