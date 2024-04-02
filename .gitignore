@@ -11,3 +11,5 @@ docs/xml
 .clangd
 Testing/
 compile_commands.json
+finalVN
+*.exe

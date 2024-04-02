@@ -48,7 +48,10 @@ int main()
         "background = \"bg.png\"\n"
         "#comment\n"
         "persona Human {path=\"./human\", background=\"bg.png\",\n"
-        "foreground = \"human0.png\", name = \"Humanio\"}\n"
+        "foreground = \"human0.png\", name = \"Humanio\",\n"
+        "angry = \"./angry.png\"}\n"
+        "foreground = Human\n"
+        "foreground = Human.angry\n"
         "exit\n";
 
     const std::vector<vst> output_test = {
@@ -62,8 +65,15 @@ int main()
         vst::SIGN_EQ,  vst::TEXT_LINE, vst::COMMA,     vst::BG,
         vst::SIGN_EQ,  vst::TEXT_LINE, vst::COMMA,     vst::NEW_LINE,
         vst::FG,       vst::SIGN_EQ,   vst::TEXT_LINE, vst::COMMA,
-        vst::NAME,     vst::SIGN_EQ,   vst::TEXT_LINE, vst::BRACE_CL,
+        vst::NAME,     vst::SIGN_EQ,   vst::TEXT_LINE, vst::COMMA, 
         vst::NEW_LINE,
+        vst::VAR,      vst::SIGN_EQ,   vst::TEXT_LINE, vst::BRACE_CL, 
+        vst::NEW_LINE,
+
+        vst::FG, vst::SIGN_EQ, vst::VAR, vst::NEW_LINE,
+
+        vst::FG, vst::SIGN_EQ, vst::VAR, vst::DOT, vst::VAR,
+        vst::NEW_LINE, 
 
         vst::EXIT};
 
