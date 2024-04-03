@@ -7,9 +7,9 @@ namespace m_comp {
 namespace fs = std::filesystem;
 
 struct ArgsFlags {
-    bool script_path_set;
-    bool dev_mod_set;
-    bool test_set;
+    bool script_path_set = false;
+    bool verbose_mode_set = false;
+    bool test_set = false;
 };
 
 bool path_integrity(const char *path) noexcept;

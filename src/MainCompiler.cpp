@@ -30,6 +30,8 @@ namespace m_comp {
 
 const std::string arg_path = "--path";
 const std::string short_arg_path = "-p";
+const std::string arg_verbose = "--verbose";
+const std::string short_arg_verbose = "-v";
 
 bool path_integrity(const char *path) noexcept
 {
@@ -55,6 +57,10 @@ fs::path check_args(int loc_argc, const char **loc_argv, ArgsFlags &args_flags)
                 }
                 args_flags.script_path_set = true;
                 script_path = loc_argv[i];
+            } else if (std::string(loc_argv[i]) == m_comp::arg_verbose
+                       || std::string(loc_argv[i]) == m_comp::short_arg_verbose)
+            {
+                args_flags.verbose_mode_set = true;
             } else {
                 throw vino::ArgsError("ERROR: Unknown argument: ");
             }
@@ -71,14 +77,16 @@ void compilation_main(int loc_argc, const char **loc_argv)
 {
     /* Flags for existence of arguments
      *  0:  --path      / -p
-     *  1:  --dev-mode  / -d
+     *  1:  --verbose   / -v
      *  2:  --test      / -t
      */
     m_comp::ArgsFlags main_args;
     fs::path          script_path;
 
     script_path = m_comp::check_args(loc_argc, loc_argv, main_args);
-
+    if (!main_args.script_path_set) {
+        throw vino::ArgsError("Program needs a source script file to run");
+    }
     using vpair = vino::PairTokenId;
 
     std::ifstream main_script{script_path, std::ios::in | std::ios::binary};
@@ -92,19 +100,19 @@ void compilation_main(int loc_argc, const char **loc_argv)
     };
 
     vino::Parser    main_parser(f_get_tokens);
-    vino::ScriptAst main_ast = main_parser.run(true);
+    vino::ScriptAst main_ast = main_parser.run(main_args.verbose_mode_set);
     std::cout << "Successful parsing\n" << std::flush;
 
     vino::SymbolTableEnv   main_symb_env;
     vino::SemanticAnalyzer main_sem_anal(main_symb_env, main_ast);
-    main_sem_anal.run(true);
+    main_sem_anal.run(main_args.verbose_mode_set);
     std::cout << "Successful semantic analysis\n" << std::flush;
 
     vino::CodeGen main_code_gen;
     fs::create_directory("./finalVN");
     std::fstream out_fbin("./finalVN/m_vm_inst.bin",
                           std::ios::trunc | std::ios::out | std::ios::binary);
-    main_code_gen.run(&main_ast, out_fbin, true);
+    main_code_gen.run(&main_ast, out_fbin, main_args.verbose_mode_set);
     std::cout << "Successful code generation\n" << std::flush;
 }
 
