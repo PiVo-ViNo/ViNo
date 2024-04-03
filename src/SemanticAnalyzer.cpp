@@ -32,12 +32,12 @@ void SemanticAnalyzer::run(bool verbose)
         return;
     }
 
-    _verbose = verbose;
+    _verb = verbose;
 
-    SemanticVisitor anal_visitor(this->_env, true);
+    SemanticVisitor anal_visitor(this->_env, _verb);
     anal_visitor.visit_script(_ast.get());
 
-    _verbose = false;
+    _verb = false;
 }
 
 }  // namespace vino

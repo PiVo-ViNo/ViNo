@@ -46,7 +46,7 @@ public:
 private:
     SymbolTableEnv& _env;  // reference&, because SemAnal exchange info with it
     std::unique_ptr<const ScriptAst> _ast;  // SemAnal take whole AST
-    bool                             _verbose = false;
+    bool                             _verb = false;
     bool                             _moved_ast;
 };
 

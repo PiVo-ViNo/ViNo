@@ -48,7 +48,7 @@ fs::path check_args(int loc_argc, const char **loc_argv, ArgsFlags &args_flags)
     fs::path script_path;
     if (loc_argc > 1) {
         for (int i = 1; i < loc_argc; i++) {
-            if (loc_argc - i >= 1
+            if (loc_argc - i >= 2
                 && (std::string(loc_argv[i]) == m_comp::arg_path
                     || std::string(loc_argv[i]) == m_comp::short_arg_path))
             {
@@ -68,7 +68,8 @@ fs::path check_args(int loc_argc, const char **loc_argv, ArgsFlags &args_flags)
     } else {  // needs a check if there is the running instance of program,
               //  if there are many, give error "Many instances : cannot attach
               //  to random"
-        throw vino::ArgsError("Program needs a source script file to run");
+        throw vino::ArgsError(
+            "ERROR: Program needs a source script file to run");
     }
     return script_path;
 }
@@ -85,13 +86,17 @@ void compilation_main(int loc_argc, const char **loc_argv)
 
     script_path = m_comp::check_args(loc_argc, loc_argv, main_args);
     if (!main_args.script_path_set) {
-        throw vino::ArgsError("Program needs a source script file to run");
+        throw vino::ArgsError(
+            "ERROR: Program needs a source script file to run");
+    }
+    if (main_args.verbose_mode_set) {
+        std::cout << "Running verbose mode\n" << std::flush;
     }
     using vpair = vino::PairTokenId;
 
     std::ifstream main_script{script_path, std::ios::in | std::ios::binary};
     if (!main_script.good()) {
-        std::runtime_error("Bad file " + script_path.string());
+        std::runtime_error("ERROR: Bad file " + script_path.string());
     }
 
     vino::TokenScanner     main_tok_scanner(std::move(main_script));
