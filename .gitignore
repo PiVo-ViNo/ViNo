@@ -13,3 +13,8 @@ Testing/
 compile_commands.json
 finalVN
 *.exe
+*.o
+*.obj
+*.dll
+*.so 
+*.so.a

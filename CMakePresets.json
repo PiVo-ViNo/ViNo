@@ -1,103 +1,112 @@
 {
-  "version": 2,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 14,
-    "patch": 0
-  },
-  "configurePresets": [
-    {
-      "name": "cmake-pedantic",
-      "hidden": true,
-      "warnings": {
-        "dev": true,
-        "deprecated": true,
-        "uninitialized": true,
-        "unusedCli": true,
-        "systemVars": false
-      },
-      "errors": {
-        "dev": true,
-        "deprecated": true
-      }
+    "version": 2,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 14,
+        "patch": 0
     },
-    {
-      "name": "dev-mode",
-      "hidden": true,
-      "inherits": "cmake-pedantic",
-      "cacheVariables": {
-        "CMAKE_COLOR_DIAGNOSTICS": "ON",
-        "ViNo_DEVELOPER_MODE": "ON",
-        "CMAKE_MESSAGE_LOG_LEVEL": "TRACE"
-      }
-    },
-    {
-      "name": "cppcheck-unix64",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_CXX_CPPCHECK": "cppcheck;--inline-suppr;--platform=unix64"
-      }
-    },
-    {
-      "name": "cppcheck-win64",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_CXX_CPPCHECK": "cppcheck;--inline-suppr;--platform=win64"
-      }
-    },
-    {
-      "name": "ci-std",
-      "description": "This preset makes sure the project actually builds with at least the specified standard",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_CXX_EXTENSIONS": "OFF",
-        "CMAKE_CXX_STANDARD": "20",
-        "CMAKE_CXX_STANDARD_REQUIRED": "ON"
-      }
-    },
-    {
-      "name": "flags-gcc-clang",
-      "description": "These flags are supported by both GCC and Clang",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "-fstack-protector-strong -fcf-protection=full -fstack-clash-protection -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wformat=2 -Wundef -Werror=float-equal -Wshadow -Wcast-align -Wunused -Wnull-dereference -Wdouble-promotion -Wimplicit-fallthrough -Wextra-semi -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast",
-        "CMAKE_EXE_LINKER_FLAGS": "-Wl,--allow-shlib-undefined,--as-needed,-z,noexecstack,-z,relro,-z,now",
-        "CMAKE_SHARED_LINKER_FLAGS": "-Wl,--allow-shlib-undefined,--as-needed,-z,noexecstack,-z,relro,-z,now"
-      }
-    },
-    {
-      "name": "flags-clang",
-      "hidden": true,
-      "cacheVariables": {
-        "CMAKE_CXX_FLAGS": "-fstack-protector-strong -fcf-protection=full -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wformat=2 -Wundef -Werror=float-equal -Wshadow -Wcast-align -Wunused -Wnull-dereference -Wdouble-promotion -Wimplicit-fallthrough -Wextra-semi -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast -gdwarf-4"
-      }
-    },
-    {
-      "name": "ci-linux",
-      "generator": "Ninja",
-      "hidden": true,
-      "inherits": ["flags-clang", "ci-std"],
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "ci-win64",
-      "generator": "Ninja",
-      "hidden": true,
-      "inherits": ["flags-clang", "ci-std"],
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    },
-    {
-      "name": "ci-cygwin",
-      "generator": "MinGW Makefiles",
-      "hidden": true,
-      "inherits": ["flags-clang", "ci-std"],
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
-      }
-    }
-  ]
+    "configurePresets": [
+        {
+            "name": "cmake-pedantic",
+            "hidden": true,
+            "warnings": {
+                "dev": true,
+                "deprecated": true,
+                "uninitialized": true,
+                "unusedCli": true,
+                "systemVars": false
+            },
+            "errors": {
+                "dev": true,
+                "deprecated": true
+            }
+        },
+        {
+            "name": "dev-mode",
+            "hidden": true,
+            "inherits": "cmake-pedantic",
+            "cacheVariables": {
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "ViNo_DEVELOPER_MODE": "ON",
+                "CMAKE_MESSAGE_LOG_LEVEL": "TRACE"
+            }
+        },
+        {
+            "name": "cppcheck-unix64",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_CPPCHECK": "cppcheck;--inline-suppr;--platform=unix64"
+            }
+        },
+        {
+            "name": "cppcheck-win64",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_CPPCHECK": "cppcheck;--inline-suppr;--platform=win64"
+            }
+        },
+        {
+            "name": "ci-std",
+            "description": "This preset makes sure the project actually builds with at least the specified standard",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_EXTENSIONS": "OFF",
+                "CMAKE_CXX_STANDARD": "20",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON"
+            }
+        },
+        {
+            "name": "flags-gcc-clang",
+            "description": "These flags are supported by both GCC and Clang",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-fstack-protector-strong -fcf-protection=full -fstack-clash-protection -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wformat=2 -Wundef -Werror=float-equal -Wshadow -Wcast-align -Wunused -Wnull-dereference -Wdouble-promotion -Wimplicit-fallthrough -Wextra-semi -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast",
+                "CMAKE_EXE_LINKER_FLAGS": "-Wl,--allow-shlib-undefined,--as-needed,-z,noexecstack,-z,relro,-z,now",
+                "CMAKE_SHARED_LINKER_FLAGS": "-Wl,--allow-shlib-undefined,--as-needed,-z,noexecstack,-z,relro,-z,now"
+            }
+        },
+        {
+            "name": "flags-clang",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-fstack-protector-strong -fcf-protection=full -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wcast-qual -Wformat=2 -Wundef -Werror=float-equal -Wshadow -Wcast-align -Wunused -Wnull-dereference -Wdouble-promotion -Wimplicit-fallthrough -Wextra-semi -Woverloaded-virtual -Wnon-virtual-dtor -Wold-style-cast -gdwarf-4"
+            }
+        },
+        {
+            "name": "ci-linux",
+            "generator": "Ninja",
+            "hidden": true,
+            "inherits": [
+                "flags-clang",
+                "ci-std"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "ci-win64",
+            "generator": "Ninja",
+            "hidden": true,
+            "inherits": [
+                "flags-clang",
+                "ci-std"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "ci-cygwin",
+            "generator": "MinGW Makefiles",
+            "hidden": true,
+            "inherits": [
+                "flags-clang",
+                "ci-std"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ]
 }

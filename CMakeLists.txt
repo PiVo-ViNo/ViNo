@@ -1,5 +1,5 @@
 # ---- The minimum required version of CMake ----
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.25)
 
 # ---- Check that the build will not go to the project source directory ----
 include(cmake/prelude.cmake)
@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED 20)
 
 project(
 	ViNo
-	VERSION 0.0.1
+	VERSION 0.1.0
 	DESCRIPTION "Vi[sual] No[vel] Creator"
 	HOMEPAGE_URL "https://github.com/PiVo-ViNo/ViNo"
 	LANGUAGES CXX
@@ -20,43 +20,10 @@ include(cmake/variables.cmake)
 # ---- Additional cmake function to add target definitions ----
 include(cmake/add_default_target_compile_definitions.cmake)
 
-# ---- The core library ----
-add_library(ViNo_lib OBJECT 
-	src/Parser.cpp
-	src/Persona.cpp
-	src/SemanticAnalyzer.cpp
-	src/SymbolTable.cpp
-	src/TokenEnum.cpp
-	src/TokenScanner.cpp
-	src/VisitorImplementations.cpp
-	src/MainCompiler.cpp
-	src/CodeGen.cpp
-)
-
-target_include_directories(
-	ViNo_lib ${warning_guard} PUBLIC
-	"$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
-	"$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>"
-)
-
-target_compile_features(ViNo_lib PUBLIC cxx_std_20)
-
-add_default_target_compile_definitions(ViNo_lib)
-
-# ---- Declare executable ----
-add_executable(ViNo_exe src/main.cpp)
-add_executable(ViNo::exe ALIAS ViNo_exe)
-
-add_default_target_compile_definitions(ViNo_exe)
-
-set_property(TARGET ViNo_exe PROPERTY OUTPUT_NAME ViNo)
-
-target_compile_features(ViNo_exe PRIVATE cxx_std_20)
-
-target_link_libraries(
-	ViNo_exe
-	PRIVATE ViNo_lib
-)
+# ---- Build All Components of ViNo ----
+add_subdirectory(src/compiler)
+add_subdirectory(src/gui)
+# add_subdirectory(src/vm)
 
 # ---- Install rules ----
 if(NOT CMAKE_SKIP_INSTALL_RULES)

@@ -16,6 +16,7 @@ Checks: >
   readability-identifier-naming,
   -performance-avoid-endl,
   -modernize-use-trailing-return-type,
+  -llvm-include-order,
 
 CheckOptions:
   - key:             readability-identifier-naming.LocalPointerCase

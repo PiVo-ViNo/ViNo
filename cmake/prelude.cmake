@@ -1,4 +1,4 @@
-# ---- Встроенная защита ----
+# ---- Embed Guard ----
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 	message(

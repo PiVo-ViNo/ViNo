@@ -10,7 +10,7 @@ include(../cmake/project-is-top-level.cmake)
 include(../cmake/folders.cmake)
 
 if(PROJECT_IS_TOP_LEVEL)
-	find_package(ViNo_lib REQUIRED)
+	find_package(ViNoCompiler_lib REQUIRED)
 	enable_testing()
 endif()
 
@@ -26,11 +26,12 @@ FetchContent_Declare(
 FetchContent_Populate(boost.ut)
 
 # ---- Parser test ----
-add_executable(ViNo-Parser_test Parser/Parser_test.cpp)
+add_executable(ViNo-Parser_test Compiler/Parser_test.cpp)
 
 target_include_directories(
 	ViNo-Parser_test
-	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>"
+	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/compiler>"
 	PUBLIC "$<BUILD_INTERFACE:${boost.ut_SOURCE_DIR}/include>"
 )
 
@@ -40,17 +41,18 @@ add_default_target_compile_definitions(ViNo-Parser_test)
 
 target_link_libraries(
 	ViNo-Parser_test
-	PRIVATE ViNo_lib
+	PRIVATE ViNoCompiler_lib
 )
 
 add_test(NAME ViNo-Parser_test COMMAND ViNo-Parser_test)
 
 # ---- Token Scanner test ----
-add_executable(ViNo-Token-Scanner_test TokenScanner/TokenScanner_test.cpp)
+add_executable(ViNo-Token-Scanner_test Compiler/TokenScanner_test.cpp)
 
 target_include_directories(
 	ViNo-Token-Scanner_test
-	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>"
+	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/compiler>"
 	PUBLIC "$<BUILD_INTERFACE:${boost.ut_SOURCE_DIR}/include>"
 )
 
@@ -60,17 +62,18 @@ add_default_target_compile_definitions(ViNo-Token-Scanner_test)
 
 target_link_libraries(
 	ViNo-Token-Scanner_test
-	PRIVATE ViNo_lib
+	PRIVATE ViNoCompiler_lib
 )
 
 add_test(NAME ViNo-Token-Scanner_test COMMAND ViNo-Token-Scanner_test)
 
 # ---- Full Compiler test ----
-add_executable(ViNo-FullCompiler_test FullCompiler/FullCompiler_test.cpp)
+add_executable(ViNo-FullCompiler_test Compiler/FullCompiler_test.cpp)
 
 target_include_directories(
 	ViNo-FullCompiler_test
-	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
+	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>"
+	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/compiler>"
 	PUBLIC "$<BUILD_INTERFACE:${boost.ut_SOURCE_DIR}/include>"
 )
 
@@ -80,11 +83,12 @@ add_default_target_compile_definitions(ViNo-FullCompiler_test)
 
 target_link_libraries(
 	ViNo-FullCompiler_test
-	PRIVATE ViNo_lib
+	PRIVATE ViNoCompiler_lib
 )
 
-file(COPY "${CMAKE_SOURCE_DIR}/test/FullCompiler/resources" DESTINATION "${CMAKE_BINARY_DIR}/test")
-
-add_test(NAME ViNo-FullCompiler_test COMMAND ViNo-FullCompiler_test)
+add_test(NAME ViNo-FullCompiler_test 
+	COMMAND ViNo-FullCompiler_test
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Compiler
+)
 
 add_folders(Test)

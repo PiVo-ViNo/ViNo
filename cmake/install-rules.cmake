@@ -1,5 +1,5 @@
 install(
-  TARGETS ViNo_exe
+  TARGETS ViNoCompiler_exe
   RUNTIME COMPONENT ViNo_Runtime
 )
 

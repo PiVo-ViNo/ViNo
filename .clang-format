@@ -20,3 +20,6 @@ BraceWrapping:
 BreakBeforeBinaryOperators: NonAssignment
 IncludeBlocks: Preserve
 SortIncludes: Never
+AlignAfterOpenBracket: DontAlign
+ContinuationIndentWidth: 8
+AlignArrayOfStructures: Right
