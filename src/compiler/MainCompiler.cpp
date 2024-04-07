@@ -115,7 +115,8 @@ void compilation_main(int loc_argc, const char **loc_argv)
 
     vino::CodeGen main_code_gen;
     fs::create_directory("./finalVN");
-    std::fstream out_fbin("./finalVN/m_vm_inst.bin",
+    std::fstream out_fbin(
+            "./finalVN/m_vm_inst_" + script_path.stem().string() + ".bin",
             std::ios::trunc | std::ios::out | std::ios::binary);
     main_code_gen.run(&main_ast, out_fbin, main_args.verbose_mode_set);
     std::cout << "Successful code generation\n" << std::flush;

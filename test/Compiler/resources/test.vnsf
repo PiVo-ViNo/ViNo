@@ -6,6 +6,19 @@ persona Human {path="./resources/human",
 persona Olegus {path= "./resources/olegus", name="Olegus", troll="./resources/Olegus_troll.png"}
 background = "./resources/bg1.png"
 text "I am Olegus"
+text "Напрасно в бешенстве порой
+Я рвал отчаянной рукой
+Терновник, спутанный плющом:
+Всё лес был, вечный лес кругом,
+Страшней и гуще каждый час;
+И миллионом чёрных глаз
+Смотрела ночи темнота
+Сквозь ветви каждого куста.
+Моя кружилась голова;
+Я стал влезать на дерева;
+Но даже на краю небес
+Всё тот же был зубчатый лес."
+
 foreground = Human
 foreground = Olegus.troll
 exit
