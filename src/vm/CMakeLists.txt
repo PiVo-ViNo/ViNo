@@ -7,6 +7,7 @@ project(
     LANGUAGES CXX
 )
 
+set(DEPS_SRC "${CMAKE_SOURCE_DIR}/_deps_src")
 include(${CMAKE_SOURCE_DIR}/cmake/project-is-top-level.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/folders.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/variables.cmake)
