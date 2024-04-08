@@ -23,7 +23,7 @@ include(cmake/add_default_target_compile_definitions.cmake)
 # ---- Build All Components of ViNo ----
 add_subdirectory(src/compiler)
 add_subdirectory(src/gui)
-# add_subdirectory(src/vm)
+add_subdirectory(src/vm)
 
 # ---- Install rules ----
 if(NOT CMAKE_SKIP_INSTALL_RULES)

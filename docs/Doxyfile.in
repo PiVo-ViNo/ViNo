@@ -26,6 +26,12 @@ GENERATE_HTML = YES
 GENERATE_LATEX = NO 
 XML_PROGRAMLISTING = NO
 CREATE_SUBDIRS = YES
+GENERATE_TREEVIEW = YES
+DISABLE_INDEX = NO
+FULL_SIDEBAR = NO
+HTML_EXTRA_STYLESHEET  = doxygen-awesome-css/doxygen-awesome.css \
+                        doxygen-awesome-css/doxygen-awesome-sidebar-only.css
+HTML_COLORSTYLE        = LIGHT # required with Doxygen >= 1.9.5
 
 # Some additional settings
 EXTRACT_PRIVATE = YES

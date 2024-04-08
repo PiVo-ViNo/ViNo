@@ -48,4 +48,4 @@ target_link_libraries(
 	PRIVATE ViNoCompiler_lib
 )
 
-add_folders(Compiler)
+add_folders(compiler)

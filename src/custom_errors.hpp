@@ -93,6 +93,21 @@ public:
     }
 };
 
+class CodeGenError : public std::exception {
+    std::string what_str;
+
+public:
+    explicit CodeGenError(std::string errstr) noexcept :
+        what_str(std::move(errstr))
+    {
+    }
+
+    [[nodiscard]] const char *what() const noexcept override
+    {
+        return what_str.c_str();
+    }
+};
+
 class WindowError : public std::exception {
     std::string what_str;
 

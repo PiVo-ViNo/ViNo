@@ -36,6 +36,7 @@ class LowBox;
 class IBox {
 public:
     virtual ~IBox() = default;
+
     [[nodiscard]] virtual bool         is_cursor_in() const;
     [[nodiscard]] virtual bool         is_clicked() const;
     [[nodiscard]] virtual glm::ivec2   get_low_left_pos() const;
@@ -100,6 +101,7 @@ protected:
 class IStaticBox : public ITextureColorBox {
 public:
     virtual ~IStaticBox() = default;
+
 protected:
     // This way, because both ImgData and Color shouldn't be omitted at once
     IStaticBox(glm::ivec2 low_left_pos, unsigned int width, unsigned int height,
@@ -290,7 +292,9 @@ public:
             glm::vec4 color = {1.0, 1.0, 1.0, 1.0});
 };
 
-/// TODO:Q: Maybe LowBox must be global?
+/// TODO:Q: Maybe LowBox glob_<setting> must be global? Or simply remove
+/// exception throwing, just give glob_<setting> some standart values +
+/// add static method() to set them before actual construction of any LowBox
 template <typename _Ch>
 class LowBox {
 public:
@@ -318,6 +322,20 @@ public:
     LowBox(Window& parent_window, const Font<char_type>& font);
 
     /**
+     * @brief Set the globals settings for LowBox
+     *
+     * @param box_ll_pos Low-left corner position
+     * @param box_dimensions Width, height
+     * @param box_color Color in RGBA float format in interval [0, 1]
+     * @param title_ll_pos Low-left corner position of Title box
+     * @param title_dimensions Title box width, height
+     * @param title_color Title box color in RGBA float format [0, 1]
+     */
+    static void set_globals(glm::ivec2 box_ll_pos, glm::uvec2 box_dimensions,
+            glm::vec4 box_color, glm::ivec2 title_ll_pos,
+            glm::uvec2 title_dimensions, glm::vec4 title_color);
+
+    /**
      * @brief Render the text previously saved in LowBox
      *
      * @remark Useful in case of long text which won't fit at one time in LowBox
@@ -340,6 +358,7 @@ private:
     inline static glm::vec4  glob_box_color{1.0, 1.0, 1.0, 1.0};
     inline static glm::ivec2 glob_title_ll_pos{};
     inline static glm::uvec2 glob_title_dimensions{};
+    inline static glm::vec4  glob_title_box_color{1.0, 1.0, 1.0, 1.0};
     inline static bool       globals_set = false;
 
     StaticTextBox<char_type>     _text_box;
@@ -348,4 +367,21 @@ private:
     Font<char_type>              _font;
 };
 
+class SimpleBox : public IStaticBox {
+public:
+    SimpleBox(glm::ivec2 low_left_pos, unsigned int width, unsigned int height,
+            Window& parent_window, glm::vec4 color, const ImgData& img = {}) :
+        IStaticBox(low_left_pos, width, height, parent_window, color, img)
+    {
+    }
+
+    SimpleBox(glm::ivec2 low_left_pos, unsigned int width, unsigned int height,
+            Window& parent_window, const ImgData& img,
+            glm::vec4 color = {1.0f, 1.0f, 1.0f, 1.0f}) :
+        IStaticBox(low_left_pos, width, height, parent_window, img, color)
+    {
+    }
+
+private:
+};
 }  // namespace vino

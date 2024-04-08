@@ -5,6 +5,8 @@
 
 namespace vino {
 
+/// TODO: Add callbacks for stbi_load_image and implement LOADBINARYBG
+/// instruction with them
 struct ImgData {
     int            width{};
     int            height{};
@@ -13,7 +15,14 @@ struct ImgData {
 
     ImgData() = default;
 
-    explicit ImgData(const std::string& path_to_img);
+    /**
+     * @brief Construct a new Img Data object
+     *
+     * @param path_to_img
+     * @param flipped=true By standard stbi load image with Y axis starting from
+     * up, but OpenGL requires Y to start from bottom
+     */
+    explicit ImgData(const std::string& path_to_img, bool flipped = true);
 
     ~ImgData();
 

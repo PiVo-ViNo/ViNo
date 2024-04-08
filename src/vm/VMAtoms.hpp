@@ -6,32 +6,62 @@
  * (c) Andrjusha (aka SibJusha)
  *
  */
+/**
+ * @file Instructions for binary language used in ViNo Virtual Machine
+ */
 #pragma once
 
 #include <array>
 #include <cstdint>
 
 /// TODO:Q: Windows use wchar for paths, is it breaking all algorithm or not?
+
+/**
+    @brief Namespace with instructions as structs
+*/
 namespace vm_instr {
 
+/**
+ * @brief NOP instruction 0x0
+ */
 struct Nop {};
 
+/**
+ * @brief START instruction 0x1
+ * @param jmp_pos uint32_t Where start 
+ */
 struct Start {
-    uint64_t jmp_line{};
+    uint32_t start_pos{};
 };
 
+/**
+ * @brief EXIT instruction 0x2
+ * @param err_code uint8_t Error code:
+ *      0 - no error
+ */
 struct Exit {
-    uint8_t err_code{};
+    char err_code{};
 };
 
+/**
+ * @brief LOADBG instruction 0x10
+ * @param bath_bg uint8_t[64] Path/to/bg
+ */
 struct LoadBg {
-    std::array<uint8_t, 64> path_bg{};
+    std::array<char, 64> path_bg{};
 };
 
+/**
+ * @brief CLEARBG instruction 0x11 
+ */
 struct ClearBg {};
 
+/**
+ * @brief LOADFG instruction 0x20
+ * @param path_fg uint8_t[64] Path/to/fg 
+ */
 struct LoadFg {
-    std::array<uint8_t, 64> path_fg{};
+    std::array<char, 64> path_fg{};
 };
 /*
 struct LoadFgPos {
@@ -41,12 +71,20 @@ struct AddFg {
 
 }; */
 
+/**
+ * @brief LOADTXTLINE instruction 0x30
+ * @param txt_line char[64] String
+ */
 struct LoadTxtLine {
-    std::array<uint8_t, 64> txt_line{};
+    std::array<char, 64> txt_line{};
 };
 
+/**
+ * @brief JMP instruction 0x40
+ * @param where_pos uint32_t Byte position where to jump
+ */
 struct Jmp {
-    uint64_t where{};
+    uint32_t where_pos{};
 };
 
 }  // namespace vm_instr

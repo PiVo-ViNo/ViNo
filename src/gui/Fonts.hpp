@@ -7,6 +7,7 @@
 
 #include <map>
 
+///TODO: Write converter between u32string and string, also char32_t[]
 namespace vino {
 
 struct Character;

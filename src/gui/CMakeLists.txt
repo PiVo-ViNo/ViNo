@@ -56,7 +56,9 @@ endif()
 
 FetchContent_GetProperties(glfw3)
 if(NOT glfw3_POPULATED)
-    set(GLFW_BUILD_WIN32 ON)
+    if(WIN32)
+        set(GLFW_BUILD_WIN32 ON)
+    endif()
     set(GLFW_BUILD_TESTS OFF) 
     set(GLFW_BUILD_EXAMPLES OFF)
     set(GLFW_BUILD_DOCS OFF)
@@ -81,7 +83,8 @@ if(CMAKE_BUILD_TYPE EQUAL Release)
 endif()
 
 # ---- Core GUI Library ----
-add_library(vinogui SHARED 
+add_library(vinogui STATIC 
+    vinogui.cpp
     glad.c 
     Window.cpp
     ImgData.cpp
@@ -103,8 +106,9 @@ target_link_libraries(vinogui
     PUBLIC glfw 
     PUBLIC freetype
 )
+target_compile_features(vinogui PUBLIC cxx_std_20)
 
-add_folders(GUI)
+add_folders(gui)
 
 # ---- Developer mode only ----
 if(NOT ViNo_DEVELOPER_MODE)
@@ -127,7 +131,7 @@ target_sources(TestViNoGUI_exe PUBLIC
     test_app/MainMenu.cpp
 )
 target_include_directories(
-    vinogui ${warning_guard} PUBLIC
+    TestViNoGUI_exe ${warning_guard} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/external>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
@@ -139,7 +143,7 @@ add_default_target_compile_definitions(TestViNoGUI_exe)
 
 set_property(TARGET TestViNoGUI_exe PROPERTY OUTPUT_NAME TestViNoGUI)
 
-target_link_libraries(TestViNoGUI_exe PRIVATE vinogui)
+target_link_libraries(TestViNoGUI_exe PUBLIC vinogui)
 
 file(COPY   "${CMAKE_SOURCE_DIR}/src/gui/test_app/res" 
             "${CMAKE_SOURCE_DIR}/src/gui/test_app/shaders" 
@@ -147,8 +151,8 @@ file(COPY   "${CMAKE_SOURCE_DIR}/src/gui/test_app/res"
     DESTINATION "${CMAKE_BINARY_DIR}/src/gui"
 )
 
-set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-include(CPack)
+# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+# include(CPack)
 
 # set(BUILD_SHARED_LIBS OFF)

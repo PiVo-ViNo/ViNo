@@ -1,12 +1,16 @@
 #include "Window.hpp"
-#include <GLFW/glfw3.h>
+
+#include "ImgData.hpp"
 #include <cmath>
+#include <filesystem>
 
 namespace vino {
 
 Window::Window(uint32_t width, uint32_t height) : _width(width), _height(height)
 {
-    glfwInit();
+    if (glfwInit() == GLFW_FALSE) {
+        throw vino::VmError("Error:Window(): cannot initialize GLFW library");
+    }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -15,7 +19,13 @@ Window::Window(uint32_t width, uint32_t height) : _width(width), _height(height)
 
 void Window::make_current()
 {
+    if (glfwGetCurrentContext() == ptrWindow) {
+        return;
+    }
     glfwMakeContextCurrent(ptrWindow);
+    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
+        throw std::runtime_error("Failed to initialize GLAD");
+    }
 }
 
 bool Window::should_close() const
@@ -23,9 +33,12 @@ bool Window::should_close() const
     return glfwWindowShouldClose(ptrWindow);
 }
 
-void Window::swap_buffers()
+void Window::update(glm::vec4 color)
 {
     glfwSwapBuffers(ptrWindow);
+    glfwPollEvents();
+    glClearColor(color.r, color.g, color.b, color.a);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 int Window::get_attribute(int glfw_attribute)
@@ -53,7 +66,7 @@ std::pair<int, int> Window::get_cursor_pos() const
     double xpos = 0;
     double ypos = 0;
     glfwGetCursorPos(ptrWindow, &xpos, &ypos);
-    return {std::floor(xpos), 600 - std::floor(ypos)};
+    return {std::floor(xpos), _height - std::floor(ypos)};
 }
 
 uint32_t Window::get_width() const
@@ -64,6 +77,17 @@ uint32_t Window::get_width() const
 uint32_t Window::get_height() const
 {
     return _height;
+}
+
+bool Window::set_icon(const fs::path& path_to_icon)
+{
+    if (!fs::exists(path_to_icon)) {
+        return false;
+    }
+    ImgData icon_data(path_to_icon.string(), false);
+    GLFWimage icon = {icon_data.width, icon_data.height, icon_data.data};
+    glfwSetWindowIcon(ptrWindow, 1, &icon);
+    return true;
 }
 
 NonResizableWindow::NonResizableWindow(
@@ -77,6 +101,7 @@ NonResizableWindow::NonResizableWindow(
         glfwTerminate();
         throw vino::WindowError("Window wasn't successfully initialized");
     }
+    make_current();
 }
 
 }  // namespace vino

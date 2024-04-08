@@ -87,7 +87,7 @@ public:
     // void scan_strings_whole();
 
 private:
-    std::unique_ptr<std::istream> _prev_istream_ptr;
+    // std::unique_ptr<std::istream> _prev_istream_ptr;
     std::unique_ptr<std::istream> _istream_ptr;
     std::size_t                   _cur_line = 0;
 

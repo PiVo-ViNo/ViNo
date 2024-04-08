@@ -49,12 +49,11 @@ PairTokenId TokenScanner::get_token()
 {
     if (!_istream_ptr) throw NullPtrExc();
 
-    /// Alphabet-numeric string, it gets all alnums from input
+    // Alphabet-numeric string, it gets all alnums from input
     std::string alnum_str{};
 
     char ch = 0;
-    /// TODO: Remove cast and use something more presentable
-    while ((ch = static_cast<char>(_istream_ptr->get()))
+    while (_istream_ptr->get(ch) //(ch = static_cast<char>(_istream_ptr->get()))
             && _istream_ptr->good())
     {
         switch (ch) {

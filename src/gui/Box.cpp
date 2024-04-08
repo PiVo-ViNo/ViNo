@@ -387,8 +387,8 @@ void StaticTextBox<_Ch>::render_text(std::basic_string<_Ch> text,
 {
     const int glyph_max_height = font.get_dimensions_of("A", 1.0).y;
 
-    int y_cur = 
-        _ll_pos.y + std::max(static_cast<int>(_height) - glyph_max_height
+    int y_cur = _ll_pos.y
+                + std::max(static_cast<int>(_height) - glyph_max_height
                                    - glyph_max_height * 4 / 5,
                         (static_cast<int>(_height) - glyph_max_height) / 2);
 
@@ -452,8 +452,9 @@ void Button<_Ch>::render() const
     IStaticBox::render();
     _text->render_text(_title, _font, _title_color,
             {_ll_pos.x + 10,
-             _ll_pos.y + (_height - _font.get_dimensions_of("A", 1.0).y) / 2
-            },
+                    _ll_pos.y
+                            + (_height - _font.get_dimensions_of("A", 1.0).y)
+                                      / 2},
             _win);
 }
 
@@ -461,15 +462,28 @@ void Button<_Ch>::render() const
 // ----------------------------------------------------------------------------
 
 template <typename _Ch>
+void LowBox<_Ch>::set_globals(glm::ivec2 box_ll_pos, glm::uvec2 box_dimensions,
+        glm::vec4 box_color, glm::ivec2 title_ll_pos,
+        glm::uvec2 title_dimensions, glm::vec4 title_color)
+{
+    glob_box_ll_pos = box_ll_pos;
+    glob_box_dimensions = box_dimensions;
+    glob_box_color = box_color;
+    glob_title_ll_pos = title_ll_pos;
+    glob_title_dimensions = title_dimensions;
+    glob_title_box_color = title_color;
+    globals_set = true;
+}
+
+template <typename _Ch>
 LowBox<_Ch>::LowBox(Window& parent_window, glm::ivec2 box_ll_pos,
         glm::uvec2 box_dimensions, const Font<_Ch>& font) :
     _text_box(box_ll_pos, box_dimensions.x, box_dimensions.y, parent_window,
             {0.9, 0.9, 0.9, 0.8}),
-    _name_box({box_ll_pos.x + 10, 
-               static_cast<int>(box_dimensions.y) + box_ll_pos.y},
-             box_dimensions.x / 4, font.get_dimensions_of("A", 1.0).y * 2,
-             parent_window, {1.0, 1.0, 1.0, 1.0}
-             ),
+    _name_box({box_ll_pos.x + 10,
+                      static_cast<int>(box_dimensions.y) + box_ll_pos.y},
+            box_dimensions.x / 4, font.get_dimensions_of("A", 1.0).y * 2,
+            parent_window, {1.0, 1.0, 1.0, 1.0}),
     _font(font)
 {
     glob_box_ll_pos = box_ll_pos;

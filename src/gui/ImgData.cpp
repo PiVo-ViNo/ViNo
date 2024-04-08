@@ -9,10 +9,11 @@
 
 namespace vino {
 
-ImgData::ImgData(const std::string& path_to_img)
+ImgData::ImgData(const std::string& path_to_img, bool flipped)
 {
     namespace fs = std::filesystem;
     fs::path img(path_to_img);
+    /// TODO: extensions can be CAPITALIZED
     if (!fs::exists(img)
         || (img.extension() != ".png" && img.extension() != ".jpg"
             && img.extension() != ".jpeg" && img.extension() != ".bmp"
@@ -21,9 +22,12 @@ ImgData::ImgData(const std::string& path_to_img)
         throw WindowError("ImgData error loading: file " + path_to_img
                           + " doesn't exist or not image");
     }
-    stbi_set_flip_vertically_on_load(1);
+    if (flipped) {
+        stbi_set_flip_vertically_on_load(1);
+    }
     data = stbi_load(path_to_img.c_str(), &width, &height, &numColorChannels,
         STBI_rgb_alpha);
+    stbi_set_flip_vertically_on_load(0);
     // std::cout << "Reading image " << path_to_img << "\n";
     // std::cout << "width: " << width << "\t\t"
     //   << "height: " << height << "\t\t"

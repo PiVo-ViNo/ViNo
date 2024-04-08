@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <iostream>
 #include <ostream>
+#include <cstring>
 
 namespace vino {
 
@@ -272,7 +273,7 @@ void CodeGenVisitor::visit_script(const ScriptAst* mn_script_ptr)
                 "Error:CodeGenVisitor::visit_script(): Bad file in code "
                 "generation");
     }
-    int64_t start_pos = 0x1;
+    int32_t start_pos = 0x1;
     _out_bin_file.write(reinterpret_cast<char*>(&start_pos), sizeof(int64_t));
     if (_out_bin_file.bad()) {
         throw CodeGenError(

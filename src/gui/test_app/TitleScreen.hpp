@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Window.hpp"
+// #include "Window.hpp"
+#include "vinogui.hpp"
 
 namespace vino {
 

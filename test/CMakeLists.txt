@@ -91,4 +91,4 @@ add_test(NAME ViNo-FullCompiler_test
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Compiler
 )
 
-add_folders(Test)
+add_folders(test)

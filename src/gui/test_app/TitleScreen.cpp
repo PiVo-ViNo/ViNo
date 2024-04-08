@@ -1,8 +1,6 @@
 #include "TitleScreen.hpp"
 
-#include "Box.hpp"
-#include "ImgData.hpp"
-#include <GLFW/glfw3.h>
+#include <chrono>
 
 namespace vino {
 
@@ -13,22 +11,20 @@ void titleScreen(vino::Window& window)
 
     FullscreenTexture title_tex(window, img);
 
-    glfwSetTime(0.0);
+    namespace sch = std::chrono;
+    auto start = sch::system_clock::now();
 
     while (!window.should_close()) {
-        double time = glfwGetTime();
-        if (time > 6.0 || window.is_pressed(GLFW_KEY_SPACE)) {
+        float time =
+                std::chrono::duration<float>(sch::system_clock::now() - start)
+                        .count();
+        if (time > 6.0f || window.is_pressed(GLFW_KEY_SPACE)) {
             return;
         }
-        float alpha = -((time - 2.5) / 2.5) * ((time - 2.5) / 2.5) + 1;
-
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
+        float alpha = -((time - 2.5f) / 2.5f) * ((time - 2.5f) / 2.5f) + 1;
         title_tex.render(alpha);
 
-        window.swap_buffers();
-        glfwPollEvents();
+        window.update({0.0f, 0.0f, 0.0f, 1.0f});
     }
 }
 
