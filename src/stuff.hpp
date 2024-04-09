@@ -9,17 +9,20 @@ namespace vino {
  * @brief Case insensitive strings comparison
  *
  * @remark Unlike C-style strcmp(), it doesn't return int
- * @param lhs const std::string&
- * @param rhs const std::string&
+ * @param lhs const std::basic_string<_Ch>&
+ * @param rhs const std::basic_string<_Ch>&
  * @return bool
  */
-inline bool insen_str_equal(const std::string &lhs,
-                            const std::string &rhs) noexcept
+template <typename _Ch>
+inline bool insen_str_equal(const std::basic_string<_Ch> &lhs,
+        const std::basic_string<_Ch>                     &rhs) noexcept
 {
-    return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(),
-                      [](unsigned char l, unsigned char r) -> bool {
-                          return std::tolower(l) == std::tolower(r);
-                      });
+    if (lhs.size() != rhs.size()) return false;
+    return std::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend(),
+            [](const _Ch &l, const _Ch &r) -> bool {
+                return std::tolower(static_cast<int>(l))
+                       == std::tolower(static_cast<int>(r));
+            });
 }
 
 /**
@@ -33,8 +36,8 @@ inline bool insen_str_equal(const std::string &lhs,
  * @throw `std::runtime_error` in case there is problem with utf-8 encoding
  * @return `std::string` substring
  */
-inline std::string substr_utf8_min(const std::string &str, size_t pos,
-                                   size_t len)
+inline std::string substr_utf8_min(
+        const std::string &str, size_t pos, size_t len)
 {
     if (len == 0 || pos >= str.size()) {
         return "";

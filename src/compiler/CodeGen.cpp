@@ -1,9 +1,8 @@
 #include "CodeGen.hpp"
+#include "VisitorImplementations.hpp"
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
-
-#include "VisitorImplementations.hpp"
 
 namespace vino {
 
@@ -28,11 +27,25 @@ void CodeGen::copy_resources(
     if (!fs::exists(copydir)) {
         throw std::runtime_error("Copy directory couldn't be created");
     }
+    bool success = true;
     for (const auto& file : copyset) {
-        std::cout << file << std::endl;
-        fs::copy_file(file, copydir / file.filename(),
-                fs::copy_options::overwrite_existing);
+        if (fs::copy_file(file, copydir / file.filename(),
+                fs::copy_options::overwrite_existing))
+        {
+            std::cout << "Successfully copied " << file << "\n";
+        } else {
+            success = false;
+            std::cout << "Cannot copy " << file << "\n";
+        }
     }
+    if (!success) {
+        std::cout << "Copy is unsuccessful, removing successfully copied";
+        for (const auto& file : copyset) {
+            // no need to check if exists, it happens inside
+            fs::remove(copydir / file.filename());
+        } 
+    }
+    std::cout << std::flush;
 }
 
 }  // namespace vino

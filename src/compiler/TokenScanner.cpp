@@ -22,14 +22,14 @@ namespace vino {
 
 ScriptToken TokenScanner::is_keyword(const std::string &_str)
 {
-    if (insen_str_equal(_str, "background")) return ScriptToken::BG;
-    if (insen_str_equal(_str, "foreground")) return ScriptToken::FG;
-    if (insen_str_equal(_str, "text")) return ScriptToken::TEXT_TYPE;
-    if (insen_str_equal(_str, "put")) return ScriptToken::PUT;
-    if (insen_str_equal(_str, "persona")) return ScriptToken::PERSONA;
-    if (insen_str_equal(_str, "path")) return ScriptToken::PATH;
-    if (insen_str_equal(_str, "exit")) return ScriptToken::EXIT;
-    if (insen_str_equal(_str, "name")) return ScriptToken::NAME;
+    if (insen_str_equal<char>(_str, "background")) return ScriptToken::BG;
+    if (insen_str_equal<char>(_str, "foreground")) return ScriptToken::FG;
+    if (insen_str_equal<char>(_str, "text")) return ScriptToken::TEXT_TYPE;
+    if (insen_str_equal<char>(_str, "put")) return ScriptToken::PUT;
+    if (insen_str_equal<char>(_str, "persona")) return ScriptToken::PERSONA;
+    if (insen_str_equal<char>(_str, "path")) return ScriptToken::PATH;
+    if (insen_str_equal<char>(_str, "exit")) return ScriptToken::EXIT;
+    if (insen_str_equal<char>(_str, "name")) return ScriptToken::NAME;
 
     return ScriptToken::EMPTY_TOKEN;
 }

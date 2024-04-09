@@ -17,7 +17,8 @@ ImgData::ImgData(const std::string& path_to_img, bool flipped)
     /// TODO: extensions can be CAPITALIZED
     auto img_not_any_of =
             [&img](std::convertible_to<std::string> auto&&... ext) -> bool {
-        return (true && ... && !insen_str_equal(img.extension().string(), ext));
+        return (true && ... 
+                && !insen_str_equal<char>(img.extension().string(), ext));
     };
     if (!fs::exists(img)
             || img_not_any_of(".png", ".jpg", ".jpeg", ".bmp", ".psd"))
