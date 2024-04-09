@@ -7,7 +7,6 @@
 
 #include <filesystem>
 #include <iostream>
-#include <concepts>
 
 namespace vino {
 
@@ -43,7 +42,7 @@ ImgData::~ImgData()
     stbi_image_free(data);
 }
 
-unsigned int configureTexture(
+unsigned int configure_texture(
         const ImgData& img, unsigned int texNum, int texParam)
 {
     unsigned int texture;

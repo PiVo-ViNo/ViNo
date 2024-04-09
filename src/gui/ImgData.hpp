@@ -29,7 +29,7 @@ struct ImgData {
     [[nodiscard]] bool empty() const { return data == nullptr; }
 };
 
-unsigned int configureTexture(
+unsigned int configure_texture(
         const ImgData& img, unsigned int texNum, int texParam = GL_REPEAT);
 
 }  // namespace vino

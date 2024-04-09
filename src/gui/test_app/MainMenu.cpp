@@ -8,8 +8,10 @@ namespace vino {
 
 void mainMenu(Window& window)
 {
-    ImgData           fs_img("res/olegus.png");
-    FullscreenTexture fs_texture(window, fs_img);
+    std::array<ImgData, 2> fs = {
+        ImgData{"res/olegus.png"}, ImgData{"res/fs_new.jpg"}
+    };
+    FullscreenTexture fs_texture(window, fs[0]);
 
     FontsCollection<char32_t> fonts;
     /// TODO: make possible to choose different sizes
@@ -22,7 +24,8 @@ void mainMenu(Window& window)
             window, {1.0f, 1.0f, 1.0f, 0.8f}, U"Exit", fonts["ARIALBD"], {},
             {0.2, 0.2, 0.2, 0.8});
     LowBox<char32_t> low_box(window, {10, 10},
-            {window.get_width() - 20, window.get_height() / 3},
+            {window.get_width() - 20, window.get_height() / 3}, 
+            {0.9, 0.8, 0.8, 0.6}, {0.9, 0.8, 0.8, 0.8},
             fonts["ARIALBI"]);
 
     ImgData          rin("res/rin.png");
@@ -59,18 +62,20 @@ void mainMenu(Window& window)
 
     using dur = std::chrono::duration<float>;
     using sys_time = std::chrono::system_clock;
-    auto start = sys_time::now();
+    auto cur_time = sys_time::now();
+    std::size_t cur_fs = 0;
 
     while (!window.should_close()) {
         if (exit_button.is_clicked()) {
             window.close();
         }
-        if (dur(sys_time::now() - start).count() >= 0.5f
+        if (dur(sys_time::now() - cur_time).count() >= 0.5f
                 && window.is_pressed(GLFW_KEY_SPACE))
         {
+            fs_texture.change_texture(fs[++cur_fs % 2]);
             cur_text = (cur_text + 1) % texts.size();
             olegus.move_with_clip({-50, 0});
-            start = sys_time::now();
+            cur_time = sys_time::now();
         }
 
         fs_texture.render();

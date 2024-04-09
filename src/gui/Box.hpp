@@ -83,6 +83,10 @@ public:
      */
     virtual void render(float uniform_alpha) const;
 
+    void change_texture(const ImgData& new_img);
+
+    void change_color(const glm::vec4 new_color);
+
     [[nodiscard]] glm::vec4 get_color() const;
 
 protected:
@@ -309,8 +313,9 @@ public:
      * @param box_dimensions Width, Height
      * @param font Font from FontsCollection
      */
-    LowBox(Window& parent_window, glm::ivec2 box_ll_pos,
-            glm::uvec2 box_dimensions, const Font<char_type>& font);
+    LowBox(Window& parent_window, const glm::ivec2& box_ll_pos,
+            const glm::uvec2& box_dimensions, const glm::vec4& box_color, 
+            const glm::vec4 title_color, const Font<char_type>& font);
 
     /**
      * @brief Create LowBox with current global settings

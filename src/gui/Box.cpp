@@ -61,7 +61,7 @@ ITextureColorBox::ITextureColorBox(glm::ivec2 low_left_pos, unsigned int width,
     glGenBuffers(1, &_box_vertex_buffer);
     glGenVertexArrays(1, &_box_vertex_array);
     glGenBuffers(1, &_box_element_buffer);
-    _box_texture = configureTexture(img, 0);
+    _box_texture = configure_texture(img, 0);
     _box_shader.use();
     _box_shader.setInt("uTexture", 0);
 
@@ -123,6 +123,17 @@ void ITextureColorBox::render(float uniform_alpha) const
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void ITextureColorBox::change_texture(const ImgData& new_img) 
+{
+    glDeleteTextures(1, &_box_texture);
+    _box_texture = configure_texture(new_img, 0);    
+}
+
+void ITextureColorBox::change_color(const glm::vec4 new_color) 
+{
+    _color = new_color;
 }
 
 glm::vec4 ITextureColorBox::get_color() const
@@ -476,14 +487,15 @@ void LowBox<_Ch>::set_globals(glm::ivec2 box_ll_pos, glm::uvec2 box_dimensions,
 }
 
 template <typename _Ch>
-LowBox<_Ch>::LowBox(Window& parent_window, glm::ivec2 box_ll_pos,
-        glm::uvec2 box_dimensions, const Font<_Ch>& font) :
+LowBox<_Ch>::LowBox(Window& parent_window, const glm::ivec2& box_ll_pos,
+                     const glm::uvec2& box_dimensions, const glm::vec4& box_color, 
+                     const glm::vec4 title_color, const Font<char_type>& font) :
     _text_box(box_ll_pos, box_dimensions.x, box_dimensions.y, parent_window,
-            {0.9, 0.9, 0.9, 0.8}),
+            box_color),
     _name_box({box_ll_pos.x + 10,
                       static_cast<int>(box_dimensions.y) + box_ll_pos.y},
             box_dimensions.x / 4, font.get_dimensions_of("A", 1.0).y * 2,
-            parent_window, {1.0, 1.0, 1.0, 1.0}),
+            parent_window, title_color),
     _font(font)
 {
     glob_box_ll_pos = box_ll_pos;
@@ -496,7 +508,8 @@ LowBox<_Ch>::LowBox(Window& parent_window, glm::ivec2 box_ll_pos,
 
 template <typename _Ch>
 LowBox<_Ch>::LowBox(Window& parent_window, const Font<char_type>& font) :
-    LowBox(parent_window, glob_box_ll_pos, glob_box_dimensions, font)
+    LowBox(parent_window, glob_box_ll_pos, glob_box_dimensions, glob_box_color,
+            glob_title_box_color, font)
 {
     if (!globals_set) {
         throw WindowError(
