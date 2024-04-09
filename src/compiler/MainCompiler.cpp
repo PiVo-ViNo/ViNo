@@ -26,14 +26,14 @@
 
 namespace m_comp {
 
-const std::string arg_path = "--path";
-const std::string short_arg_path = "-p";
+const std::string help = "--help";
+const std::string short_help = "-h";
 const std::string arg_verbose = "--verbose";
 const std::string short_arg_verbose = "-v";
 
 bool path_integrity(const char *path) noexcept
 {
-    std::cout << fs::current_path() << std::endl;
+    // std::cout << fs::current_path() << std::endl;
     fs::path src_path(path);
     if (fs::exists(src_path) && src_path.extension().string() == ".vnsf") {
         return true;
@@ -46,54 +46,67 @@ fs::path check_args(int loc_argc, const char **loc_argv, ArgsFlags &args_flags)
     fs::path script_path;
     if (loc_argc > 1) {
         for (int i = 1; i < loc_argc; i++) {
-            if (loc_argc - i >= 2
-                    && (std::string(loc_argv[i]) == m_comp::arg_path
-                            || std::string(loc_argv[i])
-                                       == m_comp::short_arg_path))
-            {
-                if (!m_comp::path_integrity(loc_argv[++i])) {
-                    throw vino::ArgsError("ERROR: Script file error in --path");
-                }
-                args_flags.script_path_set = true;
-                script_path = loc_argv[i];
-            } else if (std::string(loc_argv[i]) == m_comp::arg_verbose
-                       || std::string(loc_argv[i]) == m_comp::short_arg_verbose)
+            if (std::string(loc_argv[i]) == m_comp::arg_verbose
+                    || std::string(loc_argv[i]) == m_comp::short_arg_verbose)
             {
                 args_flags.verbose_mode_set = true;
+            } else if (std::string(loc_argv[i]) == m_comp::help
+                       || std::string(loc_argv[i]) == m_comp::short_help)
+            {
+                args_flags.help_run_set = true;
+            } else if (m_comp::path_integrity(loc_argv[i])) {
+                args_flags.script_path_set = true;
+                script_path = loc_argv[i];
             } else {
-                throw vino::ArgsError("ERROR: Unknown argument: ");
+                args_flags.unknown_set = true;
+                args_flags.help_run_set = true;
             }
         }
-    } else {  /// TODO:Q: WTF??? WHY???
-              //  needs a check if there is the running instance of program,
-              //  if there are many, give error "Many instances : cannot attach
-              //  to random"
-        throw vino::ArgsError(
-                "ERROR: Program needs a source script file to run");
     }
     return script_path;
 }
 
-void compilation_main(int loc_argc, const char **loc_argv)
+void compilation_main(int loc_argc, const char **loc_argv, bool throw_err)
 {
+    using vpair = vino::PairTokenId;
+
     /* Flags for existence of arguments
-     *  0:  --path      / -p
      *  1:  --verbose   / -v
      *  2:  --test      / -t
+     *  3:  --help      / -h
      */
     m_comp::ArgsFlags main_args;
     fs::path          script_path;
 
+    // Read command line options and write if need
     script_path = m_comp::check_args(loc_argc, loc_argv, main_args);
-    if (!main_args.script_path_set) {
-        throw vino::ArgsError(
-                "ERROR: Program needs a source script file to run");
+    if (!main_args.help_run_set && !main_args.script_path_set) {
+        if (throw_err) {
+            throw vino::ArgsError(
+                    "ERROR: Program needs a source script file to compile");
+        }
+        std::cout << "ERROR: Program needs a source script file to compile\n";
+    }
+    if (main_args.unknown_set) {
+        if (throw_err) {
+            throw vino::ArgsError("ERROR: Uknown option");
+        }
+        std::cout << "ERROR: Unknown option\n";
+    }
+    if (main_args.help_run_set || !main_args.script_path_set) {
+        std::cout << "ViNo Complier v0.1.0\n"
+                     "Usage: ViNoCompiler [options] <source_file>.vnsf\n\n"
+                     "Options:\n"
+                     "\t-h, --help : run this help message\n"
+                     "\t-v, --verbose : output more compiler processes\n"
+                  << std::flush;
+        return;
     }
     if (main_args.verbose_mode_set) {
         std::cout << "Running verbose mode\n" << std::flush;
     }
-    using vpair = vino::PairTokenId;
 
+    // Try to open script file
     std::ifstream main_script{script_path, std::ios::in | std::ios::binary};
     if (!main_script.good()) {
         std::runtime_error("ERROR: Bad file " + script_path.string());

@@ -141,6 +141,7 @@ StmtAst Parser::stmt()
                     std::make_unique<ForeFileAst>(std::move(_cur_tok->id));
             break;
         }
+    /// TODO: ! add support of : text Human "I say this" - name of speaker
         case st::TEXT_TYPE: {
             set_current_tok();
             if (_cur_tok->token == st::SIGN_EQ) {
