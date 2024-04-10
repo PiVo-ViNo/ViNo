@@ -12,7 +12,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/folders.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/add_default_target_compile_definitions.cmake)
 
 # ---- The core library ----
-add_library(ViNoCompiler_lib OBJECT 
+add_library(vino-compiler_lib OBJECT 
 	Parser.cpp
 	Persona.cpp
 	SemanticAnalyzer.cpp
@@ -25,27 +25,27 @@ add_library(ViNoCompiler_lib OBJECT
 )
 
 target_include_directories(
-	ViNoCompiler_lib ${warning_guard} PUBLIC
+	vino-compiler_lib ${warning_guard} PUBLIC
 	"$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>"
 )
 
-target_compile_features(ViNoCompiler_lib PUBLIC cxx_std_20)
+target_compile_features(vino-compiler_lib PUBLIC cxx_std_20)
 
-add_default_target_compile_definitions(ViNoCompiler_lib)
+add_default_target_compile_definitions(vino-compiler_lib)
 
 # ---- Declare executable ----
-add_executable(ViNoCompiler_exe main.cpp)
-add_executable(ViNoCompiler::exe ALIAS ViNoCompiler_exe)
+add_executable(vino-compiler_exe main.cpp)
+add_executable(vino-compiler::exe ALIAS vino-compiler_exe)
 
-add_default_target_compile_definitions(ViNoCompiler_exe)
+add_default_target_compile_definitions(vino-compiler_exe)
 
-set_property(TARGET ViNoCompiler_exe PROPERTY OUTPUT_NAME ViNoCompiler)
+set_property(TARGET vino-compiler_exe PROPERTY OUTPUT_NAME vino-compiler)
 
-target_compile_features(ViNoCompiler_exe PRIVATE cxx_std_20)
+target_compile_features(vino-compiler_exe PRIVATE cxx_std_20)
 
 target_link_libraries(
-	ViNoCompiler_exe
-	PRIVATE ViNoCompiler_lib
+	vino-compiler_exe
+	PRIVATE vino-compiler_lib
 )
 
 add_folders(compiler)

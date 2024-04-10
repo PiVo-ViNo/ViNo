@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 project(
-    ViNo_VM
+    ViNo_ViMa 
     VERSION 0.1.0
     DESCRIPTION "Vi[sual] No[vel] Creator: VM"
     HOMEPAGE_URL "https://github.com/PiVo-ViNo/ViNo"
@@ -13,23 +13,27 @@ include(${CMAKE_SOURCE_DIR}/cmake/folders.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/variables.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/add_default_target_compile_definitions.cmake)
 
+if(PROJECT_IS_TOP_LEVEL)
+	find_package(vinogui REQUIRED)
+endif()
+
 if(WIN32)
     set(CMAKE_LINKER lld-link)
 endif()
 
 if(WIN32)
-    add_executable(ViNoVM_exe WIN32)
+    add_executable(Vinovima_exe WIN32)
     add_link_options(-Wl,"/entry:mainCRTStartup /subsystem:windows")
 else()
-    add_executable(ViNoVM_exe)
+    add_executable(Vinovima_exe)
 endif()
 
-add_executable(ViNoVM::exe ALIAS ViNoVM_exe)
-add_default_target_compile_definitions(ViNoVM_exe)
-target_sources(ViNoVM_exe PRIVATE
+add_executable(Vinovima::exe ALIAS Vinovima_exe)
+add_default_target_compile_definitions(Vinovima_exe)
+target_sources(Vinovima_exe PRIVATE
     VMMain.cpp
 )
-target_include_directories(ViNoVM_exe PUBLIC
+target_include_directories(Vinovima_exe PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>"
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/gui/external>"
     "$<BUILD_INTERFACE:${DEPS_SRC}/glm>"
@@ -37,6 +41,6 @@ target_include_directories(ViNoVM_exe PUBLIC
     "$<BUILD_INTERFACE:${DEPS_SRC}/ft2/include>"
 )
 
-target_link_libraries(ViNoVM_exe PUBLIC vinogui)
+target_link_libraries(Vinovima_exe PUBLIC vinogui)
 
 add_folders(vm)

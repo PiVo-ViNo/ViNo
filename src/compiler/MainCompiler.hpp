@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <tuple>
 
 namespace m_comp {
 
@@ -12,11 +13,13 @@ struct ArgsFlags {
     bool verbose_mode_set = false;
     bool test_set = false;
     bool help_run_set = false;
+    bool custom_outdir_set = false;
 };
 
 bool path_integrity(const char *path) noexcept;
 
-fs::path check_args(int loc_argc, const char **loc_argv, ArgsFlags &args_flags);
+std::tuple<fs::path, fs::path> check_args(
+        int loc_argc, const char **loc_argv, ArgsFlags &args_flags);
 
 /**
  * @brief Main compilation run function

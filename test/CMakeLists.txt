@@ -10,7 +10,7 @@ include(../cmake/project-is-top-level.cmake)
 include(../cmake/folders.cmake)
 
 if(PROJECT_IS_TOP_LEVEL)
-	find_package(ViNoCompiler_lib REQUIRED)
+	find_package(vino-compiler_lib REQUIRED)
 	enable_testing()
 endif()
 
@@ -41,7 +41,7 @@ add_default_target_compile_definitions(ViNo-Parser_test)
 
 target_link_libraries(
 	ViNo-Parser_test
-	PRIVATE ViNoCompiler_lib
+	PRIVATE vino-compiler_lib
 )
 
 add_test(NAME ViNo-Parser_test COMMAND ViNo-Parser_test)
@@ -62,7 +62,7 @@ add_default_target_compile_definitions(ViNo-Token-Scanner_test)
 
 target_link_libraries(
 	ViNo-Token-Scanner_test
-	PRIVATE ViNoCompiler_lib
+	PRIVATE vino-compiler_lib
 )
 
 add_test(NAME ViNo-Token-Scanner_test COMMAND ViNo-Token-Scanner_test)
@@ -83,7 +83,7 @@ add_default_target_compile_definitions(ViNo-FullCompiler_test)
 
 target_link_libraries(
 	ViNo-FullCompiler_test
-	PRIVATE ViNoCompiler_lib
+	PRIVATE vino-compiler_lib
 )
 
 add_test(NAME ViNo-FullCompiler_test 

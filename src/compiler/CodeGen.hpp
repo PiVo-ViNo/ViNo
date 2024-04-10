@@ -13,17 +13,18 @@ namespace fs = std::filesystem;
 
 class CodeGen {
 public:
-    CodeGen() = default;
+    explicit CodeGen(bool verbal) : _verb(verbal) {}
 
     /// TODO: Consider it making noexcept
-    void run(ScriptAst* in_ast, std::ostream& out_stream, bool verbose = false);
+    const std::set<fs::path> run(
+            ScriptAst* in_ast, std::ostream& out_stream, bool verbose = false);
+
+    [[nodiscard]] bool copy_resources(
+            const fs::path& copydir, const std::set<fs::path>& copyset) const;
 
 private:
     SymbolTableEnv _env{};
     bool           _verb = false;
-
-    void copy_resources(
-            const fs::path& copydir, const std::set<fs::path>& copyset) const;
 };
 
 }  // namespace vino

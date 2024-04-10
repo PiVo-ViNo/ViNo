@@ -11,7 +11,8 @@ docs/xml
 .clangd
 Testing/
 compile_commands.json
-finalVN
+finalVN/
+vn_final/
 *.exe
 *.o
 *.obj

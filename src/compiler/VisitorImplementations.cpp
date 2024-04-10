@@ -280,7 +280,10 @@ void CodeGenVisitor::visit_exit()
                 "Error:CodeGenVisitor::visit_script(): Bad file in code "
                 "generation");
     }
-    _out_bin_file.put(0x0);
+    // Exit codes: 0 - no errors, close the application
+    //             1 - no errors, go to main menu
+    //             ... errors
+    _out_bin_file.put(0x1);
     if (_out_bin_file.bad()) {
         throw CodeGenError(
                 "Error:CodeGenVisitor::visit_script(): Bad file in code "

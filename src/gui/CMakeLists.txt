@@ -110,6 +110,10 @@ target_compile_features(vinogui PUBLIC cxx_std_20)
 
 add_folders(gui)
 
+# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+# include(CPack)
+
 # ---- Developer mode only ----
 if(NOT ViNo_DEVELOPER_MODE)
 	return()
@@ -150,9 +154,5 @@ file(COPY   "${CMAKE_SOURCE_DIR}/src/gui/test_app/res"
             "${CMAKE_SOURCE_DIR}/src/gui/test_app/fonts" 
     DESTINATION "${CMAKE_BINARY_DIR}/src/gui"
 )
-
-# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-# include(CPack)
 
 # set(BUILD_SHARED_LIBS OFF)

@@ -30,6 +30,8 @@ const std::string help = "--help";
 const std::string short_help = "-h";
 const std::string arg_verbose = "--verbose";
 const std::string short_arg_verbose = "-v";
+const std::string output = "--output-path";
+const std::string short_output = "-o";
 
 bool path_integrity(const char *path) noexcept
 {
@@ -41,9 +43,11 @@ bool path_integrity(const char *path) noexcept
     return false;
 }
 
-fs::path check_args(int loc_argc, const char **loc_argv, ArgsFlags &args_flags)
+std::tuple<fs::path, fs::path> check_args(
+        int loc_argc, const char **loc_argv, ArgsFlags &args_flags)
 {
-    fs::path script_path;
+    fs::path script_path{};
+    fs::path output_path{};
     if (loc_argc > 1) {
         for (int i = 1; i < loc_argc; i++) {
             if (std::string(loc_argv[i]) == m_comp::arg_verbose
@@ -57,13 +61,20 @@ fs::path check_args(int loc_argc, const char **loc_argv, ArgsFlags &args_flags)
             } else if (m_comp::path_integrity(loc_argv[i])) {
                 args_flags.script_path_set = true;
                 script_path = loc_argv[i];
+            } else if (loc_argc - i >= 2
+                       && (std::string(loc_argv[i]) == m_comp::output
+                               || std::string(loc_argv[i])
+                                          == m_comp::short_output))
+            {
+                args_flags.custom_outdir_set = true;
+                output_path = loc_argv[++i];
             } else {
                 args_flags.unknown_set = true;
                 args_flags.help_run_set = true;
             }
         }
     }
-    return script_path;
+    return {script_path, output_path};
 }
 
 void compilation_main(int loc_argc, const char **loc_argv, bool throw_err)
@@ -76,10 +87,10 @@ void compilation_main(int loc_argc, const char **loc_argv, bool throw_err)
      *  3:  --help      / -h
      */
     m_comp::ArgsFlags main_args;
-    fs::path          script_path;
 
     // Read command line options and write if need
-    script_path = m_comp::check_args(loc_argc, loc_argv, main_args);
+    auto [script_path, outdir_path] =
+            m_comp::check_args(loc_argc, loc_argv, main_args);
     if (!main_args.help_run_set && !main_args.script_path_set) {
         if (throw_err) {
             throw vino::ArgsError(
@@ -95,15 +106,19 @@ void compilation_main(int loc_argc, const char **loc_argv, bool throw_err)
     }
     if (main_args.help_run_set || !main_args.script_path_set) {
         std::cout << "ViNo Complier v0.1.0\n"
-                     "Usage: ViNoCompiler [options] <source_file>.vnsf\n\n"
+                     "Usage: vino-compiler [options] <source_file>.vnsf\n\n"
                      "Options:\n"
                      "\t-h, --help : run this help message\n"
-                     "\t-v, --verbose : output more compiler processes\n"
+                     "\t-v, --verbose : print more compiler messages\n"
+                     "\t-o, --output-path: set custom output directory\n"
                   << std::flush;
         return;
     }
     if (main_args.verbose_mode_set) {
         std::cout << "Running verbose mode\n" << std::flush;
+    }
+    if (!main_args.custom_outdir_set) {
+        outdir_path = "./vn_final/";
     }
 
     // Try to open script file
@@ -126,13 +141,20 @@ void compilation_main(int loc_argc, const char **loc_argv, bool throw_err)
     main_sem_anal.run(main_args.verbose_mode_set);
     std::cout << "Successful semantic analysis\n" << std::flush;
 
-    vino::CodeGen main_code_gen;
-    fs::create_directory("./finalVN");
+    vino::CodeGen main_code_gen(main_args.verbose_mode_set);
+    fs::create_directory(outdir_path);
     std::fstream out_fbin(
-            "./finalVN/m_vm_inst_" + script_path.stem().string() + ".bin",
+            outdir_path / ("m_vm_inst_" + script_path.stem().string() + ".bin"),
             std::ios::trunc | std::ios::out | std::ios::binary);
-    main_code_gen.run(&main_ast, out_fbin, main_args.verbose_mode_set);
+
+    auto copyset =
+            main_code_gen.run(&main_ast, out_fbin, main_args.verbose_mode_set);
     std::cout << "Successful code generation\n" << std::flush;
+
+    if (!main_code_gen.copy_resources(outdir_path / "res", copyset) && throw_err)
+    {
+        throw vino::CodeGenError("copy_resources(): unsuccessful");
+    }
 }
 
 }  // namespace m_comp

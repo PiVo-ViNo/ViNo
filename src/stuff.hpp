@@ -76,4 +76,15 @@ inline std::string substr_utf8_min(
     return substr;
 }
 
+/**
+ * @brief Convert std::string to std::u32string
+ * 
+ * @param u8string 
+ * @return std::u32string 
+ */
+inline std::u32string to_u32string(const std::string& u8string)
+{
+    return {u8string.cbegin(), u8string.cend()};
+}
+
 }  // namespace vino
