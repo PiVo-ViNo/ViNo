@@ -6,8 +6,9 @@
 
 namespace vino {
 
-Window::Window(uint32_t width, uint32_t height) : _width(width), _height(height)
+Window::Window(int width, int height) : _width(width), _height(height)
 {
+    assert(width > 0 && height > 0);
     if (glfwInit() == GLFW_FALSE) {
         throw vino::VmError("Error:Window(): cannot initialize GLFW library");
     }
@@ -16,6 +17,8 @@ Window::Window(uint32_t width, uint32_t height) : _width(width), _height(height)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 }
+
+Window::~Window() { glfwTerminate(); }
 
 void Window::make_current()
 {
@@ -33,7 +36,7 @@ bool Window::should_close() const
     return glfwWindowShouldClose(ptrWindow);
 }
 
-void Window::update(glm::vec4 color)
+void Window::update(const glm::vec4& color)
 {
     glfwSwapBuffers(ptrWindow);
     glfwPollEvents();
@@ -69,12 +72,12 @@ std::pair<int, int> Window::get_cursor_pos() const
     return {std::floor(xpos), _height - std::floor(ypos)};
 }
 
-uint32_t Window::get_width() const
+int Window::get_width() const
 {
     return _width;
 }
 
-uint32_t Window::get_height() const
+int Window::get_height() const
 {
     return _height;
 }
@@ -91,7 +94,7 @@ bool Window::set_icon(const fs::path& path_to_icon)
 }
 
 NonResizableWindow::NonResizableWindow(
-        uint32_t width, uint32_t height, const std::string& title) :
+        int width, int height, const std::string& title) :
     Window(width, height)
 {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);

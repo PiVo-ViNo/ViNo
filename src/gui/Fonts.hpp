@@ -24,7 +24,7 @@ struct Character {
     unsigned int texture_id;  // ID handle of the glyph texture
     glm::ivec2   size;        // Size of glyph
     glm::ivec2   bearing;     // Offset from baseline to left/top of glyph
-    unsigned int advance;     // Offset to advance to next glyph
+    int advance;     // Offset to advance to next glyph
 };
 
 /**
@@ -76,11 +76,11 @@ private:
     friend class FontsCollection<char_type>;
 
     FreeTypeFace(
-            FT_Library& ft_lib, std::string font_path, unsigned int pxl_size);
+            FT_Library& ft_lib, std::string font_path, int pxl_size);
 
     /// @param `pixel_height` can be omitted, makes it equal to `pixel_width`
     void set_pixel_size(
-            unsigned int pixel_width, unsigned int pixel_height = 0);
+            int pixel_width, int pixel_height = 0);
 
     Character& load_symbol(char_type ch, bool in_cycle = false);
     void       load_ascii();
@@ -103,14 +103,14 @@ public:
     explicit Font(FreeTypeFace<char_type>& face) : _face(face) {}
 
     void render_str(const std::basic_string<char_type>& str, unsigned int vbo,
-            glm::uvec2 ll_pos, float scale) const;
+            glm::ivec2 ll_pos, float scale) const;
 
     /// @return how many chars from str was rendered
     std::size_t render_str_inbound(const std::basic_string<char_type>& str,
-            unsigned int vbo, glm::uvec2 ll_pos, float scale,
-            unsigned int x_bound) const;
+            unsigned int vbo, glm::ivec2 ll_pos, float scale,
+            int x_bound) const;
 
-    [[nodiscard]] glm::uvec2 get_dimensions_of(
+    [[nodiscard]] glm::ivec2 get_dimensions_of(
             const std::string& str, float scale) const;
 
 private:
@@ -132,8 +132,8 @@ public:
     FontsCollection<char_type>() = default;
     // explicit FontCollection(FreeTypeLib& ft_lib) : _ft_lib(ft_lib) {}
 
-    bool add_font(const std::string& font_path, unsigned int size);
-    bool add_font_with_ascii(const std::string& font_path, unsigned int size);
+    bool add_font(const std::string& font_path, int size);
+    bool add_font_with_ascii(const std::string& font_path, int size);
 
     Font<char_type> operator[](const std::string& font_name);
 

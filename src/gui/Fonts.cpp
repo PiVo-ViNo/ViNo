@@ -1,5 +1,6 @@
 #include "Fonts.hpp"
 
+#include <freetype/fttypes.h>
 #include <glad/glad.h>
 // #include "freetype/freetype.h"
 #include <filesystem>
@@ -41,9 +42,10 @@ FreeTypeFace<_Ch>::FreeTypeFace(FreeTypeFace&& other) :
 
 template <typename _Ch>
 FreeTypeFace<_Ch>::FreeTypeFace(
-        FT_Library& ft_lib, std::string font_path, unsigned int pxl_size) :
+        FT_Library& ft_lib, std::string font_path, int pxl_size) :
     _font_path(std::move(font_path))
 {
+    assert(pxl_size > 0);
     if (_font_path.empty()) {
         throw WindowError("ERROR::FREETYPE::Empty path to font");
     }
@@ -53,7 +55,9 @@ FreeTypeFace<_Ch>::FreeTypeFace(
         throw WindowError("ERROR::FREETYPE " + std::to_string(err)
                           + "::Couldn't init FreeTypeFace");
     }
-    if (FT_Error err = FT_Set_Pixel_Sizes(_native_ft_face, 0, pxl_size)) {
+    if (FT_Error err = FT_Set_Pixel_Sizes(
+                _native_ft_face, 0, static_cast<FT_UInt>(pxl_size)))
+    {
         FT_Done_Face(_native_ft_face);
         throw WindowError("ERROR::FREETYPE " + std::to_string(err)
                           + "::Couldn't set pixel size");
@@ -61,11 +65,12 @@ FreeTypeFace<_Ch>::FreeTypeFace(
 }
 
 template <typename _Ch>
-void FreeTypeFace<_Ch>::set_pixel_size(
-        unsigned int pixel_width, unsigned int pixel_height)
+void FreeTypeFace<_Ch>::set_pixel_size(int pixel_width, int pixel_height)
 {
-    if (FT_Error err = FT_Set_Pixel_Sizes(
-                _native_ft_face, pixel_width, pixel_height))
+    assert(pixel_width > 0 && pixel_height > 0);
+    if (FT_Error err = FT_Set_Pixel_Sizes(_native_ft_face,
+                static_cast<FT_UInt>(pixel_width),
+                static_cast<FT_UInt>(pixel_height)))
     {
         throw WindowError("ERROR::FREETYPE " + std::to_string(err)
                           + "::Couldn't set pixel size");
@@ -77,8 +82,8 @@ Character& FreeTypeFace<_Ch>::load_symbol(_Ch ch, bool in_cycle)
 {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     // Load character glyph in render mode
-    if (FT_Error err = FT_Load_Char(_native_ft_face, 
-                            static_cast<FT_ULong>(ch), FT_LOAD_RENDER)) 
+    if (FT_Error err = FT_Load_Char(
+                _native_ft_face, static_cast<FT_ULong>(ch), FT_LOAD_RENDER))
     {
         throw WindowError("ERROR::FREETYPE " + std::to_string(err)
                           + "::Failed to load Glyph");
@@ -102,7 +107,7 @@ Character& FreeTypeFace<_Ch>::load_symbol(_Ch ch, bool in_cycle)
                     _native_ft_face->glyph->bitmap.rows),
             glm::ivec2(_native_ft_face->glyph->bitmap_left,
                     _native_ft_face->glyph->bitmap_top),
-            static_cast<unsigned int>(_native_ft_face->glyph->advance.x)};
+            static_cast<int>(_native_ft_face->glyph->advance.x)};
     auto it = _chars_map.insert(std::pair<_Ch, Character>(ch, character)).first;
     if (!in_cycle) {
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -135,7 +140,7 @@ Character& FreeTypeFace<_Ch>::get_char(const _Ch& ch)
 
 template <typename _Ch>
 void Font<_Ch>::render_str(const std::basic_string<_Ch>& str, unsigned int vbo,
-        glm::uvec2 lowleft_pos, float scale) const
+        glm::ivec2 lowleft_pos, float scale) const
 {
     if (str.empty()) {
         return;
@@ -147,8 +152,8 @@ void Font<_Ch>::render_str(const std::basic_string<_Ch>& str, unsigned int vbo,
         Character ch = _face.get_char(c);
 
         float xpos = ll_pos.x + static_cast<float>(ch.bearing.x) * scale;
-        float ypos = 
-            ll_pos.y - static_cast<float>(ch.size.y - ch.bearing.y) * scale;
+        float ypos =
+                ll_pos.y - static_cast<float>(ch.size.y - ch.bearing.y) * scale;
 
         float w = static_cast<float>(ch.size.x) * scale;
         float h = static_cast<float>(ch.size.y) * scale;
@@ -180,9 +185,9 @@ void Font<_Ch>::render_str(const std::basic_string<_Ch>& str, unsigned int vbo,
 }
 
 template <typename _Ch>
-std::size_t Font<_Ch>::render_str_inbound(const std::basic_string<_Ch>& str,
-        unsigned int vbo, glm::uvec2 lowleft_pos, float scale,
-        unsigned int x_bound) const
+std::size_t Font<_Ch>::render_str_inbound(
+        const std::basic_string<char_type>& str, unsigned int vbo,
+        glm::ivec2 lowleft_pos, float scale, int x_bound) const
 {
     if (str.empty()) {
         return 0;
@@ -195,12 +200,11 @@ std::size_t Font<_Ch>::render_str_inbound(const std::basic_string<_Ch>& str,
         Character ch = _face.get_char(c);
 
         float xpos = ll_pos.x + static_cast<float>(ch.bearing.x) * scale;
-        float ypos = 
-            ll_pos.y - static_cast<float>(ch.size.y - ch.bearing.y) * scale;
-        if (c == '\n' 
-            || ll_pos.x 
-                + static_cast<float>(ch.advance >> 6) * scale 
-                                            >= static_cast<float>(x_bound)) 
+        float ypos =
+                ll_pos.y - static_cast<float>(ch.size.y - ch.bearing.y) * scale;
+        if (c == '\n'
+                || ll_pos.x + static_cast<float>(ch.advance >> 6) * scale
+                           >= static_cast<float>(x_bound))
         {
             glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
             return ++count_chars;
@@ -210,8 +214,7 @@ std::size_t Font<_Ch>::render_str_inbound(const std::basic_string<_Ch>& str,
         float h = static_cast<float>(ch.size.y) * scale;
 
         std::array<std::array<float, 4>, 6> vertices = {
-                {{xpos, ypos + h, 0.0f, 0.0f}, 
-                 {xpos, ypos, 0.0f, 1.0f},
+                {{xpos, ypos + h, 0.0f, 0.0f}, {xpos, ypos, 0.0f, 1.0f},
                  {xpos + w, ypos, 1.0f, 1.0f},
 
                  {xpos, ypos + h, 0.0f, 0.0f},
@@ -240,18 +243,18 @@ std::size_t Font<_Ch>::render_str_inbound(const std::basic_string<_Ch>& str,
 }
 
 template <typename _Ch>
-glm::uvec2 Font<_Ch>::get_dimensions_of(
+glm::ivec2 Font<_Ch>::get_dimensions_of(
         const std::string& str, float scale) const
 {
-    glm::uvec2 dimensions{};
+    glm::ivec2 dimensions{};
 
     for (const char& c : str) {
         Character ch = _face.get_char(static_cast<_Ch>(c));
 
-        dimensions.x += static_cast<unsigned int>(
-                                static_cast<float>(ch.advance >> 6) * scale);
-        if (ch.bearing.y > static_cast<int>(dimensions.y)) {
-            dimensions.y = static_cast<unsigned int>(ch.bearing.y);
+        dimensions.x +=
+                static_cast<int>(static_cast<float>(ch.advance >> 6) * scale);
+        if (ch.bearing.y > dimensions.y) {
+            dimensions.y = ch.bearing.y;
         }
     }
 
@@ -263,8 +266,9 @@ glm::uvec2 Font<_Ch>::get_dimensions_of(
 
 template <typename _Ch>
 bool FontsCollection<_Ch>::add_font_with_ascii(
-        const std::string& font_path, unsigned int size)
+        const std::string& font_path, int size)
 {
+    assert(size > 0);
     std::filesystem::path temp_path = std::filesystem::path(font_path);
     if (!std::filesystem::exists(temp_path) || temp_path.extension() != ".ttf")
     {

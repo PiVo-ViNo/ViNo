@@ -6,7 +6,6 @@
 
 #include "custom_errors.hpp"
 #include <filesystem>
-#include <cstdint>
 #include <string>
 
 namespace vino {
@@ -24,11 +23,11 @@ public:
     Window& operator=(Window&&) = delete;
     Window(const Window& other) = delete;
 
-    virtual ~Window() { glfwTerminate(); }
+    virtual ~Window();
 
     void make_current();
     void close();
-    void update(glm::vec4 color = {0.0f, 0.0f, 0.0f, 1.0f});
+    void update(const glm::vec4& color = {0.0f, 0.0f, 0.0f, 1.0f});
     bool set_icon(const fs::path& path_to_icon);
 
     int get_attribute(int glfw_attribute);
@@ -38,14 +37,14 @@ public:
     [[nodiscard]] bool is_clicked() const;
 
     [[nodiscard]] std::pair<int, int> get_cursor_pos() const;
-    [[nodiscard]] uint32_t            get_width() const;
-    [[nodiscard]] uint32_t            get_height() const;
+    [[nodiscard]] int            get_width() const;
+    [[nodiscard]] int            get_height() const;
 
 protected:
-    Window(uint32_t width, uint32_t height);
+    Window(int width, int height);
 
-    uint32_t    _width{};
-    uint32_t    _height{};
+    int _width{};
+    int _height{};
     GLFWwindow* ptrWindow = nullptr;
 };
 
@@ -57,7 +56,7 @@ public:
     NonResizableWindow& operator=(NonResizableWindow&&) = delete;
 
     NonResizableWindow(
-            uint32_t width, uint32_t height, const std::string& title);
+            int width, int height, const std::string& title);
 
     ~NonResizableWindow() override = default;
 

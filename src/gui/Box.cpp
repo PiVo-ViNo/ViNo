@@ -6,7 +6,7 @@ namespace vino {
 // IBox -----------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-IBox::IBox(glm::ivec2 low_left_pos, unsigned int width, unsigned int height,
+IBox::IBox(const glm::ivec2& low_left_pos, int width, int height,
         Window& parent_window) :
     _win(parent_window), _ll_pos(low_left_pos), _width(width), _height(height)
 {
@@ -20,8 +20,8 @@ bool IBox::is_cursor_in() const
         return false;
     }
     return (pair.first >= _ll_pos.x && pair.second >= _ll_pos.y
-            && pair.first <= _ll_pos.x + static_cast<int>(_width)
-            && pair.second <= _ll_pos.y + static_cast<int>(_height));
+            && pair.first <= _ll_pos.x + _width
+            && pair.second <= _ll_pos.y + _height);
 }
 
 bool IBox::is_clicked() const
@@ -34,12 +34,12 @@ glm::ivec2 IBox::get_low_left_pos() const
     return _ll_pos;
 }
 
-unsigned int IBox::get_width() const
+int IBox::get_width() const
 {
     return _width;
 }
 
-unsigned int IBox::get_height() const
+int IBox::get_height() const
 {
     return _height;
 }
@@ -47,9 +47,9 @@ unsigned int IBox::get_height() const
 // ITextureColorBox -----------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-ITextureColorBox::ITextureColorBox(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, const ImgData& img,
-        glm::vec4 color, int GL_TYPE_DRAW) :
+ITextureColorBox::ITextureColorBox(const glm::ivec2& low_left_pos, int width,
+        int height, Window& parent_window, const ImgData& img,
+        const glm::vec4& color, int GL_TYPE_DRAW) :
     IBox(low_left_pos, width, height, parent_window),
     _box_shader("./shaders/basicVertex.glsl", "shaders/basicFrag.glsl"),
     _color(color)
@@ -67,13 +67,11 @@ ITextureColorBox::ITextureColorBox(glm::ivec2 low_left_pos, unsigned int width,
 
     std::array<std::array<int, 5>, 4> corners = {
             {{_ll_pos.x, _ll_pos.y, 0, 0, 0},
-             {_ll_pos.x, _ll_pos.y + static_cast<int>(_height), 0, 0, 1},
-             {_ll_pos.x + static_cast<int>(_width),
-             _ll_pos.y + static_cast<int>(_height), 0, 1, 1},
-             {_ll_pos.x + static_cast<int>(_width), _ll_pos.y, 0, 1,
-             0}}
+             {_ll_pos.x, _ll_pos.y + _height, 0, 0, 1},
+             {_ll_pos.x + _width, _ll_pos.y + _height, 0, 1, 1},
+             {_ll_pos.x + _width, _ll_pos.y, 0, 1, 0}}
     };
-    std::array<unsigned int, 6> elem_indices = {0, 1, 2, 2, 3, 0};
+    std::array<int, 6> elem_indices = {0, 1, 2, 2, 3, 0};
 
     // init buffers for box
     glBindVertexArray(_box_vertex_array);
@@ -111,6 +109,7 @@ void ITextureColorBox::render(float uniform_alpha) const
     glBindTexture(GL_TEXTURE_2D, _box_texture);
 
     _box_shader.use();
+    /// TODO:Q: Usage of static_cast of float-matrix at all, can be int?
     glm::mat4 projection =
             glm::ortho(0.0f, static_cast<float>(_win.get_width()), 0.0f,
                     static_cast<float>(_win.get_height()));
@@ -125,13 +124,13 @@ void ITextureColorBox::render(float uniform_alpha) const
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ITextureColorBox::change_texture(const ImgData& new_img) 
+void ITextureColorBox::change_texture(const ImgData& new_img)
 {
     glDeleteTextures(1, &_box_texture);
-    _box_texture = configure_texture(new_img, 0);    
+    _box_texture = configure_texture(new_img, 0);
 }
 
-void ITextureColorBox::change_color(const glm::vec4 new_color) 
+void ITextureColorBox::change_color(const glm::vec4& new_color)
 {
     _color = new_color;
 }
@@ -152,18 +151,16 @@ ITextureColorBox::~ITextureColorBox()
 // IStaticBox -----------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-IStaticBox::IStaticBox(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, glm::vec4 color,
-        const ImgData& img) :
+IStaticBox::IStaticBox(const glm::ivec2& low_left_pos, int width, int height,
+        Window& parent_window, const glm::vec4& color, const ImgData& img) :
     ITextureColorBox(low_left_pos, width, height, parent_window, img, color,
             GL_STATIC_DRAW)
 {
     // std::cout << "IStaticBox created" << std::endl;
 }
 
-IStaticBox::IStaticBox(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, const ImgData& img,
-        glm::vec4 color) :
+IStaticBox::IStaticBox(const glm::ivec2& low_left_pos, int width, int height,
+        Window& parent_window, const ImgData& img, const glm::vec4& color) :
     ITextureColorBox(low_left_pos, width, height, parent_window, img, color,
             GL_STATIC_DRAW)
 {
@@ -177,11 +174,9 @@ void IDynamicBox::recalculate_corners()
 {
     _corners = {
             {{_ll_pos.x, _ll_pos.y, 0, 0, 0},
-             {_ll_pos.x, _ll_pos.y + static_cast<int>(_height), 0, 0, 1},
-             {_ll_pos.x + static_cast<int>(_width),
-             _ll_pos.y + static_cast<int>(_height), 0, 1, 1},
-             {_ll_pos.x + static_cast<int>(_width), _ll_pos.y, 0, 1,
-             0}}
+             {_ll_pos.x, _ll_pos.y + _height, 0, 0, 1},
+             {_ll_pos.x + _width, _ll_pos.y + _height, 0, 1, 1},
+             {_ll_pos.x + _width, _ll_pos.y, 0, 1, 0}}
     };
 
     glBindVertexArray(_box_vertex_array);
@@ -195,28 +190,24 @@ void IDynamicBox::recalculate_corners()
     glBindVertexArray(0);
 }
 
-glm::ivec2 IDynamicBox::move_no_clip(glm::ivec2 direction)
+glm::ivec2 IDynamicBox::move_no_clip(const glm::ivec2& direction)
 {
     _ll_pos += direction;
     recalculate_corners();
     return _ll_pos;
 }
 
-glm::uvec2 IDynamicBox::move_with_clip(glm::ivec2 direction)
+glm::ivec2 IDynamicBox::move_with_clip(const glm::ivec2& direction)
 {
     glm::ivec2 result_vec = _ll_pos + direction;
     if (result_vec.x < 0) {
         result_vec.x = 0;
-    } else if (static_cast<unsigned int>(result_vec.x) + _width
-               > _win.get_width())
-    {
+    } else if (result_vec.x + _width > _win.get_width()) {
         result_vec.x = _win.get_width() - _width;
     }
     if (result_vec.y < 0) {
         result_vec.y = 0;
-    } else if (static_cast<unsigned int>(result_vec.y) + _height
-               > _win.get_height())
-    {
+    } else if (result_vec.y + _height > _win.get_height()) {
         result_vec.y = _win.get_height() - _height;
     }
     _ll_pos = result_vec;
@@ -224,8 +215,9 @@ glm::uvec2 IDynamicBox::move_with_clip(glm::ivec2 direction)
     return result_vec;
 }
 
-glm::uvec2 IDynamicBox::resize_no_clip(glm::uvec2 new_dimension)
+glm::ivec2 IDynamicBox::resize_no_clip(const glm::ivec2& new_dimension)
 {
+    assert(new_dimension.x >= 0 && new_dimension.y >= 0);
     _width = new_dimension.x;
     _height = new_dimension.y;
 
@@ -233,7 +225,7 @@ glm::uvec2 IDynamicBox::resize_no_clip(glm::uvec2 new_dimension)
     return new_dimension;
 }
 
-glm::uvec2 IDynamicBox::resize_with_clip(glm::uvec2 new_dimension)
+glm::ivec2 IDynamicBox::resize_with_clip(const glm::ivec2& new_dimension)
 {
     if (_ll_pos.x + new_dimension.x > _win.get_width()) {
         _width = _win.get_width() - _ll_pos.x;
@@ -249,34 +241,28 @@ glm::uvec2 IDynamicBox::resize_with_clip(glm::uvec2 new_dimension)
     return {_width, _height};
 }
 
-IDynamicBox::IDynamicBox(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, glm::vec4 color,
-        const ImgData& img) :
+IDynamicBox::IDynamicBox(const glm::ivec2& low_left_pos, int width, int height,
+        Window& parent_window, const glm::vec4& color, const ImgData& img) :
     ITextureColorBox(low_left_pos, width, height, parent_window, img, color,
             GL_DYNAMIC_DRAW),
     _corners({
             {{_ll_pos.x, _ll_pos.y, 0, 0, 0},
-             {_ll_pos.x, _ll_pos.y + static_cast<int>(_height), 0, 0, 1},
-             {_ll_pos.x + static_cast<int>(_width),
-             _ll_pos.y + static_cast<int>(_height), 0, 1, 1},
-             {_ll_pos.x + static_cast<int>(_width), _ll_pos.y, 0, 1,
-             0}}
+             {_ll_pos.x, _ll_pos.y + _height, 0, 0, 1},
+             {_ll_pos.x + _width, _ll_pos.y + _height, 0, 1, 1},
+             {_ll_pos.x + _width, _ll_pos.y, 0, 1, 0}}
 })
 {
 }
 
-IDynamicBox::IDynamicBox(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, const ImgData& img,
-        glm::vec4 color) :
+IDynamicBox::IDynamicBox(const glm::ivec2& low_left_pos, int width, int height,
+        Window& parent_window, const ImgData& img, const glm::vec4& color) :
     ITextureColorBox(low_left_pos, width, height, parent_window, img, color,
             GL_DYNAMIC_DRAW),
     _corners({
             {{_ll_pos.x, _ll_pos.y, 0, 0, 0},
-             {_ll_pos.x, _ll_pos.y + static_cast<int>(_height), 0, 0, 1},
-             {_ll_pos.x + static_cast<int>(_width),
-             _ll_pos.y + static_cast<int>(_height), 0, 1, 1},
-             {_ll_pos.x + static_cast<int>(_width), _ll_pos.y, 0, 1,
-             0}}
+             {_ll_pos.x, _ll_pos.y + _height, 0, 0, 1},
+             {_ll_pos.x + _width, _ll_pos.y + _height, 0, 1, 1},
+             {_ll_pos.x + _width, _ll_pos.y, 0, 1, 0}}
 })
 {
 }
@@ -286,7 +272,7 @@ IDynamicBox::IDynamicBox(glm::ivec2 low_left_pos, unsigned int width,
 
 template <typename _Ch>
 void TextRenderer<_Ch>::render_text(const std::basic_string<_Ch>& str,
-        const Font<_Ch>& font, glm::vec3 color, glm::ivec2 ll_pos,
+        const Font<_Ch>& font, const glm::vec3& color, const glm::ivec2& ll_pos,
         const Window& window) const
 {
     if (str.empty()) {
@@ -316,7 +302,7 @@ void TextRenderer<_Ch>::render_text(const std::basic_string<_Ch>& str,
 template <typename _Ch>
 std::size_t TextRenderer<_Ch>::render_text_inbound(
         const std::basic_string<_Ch>& str, const Font<_Ch>& font,
-        glm::vec3 color, glm::ivec2 ll_pos, unsigned int x_bound,
+        const glm::vec3& color, const glm::ivec2& ll_pos, int x_bound,
         const Window& window) const
 {
     if (str.empty()) {
@@ -375,8 +361,8 @@ TextRenderer<_Ch>::~TextRenderer()
 // ----------------------------------------------------------------------------
 
 template <typename _Ch>
-StaticTextBox<_Ch>::StaticTextBox(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, glm::vec4 color,
+StaticTextBox<_Ch>::StaticTextBox(const glm::ivec2& low_left_pos, int width,
+        int height, Window& parent_window, const glm::vec4& color,
         const ImgData& img) :
     IStaticBox(low_left_pos, width, height, parent_window, img, color)
 {
@@ -384,24 +370,24 @@ StaticTextBox<_Ch>::StaticTextBox(glm::ivec2 low_left_pos, unsigned int width,
 }
 
 template <typename _Ch>
-StaticTextBox<_Ch>::StaticTextBox(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, const ImgData& img,
-        glm::vec4 color) :
+StaticTextBox<_Ch>::StaticTextBox(const glm::ivec2& low_left_pos, int width,
+        int height, Window& parent_window, const ImgData& img,
+        const glm::vec4& color) :
     IStaticBox(low_left_pos, width, height, parent_window, img, color)
 {
     _text = std::make_unique<TextRenderer<char_type>>();
 }
 
 template <typename _Ch>
-void StaticTextBox<_Ch>::render_text(std::basic_string<_Ch> text,
-        const Font<_Ch>& font, glm::vec4 color) const
+void StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
+        const Font<_Ch>& font, const glm::vec4& color) const
 {
     const int glyph_max_height = font.get_dimensions_of("A", 1.0).y;
 
-    int y_cur = _ll_pos.y
-                + std::max(static_cast<int>(_height) - glyph_max_height
-                                   - glyph_max_height * 4 / 5,
-                        (static_cast<int>(_height) - glyph_max_height) / 2);
+    int y_cur =
+            _ll_pos.y
+            + std::max(_height - glyph_max_height - glyph_max_height * 4 / 5,
+                    (_height - glyph_max_height) / 2);
 
     std::size_t rendered_chars = _text->render_text_inbound(text, font, color,
             {_ll_pos.x + 10, y_cur}, _ll_pos.x + _width - 10, _win);
@@ -417,9 +403,9 @@ void StaticTextBox<_Ch>::render_text(std::basic_string<_Ch> text,
 // ForegroundFigure -----------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-ForegroundFigure::ForegroundFigure(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, const ImgData& img,
-        glm::vec4 color) :
+ForegroundFigure::ForegroundFigure(const glm::ivec2& low_left_pos, int width,
+        int height, Window& parent_window, const ImgData& img,
+        const glm::vec4& color) :
     IDynamicBox(low_left_pos, width, height, parent_window, img, color)
 {
 }
@@ -428,14 +414,14 @@ ForegroundFigure::ForegroundFigure(glm::ivec2 low_left_pos, unsigned int width,
 // ----------------------------------------------------------------------------
 
 FullscreenTexture::FullscreenTexture(
-        Window& window, const ImgData& img, glm::vec4 color) :
+        Window& window, const ImgData& img, const glm::vec4& color) :
     IStaticBox(
             {0, 0}, window.get_width(), window.get_height(), window, img, color)
 {
 }
 
 FullscreenTexture::FullscreenTexture(
-        Window& window, glm::vec4 color, const ImgData& img) :
+        Window& window, const glm::vec4& color, const ImgData& img) :
     IStaticBox(
             {0, 0}, window.get_width(), window.get_height(), window, img, color)
 {
@@ -445,10 +431,10 @@ FullscreenTexture::FullscreenTexture(
 // ----------------------------------------------------------------------------
 
 template <typename _Ch>
-Button<_Ch>::Button(glm::ivec2 low_left_pos, unsigned int width,
-        unsigned int height, Window& parent_window, glm::vec4 font_color,
-        std::basic_string<char_type> title, const Font<char_type>& font,
-        const ImgData& img, glm::vec4 box_color) :
+Button<_Ch>::Button(const glm::ivec2& low_left_pos, int width, int height,
+        Window& parent_window, const glm::vec4& font_color,
+        const std::basic_string<char_type>& title, const Font<char_type>& font,
+        const ImgData& img, const glm::vec4& box_color) :
     IStaticBox(low_left_pos, width, height, parent_window, img, box_color),
     _title(std::move(title)),
     _font(font),
@@ -473,9 +459,10 @@ void Button<_Ch>::render() const
 // ----------------------------------------------------------------------------
 
 template <typename _Ch>
-void LowBox<_Ch>::set_globals(glm::ivec2 box_ll_pos, glm::uvec2 box_dimensions,
-        glm::vec4 box_color, glm::ivec2 title_ll_pos,
-        glm::uvec2 title_dimensions, glm::vec4 title_color)
+void LowBox<_Ch>::set_globals(const glm::ivec2& box_ll_pos,
+        const glm::ivec2& box_dimensions, const glm::vec4& box_color,
+        const glm::ivec2& title_ll_pos, const glm::ivec2& title_dimensions,
+        const glm::vec4& title_color)
 {
     glob_box_ll_pos = box_ll_pos;
     glob_box_dimensions = box_dimensions;
@@ -488,12 +475,11 @@ void LowBox<_Ch>::set_globals(glm::ivec2 box_ll_pos, glm::uvec2 box_dimensions,
 
 template <typename _Ch>
 LowBox<_Ch>::LowBox(Window& parent_window, const glm::ivec2& box_ll_pos,
-                     const glm::uvec2& box_dimensions, const glm::vec4& box_color, 
-                     const glm::vec4 title_color, const Font<char_type>& font) :
+        const glm::ivec2& box_dimensions, const glm::vec4& box_color,
+        const glm::vec4& title_color, const Font<char_type>& font) :
     _text_box(box_ll_pos, box_dimensions.x, box_dimensions.y, parent_window,
             box_color),
-    _name_box({box_ll_pos.x + 10,
-                      static_cast<int>(box_dimensions.y) + box_ll_pos.y},
+    _name_box({box_ll_pos.x + 10, box_dimensions.y + box_ll_pos.y},
             box_dimensions.x / 4, font.get_dimensions_of("A", 1.0).y * 2,
             parent_window, title_color),
     _font(font)
