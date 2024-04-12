@@ -149,6 +149,7 @@ void Font<_Ch>::render_str(const std::basic_string<_Ch>& str, unsigned int vbo,
 
     glm::vec2 ll_pos(std::move(lowleft_pos));
     for (const _Ch& c : str) {
+        if (c == '\r') continue;
         Character ch = _face.get_char(c);
 
         float xpos = ll_pos.x + static_cast<float>(ch.bearing.x) * scale;
@@ -197,6 +198,10 @@ std::size_t Font<_Ch>::render_str_inbound(
 
     glm::vec2 ll_pos(std::move(lowleft_pos));
     for (const _Ch& c : str) {
+        if (c == '\r') {
+            count_chars++;
+            continue;
+        }
         Character ch = _face.get_char(c);
 
         float xpos = ll_pos.x + static_cast<float>(ch.bearing.x) * scale;

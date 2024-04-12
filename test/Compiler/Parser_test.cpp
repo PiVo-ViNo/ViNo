@@ -29,10 +29,8 @@ public:
         fs::create_directory(tmp / "dir");
         std::ofstream ostrm(tmp / "test.png", std::ios::binary | std::ios::out);
         ostrm.put('a');
-        ostrm.close();
         ostrm.open(tmp / "test.txt", std::ios::binary | std::ios::out);
         ostrm.put('a');
-        ostrm.close();
     }
 
     vino::PairTokenId test_get_token()

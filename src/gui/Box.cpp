@@ -44,6 +44,11 @@ int IBox::get_height() const
     return _height;
 }
 
+Window& IBox::get_window() const
+{
+    return _win;
+}
+
 // ITextureColorBox -----------------------------------------------------------
 // ----------------------------------------------------------------------------
 
@@ -459,21 +464,6 @@ void Button<_Ch>::render() const
 // ----------------------------------------------------------------------------
 
 template <typename _Ch>
-void LowBox<_Ch>::set_globals(const glm::ivec2& box_ll_pos,
-        const glm::ivec2& box_dimensions, const glm::vec4& box_color,
-        const glm::ivec2& title_ll_pos, const glm::ivec2& title_dimensions,
-        const glm::vec4& title_color)
-{
-    glob_box_ll_pos = box_ll_pos;
-    glob_box_dimensions = box_dimensions;
-    glob_box_color = box_color;
-    glob_title_ll_pos = title_ll_pos;
-    glob_title_dimensions = title_dimensions;
-    glob_title_box_color = title_color;
-    globals_set = true;
-}
-
-template <typename _Ch>
 LowBox<_Ch>::LowBox(Window& parent_window, const glm::ivec2& box_ll_pos,
         const glm::ivec2& box_dimensions, const glm::vec4& box_color,
         const glm::vec4& title_color, const Font<char_type>& font) :
@@ -484,24 +474,19 @@ LowBox<_Ch>::LowBox(Window& parent_window, const glm::ivec2& box_ll_pos,
             parent_window, title_color),
     _font(font)
 {
-    glob_box_ll_pos = box_ll_pos;
-    glob_box_dimensions = box_dimensions;
-    glob_title_ll_pos = _name_box.get_low_left_pos();
-    glob_title_dimensions = {_name_box.get_width(), _name_box.get_height()};
-    glob_box_color = _text_box.get_color();
-    globals_set = true;
+    _box_ll_pos = box_ll_pos;
+    _box_dimensions = box_dimensions;
+    _title_ll_pos = _name_box.get_low_left_pos();
+    _title_dimensions = {_name_box.get_width(), _name_box.get_height()};
+    _box_color = _text_box.get_color();
 }
 
 template <typename _Ch>
-LowBox<_Ch>::LowBox(Window& parent_window, const Font<char_type>& font) :
-    LowBox(parent_window, glob_box_ll_pos, glob_box_dimensions, glob_box_color,
-            glob_title_box_color, font)
+LowBox<_Ch>::LowBox(const LowBox<char_type>& other) :
+    LowBox(other._text_box.get_window(), other._box_ll_pos,
+            other._box_dimensions, other._box_color, other._title_box_color,
+            other._font)
 {
-    if (!globals_set) {
-        throw WindowError(
-                "First vino::LowBox construction must be done through full "
-                "constructor to init global LowBox parameters (!= 0)");
-    }
 }
 
 /// TODO: Text must be rendered without breaking the words (exception: too long
@@ -512,8 +497,8 @@ void LowBox<_Ch>::render() const
     _text_box.render();
     _name_box.render();
     _text_box.render_text(_text, _font,
-            {1.0f - glob_box_color.r, 1.0f - glob_box_color.g,
-                    1.0f - glob_box_color.b, 1.0f});
+            {1.0f - _box_color.r, 1.0f - _box_color.g, 1.0f - _box_color.b,
+                    1.0f});
 }
 
 template <typename _Ch>
@@ -525,8 +510,8 @@ void LowBox<_Ch>::render(
     _name_box.render();
     // Render texts colors as inverted to boxes's colors
     _text_box.render_text(_text, _font,
-            {1.0f - glob_box_color.r, 1.0f - glob_box_color.g,
-                    1.0f - glob_box_color.b, 1.0f});
+            {1.0f - _box_color.r, 1.0f - _box_color.g, 1.0f - _box_color.b,
+                    1.0f});
     _name_box.render_text(name, _font,
             {1.0f - _name_box.get_color().r, 1.0f - _name_box.get_color().g,
                     1.0f - _name_box.get_color().b, 1.0f});
@@ -536,6 +521,12 @@ template <typename _Ch>
 void LowBox<_Ch>::update_text(const std::basic_string<char_type>& text)
 {
     _text = text;
+}
+
+template <typename _Ch>
+inline void LowBox<_Ch>::add_text(const std::basic_string<char_type>& text)
+{
+    _text += text;
 }
 
 // explicit instantiations

@@ -14,7 +14,6 @@ ImgData::ImgData(const std::string& path_to_img, bool flipped)
 {
     namespace fs = std::filesystem;
     fs::path img(path_to_img);
-    /// TODO: extensions can be CAPITALIZED
     auto img_not_any_of =
             [&img](std::convertible_to<std::string> auto&&... ext) -> bool {
         return (true && ... 

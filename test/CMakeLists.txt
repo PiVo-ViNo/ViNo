@@ -91,4 +91,19 @@ add_test(NAME ViNo-FullCompiler_test
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Compiler
 )
 
+# ---- ImgData test ----
+add_executable(ViNo-Stuff_test Stuff_test.cpp)
+
+target_include_directories(
+	ViNo-Stuff_test
+	PUBLIC "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>"
+	PUBLIC "$<BUILD_INTERFACE:${boost.ut_SOURCE_DIR}/include>"
+)
+
+target_compile_features(ViNo-Stuff_test PRIVATE cxx_std_20)
+
+add_default_target_compile_definitions(ViNo-Stuff_test)
+
+add_test(NAME ViNo-Stuff_test COMMAND ViNo-Stuff_test)
+
 add_folders(test)
