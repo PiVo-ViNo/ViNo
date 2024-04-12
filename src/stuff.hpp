@@ -1,9 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <codecvt>
-#include <cwchar>
-#include <locale>
 #include <string>
 
 namespace vino {
@@ -102,9 +99,8 @@ inline std::basic_string<_Ch2> convert_str(
  *
  * @param utf8str The input UTF-8 string to convert
  * @return The resulting UTF-32 encoded string
- * @throws std::runtime_error if the input UTF-8 sequence is invalid
  */
-inline std::u32string to_utf32str(const std::string &utf8str)
+inline std::u32string to_utf32str(const std::string &utf8str) noexcept
 {
     std::u32string u32str;
     for (std::size_t i = 0; i < utf8str.size(); i++) {
@@ -156,7 +152,8 @@ inline std::u32string to_utf32str(const std::string &utf8str)
                     }
                 }
             } else {
-                throw std::runtime_error("Invalid UTF-8 sequence");
+                continue;
+                // throw std::runtime_error("Invalid UTF-8 sequence");
             }
         } else {
             u32str += (0UL | static_cast<uint8_t>(ch));

@@ -250,13 +250,14 @@ public:
     virtual ~StaticTextBox() = default;
 
     /**
-     * @brief Renders text after clearing the box from the previous one
+     * @brief Renders text within the bounds of the Box
      *
      * @param text Text to render
      * @param font Font from FontsCollection
      * @param color Color in RGBA float format in interval [0.0, 1.0]
+     * @return std::size_t up to what position text was rendered
      */
-    void render_text(const std::basic_string<char_type>& text,
+    std::size_t render_text(const std::basic_string<char_type>& text,
             const Font<char_type>& font, const glm::vec4& color) const;
 
 private:
@@ -336,7 +337,7 @@ public:
      *
      * @remark Useful in case of long text which won't fit at one time in LowBox
      */
-    void render() const;
+    void render();
 
     /**
      * @brief Render LowBox with new text
@@ -348,6 +349,15 @@ public:
             const std::basic_string<char_type>&     text);
     void update_text(const std::basic_string<char_type>& text);
     void add_text(const std::basic_string<char_type>& text);
+    void update_name(const std::basic_string<char_type>& name);
+    
+    /**
+     * @brief Update text to next slide
+     * 
+     * @return true New slide is not empty
+     * @return false New slide is empty
+     */
+    bool next_slide();
 
 private:
     glm::ivec2 _box_ll_pos{};
@@ -360,6 +370,8 @@ private:
     StaticTextBox<char_type>     _text_box;
     StaticTextBox<char_type>     _name_box;
     std::basic_string<char_type> _text{};
+    std::size_t                  _text_pos{};
+    std::basic_string<char_type> _name_text{};
     Font<char_type>              _font;
 };
 

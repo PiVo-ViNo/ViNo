@@ -15,12 +15,14 @@
 #include <cstdint>
 
 /// TODO:Q: Windows use wchar for paths, is it breaking all algorithm or not?
-
-/**
-    @brief Namespace with instructions as structs
-*/
 namespace vm_instr {
 
+/**
+ * @defgroup VM instructions
+ * @{
+ * @details Full list of instructions with opcodes, instructions with no struct
+ * members doesn't have any parameters beside opcode.
+ */
 /**
  * @brief NOP instruction 0x0
  */
@@ -28,7 +30,7 @@ struct Nop {};
 
 /**
  * @brief START instruction 0x1
- * @param jmp_pos uint32_t Where start 
+ * @param jmp_pos uint32_t Where start
  */
 struct Start {
     uint32_t start_pos{};
@@ -52,13 +54,13 @@ struct LoadBg {
 };
 
 /**
- * @brief CLEARBG instruction 0x11 
+ * @brief CLEARBG instruction 0x11
  */
 struct ClearBg {};
 
 /**
  * @brief LOADFG instruction 0x20
- * @param path_fg uint8_t[64] Path/to/fg 
+ * @param path_fg uint8_t[64] Path/to/fg
  */
 struct LoadFg {
     std::array<char, 64> path_fg{};
@@ -80,11 +82,29 @@ struct LoadTxtLine {
 };
 
 /**
+ * @brief PreBreakage instruction 0x31
+ *
+ * @details Instruction to signal VM that end of TXTLINE is reached
+ * and next instruction will be actual TxtLineBreakage (0x32)
+ */
+struct PreBreakage {};
+
+/**
+ * @brief TxtLineBreakage instruction 0x32
+ *
+ * @details Instruction to signal VM to break line in text box.
+ * Useful for texts in multiple lines.
+ */
+struct TxtLineBreakage {};
+
+/**
  * @brief JMP instruction 0x40
  * @param where_pos uint32_t Byte position where to jump
  */
 struct Jmp {
     uint32_t where_pos{};
 };
+
+/* @}*/
 
 }  // namespace vm_instr

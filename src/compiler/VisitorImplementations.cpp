@@ -18,16 +18,16 @@ namespace fs = std::filesystem;
 // SemanticVisitor ------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
-bool img_at_least_one_of(const std::string& file_ext, 
+bool img_at_least_one_of(const std::string& file_ext,
         std::convertible_to<std::string> auto&&... ext)
 {
-    return (false || ... || insen_str_equal<char>(file_ext, ext)); 
+    return (false || ... || insen_str_equal<char>(file_ext, ext));
 }
 
 bool img_has_good_extension(const std::string& file_ext)
 {
-    return img_at_least_one_of(file_ext, ".jpg", ".png", ".bmp",
-                                ".psd", ".jpeg");
+    return img_at_least_one_of(
+            file_ext, ".jpg", ".png", ".bmp", ".psd", ".jpeg");
 }
 
 void SemanticVisitor::visit_exit()
@@ -94,7 +94,7 @@ void SemanticVisitor::visit_persona(const PersonaAst* mn_persona_ptr)
 
 /// TODO: all image variables (include main FG) must lie inside persona.path
 ///     though their path could be absolute, check absolute path first
-/// Q: what if we define persona.path after variable image? We need to 
+/// Q: what if we define persona.path after variable image? We need to
 ///     make double check for persona in this case
 void SemanticVisitor::visit_ins_type(
         const InsTypeAst* mn_ins_type_ptr, Persona& persona)
@@ -127,8 +127,9 @@ void SemanticVisitor::visit_ins_type(
                         mn_ins_type_ptr->lexem.id, mn_ins_type_ptr->str_param))
             {
                 fs::path temp_path(mn_ins_type_ptr->str_param);
-                if (fs::exists(temp_path) 
-                    && img_has_good_extension(temp_path.extension().string())) 
+                if (fs::exists(temp_path)
+                        && img_has_good_extension(
+                                temp_path.extension().string()))
                 {
                     return;
                 }
@@ -157,8 +158,9 @@ void SemanticVisitor::visit_ins_type(
                     std::cout << persona.get_main_fg() << std::endl;
                 }
                 fs::path temp_path(mn_ins_type_ptr->str_param);
-                if (fs::exists(temp_path) 
-                    && img_has_good_extension(temp_path.extension().string()))
+                if (fs::exists(temp_path)
+                        && img_has_good_extension(
+                                temp_path.extension().string()))
                 {
                     return;
                 }
@@ -182,8 +184,8 @@ void SemanticVisitor::visit_persona_var(const PersonaVarAst* mn_p_var_ptr)
     }
     // param must be valid path
     fs::path temp_path(mn_p_var_ptr->param);
-    if (!fs::exists(temp_path) 
-        || !img_has_good_extension(temp_path.extension().string()))
+    if (!fs::exists(temp_path)
+            || !img_has_good_extension(temp_path.extension().string()))
     {
         throw SemanticError("Error: " + mn_p_var_ptr->param
                             + " doesn't exist or not an image;");
@@ -203,8 +205,8 @@ void SemanticVisitor::visit_bg_file(const BackFileAst* mn_bg_ptr)
         std::cout << "bgfile\n" << std::flush;
     }
     fs::path temp_path(mn_bg_ptr->path_bg);
-    if (!fs::exists(temp_path) 
-        || !img_has_good_extension(temp_path.extension().string()))
+    if (!fs::exists(temp_path)
+            || !img_has_good_extension(temp_path.extension().string()))
     {
         throw SemanticError("Error: " + temp_path.string()
                             + " doesn't exist or not an image;");
@@ -217,8 +219,8 @@ void SemanticVisitor::visit_fg_file(const ForeFileAst* mn_fg_f_ptr)
         std::cout << "fgfile\n" << std::flush;
     }
     fs::path temp_path(mn_fg_f_ptr->path_fg);
-    if (!fs::exists(temp_path) 
-        || !img_has_good_extension(temp_path.extension().string()))
+    if (!fs::exists(temp_path)
+            || !img_has_good_extension(temp_path.extension().string()))
     {
         throw SemanticError("Error: " + temp_path.string()
                             + " doesn't exist or not an image;");
@@ -539,6 +541,15 @@ void CodeGenVisitor::visit_txt_line(const TextLineAst* txt_line_ptr)
         }
         chpos += sub_text_64.size();
         sub_text_64 = substr_utf8_min(txt_line_ptr->text, chpos, instl - 1);
+    }
+    // text line pre-breakage and actual breakage
+    _out_bin_file.put(0x31);
+    _out_bin_file.put(0x32);
+    if (_out_bin_file.bad()) {
+        throw CodeGenError(
+                "Error:CodeGenVisitor::visit_script(): Bad file in "
+                "code "
+                "generation");
     }
 }
 

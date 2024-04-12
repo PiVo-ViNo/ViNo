@@ -384,7 +384,7 @@ StaticTextBox<_Ch>::StaticTextBox(const glm::ivec2& low_left_pos, int width,
 }
 
 template <typename _Ch>
-void StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
+std::size_t StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
         const Font<_Ch>& font, const glm::vec4& color) const
 {
     const int glyph_max_height = font.get_dimensions_of("A", 1.0).y;
@@ -399,10 +399,14 @@ void StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
 
     while (rendered_chars < text.size()) {
         y_cur -= glyph_max_height + glyph_max_height * 4 / 5;
+        if (y_cur < _ll_pos.y + 5) {
+            break;
+        }
         rendered_chars += _text->render_text_inbound(
                 text.substr(rendered_chars, text.size()), font, color,
                 {_ll_pos.x + 10, y_cur}, _ll_pos.x + _width - 10, _win);
     }
+    return rendered_chars;
 }
 
 // ForegroundFigure -----------------------------------------------------------
@@ -492,13 +496,16 @@ LowBox<_Ch>::LowBox(const LowBox<char_type>& other) :
 /// TODO: Text must be rendered without breaking the words (exception: too long
 /// words, for now just break them in place)
 template <typename _Ch>
-void LowBox<_Ch>::render() const
+void LowBox<_Ch>::render() 
 {
     _text_box.render();
     _name_box.render();
-    _text_box.render_text(_text, _font,
+    _text_pos = _text_box.render_text(_text, _font,
             {1.0f - _box_color.r, 1.0f - _box_color.g, 1.0f - _box_color.b,
                     1.0f});
+    _name_box.render_text(_name_text, _font,
+            {1.0f - _name_box.get_color().r, 1.0f - _name_box.get_color().g,
+                    1.0f - _name_box.get_color().b, 1.0f});
 }
 
 template <typename _Ch>
@@ -506,15 +513,8 @@ void LowBox<_Ch>::render(
         const std::basic_string<_Ch>& name, const std::basic_string<_Ch>& text)
 {
     update_text(text);
-    _text_box.render();
-    _name_box.render();
-    // Render texts colors as inverted to boxes's colors
-    _text_box.render_text(_text, _font,
-            {1.0f - _box_color.r, 1.0f - _box_color.g, 1.0f - _box_color.b,
-                    1.0f});
-    _name_box.render_text(name, _font,
-            {1.0f - _name_box.get_color().r, 1.0f - _name_box.get_color().g,
-                    1.0f - _name_box.get_color().b, 1.0f});
+    update_name(name);
+    render();
 }
 
 template <typename _Ch>
@@ -524,9 +524,29 @@ void LowBox<_Ch>::update_text(const std::basic_string<char_type>& text)
 }
 
 template <typename _Ch>
+bool LowBox<_Ch>::next_slide()
+{
+    if (_text_pos == _text.size()) {
+        // almost all implementations doesn't deallocate in call of clear()
+        // so it's not really bad for performance
+        _text.clear();
+        return false;
+    }
+    _text.erase(0, _text_pos);
+    _text_pos = 0;
+    return true;
+}
+
+template <typename _Ch>
 inline void LowBox<_Ch>::add_text(const std::basic_string<char_type>& text)
 {
     _text += text;
+}
+
+template <typename _Ch>
+void LowBox<_Ch>::update_name(const std::basic_string<char_type>& name)
+{
+    _name_text = name;
 }
 
 // explicit instantiations
