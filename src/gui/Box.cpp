@@ -388,9 +388,9 @@ template <typename _Ch>
 std::size_t StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
         const Font<_Ch>& font, const glm::vec4& color) const
 {
-    std::string                       strws = " \n";
-    std::basic_string<char_type>      white_spaces(strws.begin(), strws.end());
-    const int glyph_max_height = font.size();
+    std::string                  strws = " \n";
+    std::basic_string<char_type> white_spaces(strws.begin(), strws.end());
+    const int                    glyph_max_height = font.size();
 
     int y_cur =
             _ll_pos.y
@@ -398,8 +398,8 @@ std::size_t StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
                     (_height - glyph_max_height) / 2);
     int x_cur = _ll_pos.x + font.size();
 
-    // Get the words from str, but if str is longer than all box, sent it as it
-    // is to the renderer, tearing it apart in some places there
+    // Get the words from str, but if str is longer than whole box, sent it as
+    // it is to the renderer, tearing it apart in some places there
     std::basic_string_view<char_type> text_view(text);
     std::basic_string_view<char_type> text_view_word =
             text_view.substr(0, text_view.find_first_of(white_spaces));
@@ -417,7 +417,7 @@ std::size_t StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
 
         if (text_view_word.starts_with('\n')
                 || (x_cur + word_length > _ll_pos.x + _width - font.size()
-                && word_length < _width))
+                        && word_length < _width))
         {
             y_cur -= glyph_max_height * 7 / 5;
             if (y_cur < _ll_pos.y + glyph_max_height / 4) {
@@ -431,6 +431,7 @@ std::size_t StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
             word_length = font.get_dimensions_of(text_view_word, 1.0).x;
         }
 
+        /// TODO:Q: don't render with *_inbound()?
         rendered_chars += _text->render_text_inbound(text_view_word, font,
                 color, {x_cur, y_cur}, _ll_pos.x + _width - font.size(), _win);
         x_cur += word_length;

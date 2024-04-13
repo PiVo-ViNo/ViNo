@@ -19,3 +19,5 @@ vn_final/
 *.dll
 *.so 
 *.so.a
+vm/res
+vm/*.bin

@@ -65,7 +65,7 @@ private:
 
 void open_screen(vino::Window &window)
 {
-    vino::ImgData img("res/title.png");
+    vino::ImgData img("sys/title.png");
 
     vino::FullscreenTexture title_tex(window, img);
 
@@ -89,7 +89,7 @@ void open_screen(vino::Window &window)
 GameStatus main_menu_screen(vino::Window &window)
 {
     vino::FullscreenTexture title_screen(
-            window, vino::ImgData("res/jack.png"));
+            window, vino::ImgData("sys/menu_tex.jpg"));
     int width_1_16 = window.get_width() / 16;
     int height_1_9 = window.get_height() / 9;
 
@@ -106,7 +106,7 @@ GameStatus main_menu_screen(vino::Window &window)
     vino::SimpleBox vino_letter({width_1_16 * 13, height_1_9 * 0.2},
             static_cast<int>(width_1_16 * 0.5),
             static_cast<int>(height_1_9 * 0.5), window,
-            vino::ImgData("vinovm.png"));
+            vino::ImgData("sys/vinovm.png"));
 
     vino::Button<char32_t> but_new_game({width_1_16 * 3, height_1_9 * 5},
             width_1_16 * 3, height_1_9, window, {1.0f, 1.0f, 1.0f, 1.0f},
@@ -147,7 +147,7 @@ GameStatus main_loop(vino::Window &window)
 {
     vino::init_vinogui();
 
-    fs::path m_vm_inst_path("./m_vm_inst_test.bin");
+    fs::path m_vm_inst_path("./m_vm_inst.bin");
     if (!fs::exists(m_vm_inst_path)) {
         throw vino::VmError("No input m_vm_inst.bin");
     }
@@ -157,7 +157,7 @@ GameStatus main_loop(vino::Window &window)
 
     GuiInterface main_gui(&window);
     main_gui.fullscreen_textures.emplace_back(
-            window, vino::ImgData("res/jack.png"));
+            window, vino::ImgData("sys/title.png"));
     main_gui.low_boxes.emplace_back(window, glm::ivec2{10, 10},
             glm::uvec2{window.get_width() - 20, window.get_height() / 3},
             glm::vec4{0.8, 0.7, 0.7, 0.8}, glm::vec4{0.7, 0.7, 0.7, 0.9},
@@ -214,7 +214,7 @@ int WinMain()
 int main()
 #endif
 {
-    auto start = std::chrono::system_clock::now();
+    // auto start = std::chrono::system_clock::now();
     try {
         vino::init_vinogui();
         vino::NonResizableWindow main_window(1280, 720, "ViNo");
@@ -245,15 +245,15 @@ int main()
         }
         main_window.close();
     } catch (std::exception &exc) {
-        float time = std::chrono::duration<float>(
-                std::chrono::system_clock::now() - start)
-                             .count();
+        // float time = std::chrono::duration<float>(
+        //         std::chrono::system_clock::now() - start)
+        //                      .count();
         vino::NonResizableWindow  err_window(500, 200, "ViNo Error");
         vino::FullscreenTexture   err_bg(err_window, {1.0f, 1.0f, 1.0f, 1.0f});
         vino::StaticTextBox<char> err_box(
                 {50, 0}, 450, 185, err_window, {1.0f, 1.0f, 1.0f, 1.0f});
         vino::SimpleBox err_symbol({10, 150}, 30, 30, err_window,
-                vino::ImgData("error_symbol.png"));
+                vino::ImgData("sys/error_symbol.png"));
 
         vino::FontsCollection<char> fonts;
         /// TODO: make possible to choose different sizes
@@ -262,7 +262,7 @@ int main()
         while (!err_window.should_close()) {
             err_bg.render();
             err_symbol.render();
-            err_box.render_text("time: " + std::to_string(time), fonts["ARIAL"],
+            err_box.render_text("Error: " + std::string(exc.what()), fonts["ARIAL"],
                     {0.0f, 0.0f, 0.0f, 1.0f});
 
             err_window.update();
@@ -273,7 +273,6 @@ int main()
 
 namespace vino_vm {
 
-/// TODO:Q: set exceptions flags for std::ifstream and remove all custom errors?
 std::unique_ptr<IHandler> InstructionsReader::read_instruction()
 {
     if (!_input_file.good()) {

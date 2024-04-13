@@ -29,7 +29,10 @@ else()
 endif()
 
 add_executable(Vinovima::exe ALIAS Vinovima_exe)
+
 add_default_target_compile_definitions(Vinovima_exe)
+set_property(TARGET Vinovima_exe PROPERTY OUTPUT_NAME Vinovima)
+
 target_sources(Vinovima_exe PRIVATE
     VMMain.cpp
 )
