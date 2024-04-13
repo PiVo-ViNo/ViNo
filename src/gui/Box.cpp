@@ -1,6 +1,7 @@
 #include "Box.hpp"
 #include <string>
 #include <string_view>
+#include <stuff.hpp>
 
 namespace vino {
 
@@ -388,14 +389,13 @@ template <typename _Ch>
 std::size_t StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
         const Font<_Ch>& font, const glm::vec4& color) const
 {
-    std::string                  strws = " \n";
-    std::basic_string<char_type> white_spaces(strws.begin(), strws.end());
-    const int                    glyph_max_height = font.size();
+    std::basic_string<char_type> white_spaces =
+            convert_str<char, char_type>(" \n");
+    const int glyph_max_height = font.size();
 
-    int y_cur =
-            _ll_pos.y
-            + std::max(_height - glyph_max_height - glyph_max_height * 2 / 5,
-                    (_height - glyph_max_height) / 2);
+    int y_cur = _ll_pos.y
+                + std::max(_height - glyph_max_height * 7 / 5,
+                        (_height - glyph_max_height) / 2);
     int x_cur = _ll_pos.x + font.size();
 
     // Get the words from str, but if str is longer than whole box, sent it as
