@@ -323,11 +323,9 @@ public:
             const glm::vec4& title_color, const Font<char_type>& font);
 
     /**
-     * @brief Create LowBox with current global settings
+     * @brief Create LowBox as copy of other LowBox 
      *
-     * @warning Don't use this constructor when no LowBox was created yet
-     * @throw `WindowError()` in case the other constructor was never called
-     *        before this one
+     * @note Doesn't copy text or name, only GUI settings
      */
     LowBox(const LowBox<char_type>& other);
 
@@ -357,6 +355,8 @@ public:
      * @return false New slide is empty
      */
     bool next_slide();
+
+    [[nodiscard]] std::basic_string<char_type> get_text() const;
 
 private:
     glm::ivec2 _box_ll_pos{};

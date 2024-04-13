@@ -18,7 +18,7 @@
 namespace vm_instr {
 
 /**
- * @defgroup VM instructions
+ * @defgroup instructions VM Instructions
  * @{
  * @details Full list of instructions with opcodes, instructions with no struct
  * members doesn't have any parameters beside opcode.
@@ -82,7 +82,7 @@ struct LoadTxtLine {
 };
 
 /**
- * @brief PreBreakage instruction 0x31
+ * @brief PREBREAKAGE instruction 0x31
  *
  * @details Instruction to signal VM that end of TXTLINE is reached
  * and next instruction will be actual TxtLineBreakage (0x32)
@@ -90,7 +90,7 @@ struct LoadTxtLine {
 struct PreBreakage {};
 
 /**
- * @brief TxtLineBreakage instruction 0x32
+ * @brief TXTLINEBREAKAGE instruction 0x32
  *
  * @details Instruction to signal VM to break line in text box.
  * Useful for texts in multiple lines.

@@ -41,7 +41,7 @@ inline bool insen_str_equal(const std::basic_string<_Ch> &lhs,
  * @param len Right boundary of how many chars (1 byte) can be included
  * @return `std::string` substring
  * @note Doesn't throw error if char is invalid, it's implied that substring
- * just starts within the middle of multibyte UNICODE symbol, so that symbol is
+ * just starts in the middle of multibyte UNICODE symbol, so that symbol is
  * skipped
  */
 inline std::string substr_utf8_min(

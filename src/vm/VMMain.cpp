@@ -145,8 +145,6 @@ GameStatus main_menu_screen(vino::Window &window)
 
 GameStatus main_loop(vino::Window &window)
 {
-    vino::init_vinogui();
-
     fs::path m_vm_inst_path("./m_vm_inst.bin");
     if (!fs::exists(m_vm_inst_path)) {
         throw vino::VmError("No input m_vm_inst.bin");
@@ -172,11 +170,19 @@ GameStatus main_loop(vino::Window &window)
     using sys_time = std::chrono::system_clock;
     auto cur_time = sys_time::now();
     auto dot_time_counter = sys_time::now();
+    int dot_counter = 0;
 
     while (main_gui.exit_flag == GameStatus::not_set && !window.should_close())
     {
-        if (dur(sys_time::now() - dot_time_counter).count() >= 0.2f) {
+        if (dur(sys_time::now() - dot_time_counter).count() >= 0.3f) {
+            if (dot_counter >= 5) {
+                auto box_text = main_gui.low_boxes.front().get_text();
+                main_gui.low_boxes.front().update_text(
+                        box_text.erase(box_text.size() - 4));
+                dot_counter = 1;
+            }
             main_gui.low_boxes.front().add_text(U".");
+            dot_counter++;
             dot_time_counter = sys_time::now();
         }
         if (window.is_pressed(GLFW_KEY_LEFT_CONTROL)
@@ -185,9 +191,9 @@ GameStatus main_loop(vino::Window &window)
         {
             if (!main_gui.low_boxes.back().next_slide()) {
                 do {
-                    continue_handling = instr_reader
-                                        .read_instruction()
-                                        ->handle_instruction(main_gui);
+                    continue_handling =
+                            instr_reader.read_instruction()->handle_instruction(
+                                    main_gui);
                 } while (continue_handling);
             }
             cur_time = sys_time::now();
@@ -262,8 +268,8 @@ int main()
         while (!err_window.should_close()) {
             err_bg.render();
             err_symbol.render();
-            err_box.render_text("Error: " + std::string(exc.what()), fonts["ARIAL"],
-                    {0.0f, 0.0f, 0.0f, 1.0f});
+            err_box.render_text("Error: " + std::string(exc.what()),
+                    fonts["ARIAL"], {0.0f, 0.0f, 0.0f, 1.0f});
 
             err_window.update();
         }
@@ -320,7 +326,7 @@ std::unique_ptr<IHandler> InstructionsReader::read_instruction()
 
             case 0x31:
                 return std::make_unique<PreBreakageHandler>();
-            
+
             case 0x32:
                 return std::make_unique<TxtLineBreakageHandler>();
 

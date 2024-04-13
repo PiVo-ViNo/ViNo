@@ -572,6 +572,12 @@ void LowBox<_Ch>::update_name(const std::basic_string<char_type>& name)
     _name_text = name;
 }
 
+template <typename _Ch>
+std::basic_string<_Ch> LowBox<_Ch>::get_text() const
+{
+    return _text;
+}
+
 // explicit instantiations
 template class TextRenderer<char>;
 template class TextRenderer<char16_t>;
