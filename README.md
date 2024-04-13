@@ -1,5 +1,7 @@
 # Vi[sual] No[vel] Creator
 
+<img alt="ViNo" src="https://github.com/PiVo-ViNo/ViNo/blob/master/vm/sys/title_thin.png?raw=true">
+
 <p align="center">
     <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/PiVo-ViNo/ViNo">
     <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/t/PiVo-ViNo/ViNo?color=green">
