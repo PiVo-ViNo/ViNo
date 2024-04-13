@@ -7,7 +7,7 @@
 
 #include <map>
 
-///TODO: Write converter between u32string and string, also char32_t[]
+/// TODO:Q: Write converter for char32_t[]
 namespace vino {
 
 struct Character;
@@ -24,7 +24,7 @@ struct Character {
     unsigned int texture_id;  // ID handle of the glyph texture
     glm::ivec2   size;        // Size of glyph
     glm::ivec2   bearing;     // Offset from baseline to left/top of glyph
-    int advance;     // Offset to advance to next glyph
+    int          advance;     // Offset to advance to next glyph
 };
 
 /**
@@ -74,17 +74,18 @@ public:
 
 private:
     friend class FontsCollection<char_type>;
+    friend class Font<char_type>;
 
     FreeTypeFace(
-            FT_Library& ft_lib, std::string font_path, int pxl_size);
+            FT_Library& ft_lib, const std::string& font_path, int pxl_size);
 
     /// @param `pixel_height` can be omitted, makes it equal to `pixel_width`
-    void set_pixel_size(
-            int pixel_width, int pixel_height = 0);
+    void set_pixel_size(int pixel_width, int pixel_height = 0);
 
     Character& load_symbol(char_type ch, bool in_cycle = false);
     void       load_ascii();
 
+    int                            _pxl_size{};
     std::string                    _font_path{};
     FT_Face                        _native_ft_face{};
     std::map<char_type, Character> _chars_map{};
@@ -93,7 +94,7 @@ private:
 /**
  * @brief External safe interface for font operations
  * @details This class is safer to operate than FreeTypeFace
- * @tparam _Ch 
+ * @tparam _Ch
  */
 template <typename _Ch>
 class Font {
@@ -106,12 +107,18 @@ public:
             glm::ivec2 ll_pos, float scale) const;
 
     /// @return how many chars from str was rendered
-    std::size_t render_str_inbound(const std::basic_string<char_type>& str,
-            unsigned int vbo, glm::ivec2 ll_pos, float scale,
+    std::size_t render_str_inbound(const std::basic_string_view<char_type>& str,
+            unsigned int vbo, glm::ivec2 lowleft_pos, float scale,
             int x_bound) const;
 
+    /**
+     * @brief Get maximum height of the font
+     *
+     * @return int > 0
+     */
+    [[nodiscard]] int        size() const;
     [[nodiscard]] glm::ivec2 get_dimensions_of(
-            const std::string& str, float scale) const;
+            const std::basic_string_view<_Ch>& str, float scale) const;
 
 private:
     FreeTypeFace<char_type>& _face;

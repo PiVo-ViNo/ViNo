@@ -9,8 +9,7 @@ namespace vino {
 void mainMenu(Window& window)
 {
     std::array<ImgData, 2> fs = {
-        ImgData{"res/olegus.png"}, ImgData{"res/fs_new.jpg"}
-    };
+            ImgData{"res/olegus.png"}, ImgData{"res/fs_new.jpg"}};
     FullscreenTexture fs_texture(window, fs[0]);
 
     FontsCollection<char32_t> fonts;
@@ -24,9 +23,8 @@ void mainMenu(Window& window)
             window, {1.0f, 1.0f, 1.0f, 0.8f}, U"Exit", fonts["ARIALBD"], {},
             {0.2, 0.2, 0.2, 0.8});
     LowBox<char32_t> low_box(window, {10, 10},
-            {window.get_width() - 20, window.get_height() / 3}, 
-            {0.9, 0.8, 0.8, 0.6}, {0.9, 0.8, 0.8, 0.8},
-            fonts["ARIALBI"]);
+            {window.get_width() - 20, window.get_height() / 3},
+            {0.9, 0.8, 0.8, 0.6}, {0.9, 0.8, 0.8, 0.8}, fonts["ARIALBI"]);
 
     ImgData          rin("res/rin.png");
     ForegroundFigure olegus({100, 50}, 300, 500, window, rin);
@@ -37,7 +35,12 @@ void mainMenu(Window& window)
             U"Теперь на самом деле даже толку нет бить глебуса молотком по "
             U"голове.");
     texts.emplace_back(
-            U"A church.... To-day, no incense to \n"
+            U"ffffffffffffffffffffffffffffffffffffffffffffffffffffsdafdsafsda"
+            U"ffdsfsdafasdfffffffffffffffffffffffffffffffffffffffffffffffffffsd"
+            U"afasdfasdfiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+            U"iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+    texts.emplace_back(
+            U"A church.... To-day, no incense to\n"
             "Its round dome coils, nor do a prayer \n"
             "The humble monks chant, hoarse-voiced, there. \n"
             "Alone, forgot by death and men, \n"
@@ -62,7 +65,7 @@ void mainMenu(Window& window)
 
     using dur = std::chrono::duration<float>;
     using sys_time = std::chrono::system_clock;
-    auto cur_time = sys_time::now();
+    auto        cur_time = sys_time::now();
     std::size_t cur_fs = 0;
 
     while (!window.should_close()) {

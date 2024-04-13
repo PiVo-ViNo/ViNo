@@ -1,5 +1,6 @@
 #include "Box.hpp"
 #include <string>
+#include <string_view>
 
 namespace vino {
 
@@ -306,7 +307,7 @@ void TextRenderer<_Ch>::render_text(const std::basic_string<_Ch>& str,
 
 template <typename _Ch>
 std::size_t TextRenderer<_Ch>::render_text_inbound(
-        const std::basic_string<_Ch>& str, const Font<_Ch>& font,
+        const std::basic_string_view<_Ch>& str, const Font<_Ch>& font,
         const glm::vec3& color, const glm::ivec2& ll_pos, int x_bound,
         const Window& window) const
 {
@@ -387,24 +388,52 @@ template <typename _Ch>
 std::size_t StaticTextBox<_Ch>::render_text(const std::basic_string<_Ch>& text,
         const Font<_Ch>& font, const glm::vec4& color) const
 {
-    const int glyph_max_height = font.get_dimensions_of("A", 1.0).y;
+    std::string                       strws = " \n";
+    std::basic_string<char_type>      white_spaces(strws.begin(), strws.end());
+    const int glyph_max_height = font.size();
 
     int y_cur =
             _ll_pos.y
-            + std::max(_height - glyph_max_height - glyph_max_height * 4 / 5,
+            + std::max(_height - glyph_max_height - glyph_max_height * 2 / 5,
                     (_height - glyph_max_height) / 2);
+    int x_cur = _ll_pos.x + font.size();
 
-    std::size_t rendered_chars = _text->render_text_inbound(text, font, color,
-            {_ll_pos.x + 10, y_cur}, _ll_pos.x + _width - 10, _win);
+    // Get the words from str, but if str is longer than all box, sent it as it
+    // is to the renderer, tearing it apart in some places there
+    std::basic_string_view<char_type> text_view(text);
+    std::basic_string_view<char_type> text_view_word =
+            text_view.substr(0, text_view.find_first_of(white_spaces));
+
+    std::size_t rendered_chars = _text->render_text_inbound(text_view_word,
+            font, color, {_ll_pos.x + font.size(), y_cur},
+            _ll_pos.x + _width - 10, _win);
+    x_cur += font.get_dimensions_of(text_view_word, 1.0).x;
 
     while (rendered_chars < text.size()) {
-        y_cur -= glyph_max_height + glyph_max_height * 4 / 5;
-        if (y_cur < _ll_pos.y + 5) {
-            break;
+        text_view_word = text_view.substr(rendered_chars,
+                text_view.find_first_of(white_spaces, rendered_chars + 1)
+                        - rendered_chars);
+        int word_length = font.get_dimensions_of(text_view_word, 1.0).x;
+
+        if (text_view_word.starts_with('\n')
+                || (x_cur + word_length > _ll_pos.x + _width - font.size()
+                && word_length < _width))
+        {
+            y_cur -= glyph_max_height * 7 / 5;
+            if (y_cur < _ll_pos.y + glyph_max_height / 4) {
+                break;
+            }
+            x_cur = _ll_pos.x + font.size();
+            std::size_t skipped =
+                    text_view_word.find_first_not_of(white_spaces);
+            rendered_chars += skipped;
+            text_view_word.remove_prefix(skipped);
+            word_length = font.get_dimensions_of(text_view_word, 1.0).x;
         }
-        rendered_chars += _text->render_text_inbound(
-                text.substr(rendered_chars, text.size()), font, color,
-                {_ll_pos.x + 10, y_cur}, _ll_pos.x + _width - 10, _win);
+
+        rendered_chars += _text->render_text_inbound(text_view_word, font,
+                color, {x_cur, y_cur}, _ll_pos.x + _width - font.size(), _win);
+        x_cur += word_length;
     }
     return rendered_chars;
 }
@@ -457,11 +486,7 @@ void Button<_Ch>::render() const
 {
     IStaticBox::render();
     _text->render_text(_title, _font, _title_color,
-            {_ll_pos.x + 10,
-                    _ll_pos.y
-                            + (_height - _font.get_dimensions_of("A", 1.0).y)
-                                      / 2},
-            _win);
+            {_ll_pos.x + 10, _ll_pos.y + (_height - _font.size()) / 2}, _win);
 }
 
 // LowBox ---------------------------------------------------------------------
@@ -474,8 +499,7 @@ LowBox<_Ch>::LowBox(Window& parent_window, const glm::ivec2& box_ll_pos,
     _text_box(box_ll_pos, box_dimensions.x, box_dimensions.y, parent_window,
             box_color),
     _name_box({box_ll_pos.x + 10, box_dimensions.y + box_ll_pos.y},
-            box_dimensions.x / 4, font.get_dimensions_of("A", 1.0).y * 2,
-            parent_window, title_color),
+            box_dimensions.x / 4, font.size() * 2, parent_window, title_color),
     _font(font)
 {
     _box_ll_pos = box_ll_pos;
@@ -493,10 +517,8 @@ LowBox<_Ch>::LowBox(const LowBox<char_type>& other) :
 {
 }
 
-/// TODO: Text must be rendered without breaking the words (exception: too long
-/// words, for now just break them in place)
 template <typename _Ch>
-void LowBox<_Ch>::render() 
+void LowBox<_Ch>::render()
 {
     _text_box.render();
     _name_box.render();
@@ -527,7 +549,7 @@ template <typename _Ch>
 bool LowBox<_Ch>::next_slide()
 {
     if (_text_pos == _text.size()) {
-        // almost all implementations doesn't deallocate in call of clear()
+        // almost all implementations don't deallocate when call clear(),
         // so it's not really bad for performance
         _text.clear();
         return false;

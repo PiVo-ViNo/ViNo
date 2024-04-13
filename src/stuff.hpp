@@ -1,3 +1,9 @@
+/**
+ * @file stuff.hpp
+ * @author Andrjusha (aka SibJusha) (andreas.yushac@gmail.com)
+ *
+ * @brief Different useful functions, can be used anywhere 
+ */
 #pragma once
 
 #include <algorithm>
@@ -26,7 +32,7 @@ inline bool insen_str_equal(const std::basic_string<_Ch> &lhs,
 }
 
 /**
- * @brief Get the smallest utf-8 sensitive substring
+ * @brief Get the biggest utf-8 sensitive substring
  *
  * @details Get the biggest substring within boundaries [pos, pos + len). If
  * unicode symbol is encoded with, e.g. 3 bytes, but substring has only 2 bytes
@@ -114,9 +120,6 @@ inline std::u32string to_utf32str(const std::string &utf8str) noexcept
                             ) << 6)
                         | static_cast<uint32_t>(
                                 0x3F & static_cast<uint8_t>(utf8str[++i])));
-                } else {
-                    // throw
-                    return u32str;
                 }
             } else if ((0b01100000 & ch) == 0b01100000) {
                 if ((0b00010000 & ch) != 0) {
@@ -133,8 +136,6 @@ inline std::u32string to_utf32str(const std::string &utf8str) noexcept
                                 ) << 6)
                             | (0x3F & static_cast<uint8_t>(utf8str[i + 3])));
                         i += 3;
-                    } else {
-                        return u32str;
                     }
                 } else {
                     if (i + 2 < utf8str.size()) {
@@ -147,13 +148,10 @@ inline std::u32string to_utf32str(const std::string &utf8str) noexcept
                                 ) << 6)
                             | (0x3F & static_cast<uint8_t>(utf8str[i + 2])));
                         i += 2;
-                    } else {
-                        return u32str;
                     }
                 }
             } else {
-                continue;
-                // throw std::runtime_error("Invalid UTF-8 sequence");
+                continue; // skips wrong char 
             }
         } else {
             u32str += (0UL | static_cast<uint8_t>(ch));

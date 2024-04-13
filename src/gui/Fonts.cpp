@@ -32,6 +32,7 @@ FreeTypeLib<_Ch>& FreeTypeLib<_Ch>::operator=(FreeTypeLib<_Ch>&& other)
 
 template <typename _Ch>
 FreeTypeFace<_Ch>::FreeTypeFace(FreeTypeFace&& other) :
+    _pxl_size(std::move(other._pxl_size)),
     _font_path(std::move(other._font_path)),
     _chars_map(std::move(other._chars_map))
 {
@@ -42,8 +43,8 @@ FreeTypeFace<_Ch>::FreeTypeFace(FreeTypeFace&& other) :
 
 template <typename _Ch>
 FreeTypeFace<_Ch>::FreeTypeFace(
-        FT_Library& ft_lib, std::string font_path, int pxl_size) :
-    _font_path(std::move(font_path))
+        FT_Library& ft_lib, const std::string& font_path, int pxl_size) :
+    _pxl_size(pxl_size), _font_path(std::move(font_path))
 {
     assert(pxl_size > 0);
     if (_font_path.empty()) {
@@ -149,7 +150,7 @@ void Font<_Ch>::render_str(const std::basic_string<_Ch>& str, unsigned int vbo,
 
     glm::vec2 ll_pos(std::move(lowleft_pos));
     for (const _Ch& c : str) {
-        if (c == '\r') continue;
+        if (c == '\r' || c == '\n') continue;
         Character ch = _face.get_char(c);
 
         float xpos = ll_pos.x + static_cast<float>(ch.bearing.x) * scale;
@@ -187,7 +188,7 @@ void Font<_Ch>::render_str(const std::basic_string<_Ch>& str, unsigned int vbo,
 
 template <typename _Ch>
 std::size_t Font<_Ch>::render_str_inbound(
-        const std::basic_string<char_type>& str, unsigned int vbo,
+        const std::basic_string_view<char_type>& str, unsigned int vbo,
         glm::ivec2 lowleft_pos, float scale, int x_bound) const
 {
     if (str.empty()) {
@@ -205,8 +206,6 @@ std::size_t Font<_Ch>::render_str_inbound(
         Character ch = _face.get_char(c);
 
         float xpos = ll_pos.x + static_cast<float>(ch.bearing.x) * scale;
-        float ypos =
-                ll_pos.y - static_cast<float>(ch.size.y - ch.bearing.y) * scale;
         if (c == '\n'
                 || ll_pos.x + static_cast<float>(ch.advance >> 6) * scale
                            >= static_cast<float>(x_bound))
@@ -214,6 +213,8 @@ std::size_t Font<_Ch>::render_str_inbound(
             glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
             return ++count_chars;
         }
+        float ypos =
+                ll_pos.y - static_cast<float>(ch.size.y - ch.bearing.y) * scale;
 
         float w = static_cast<float>(ch.size.x) * scale;
         float h = static_cast<float>(ch.size.y) * scale;
@@ -248,19 +249,23 @@ std::size_t Font<_Ch>::render_str_inbound(
 }
 
 template <typename _Ch>
+int Font<_Ch>::size() const
+{
+    return _face._pxl_size;
+}
+
+template <typename _Ch>
 glm::ivec2 Font<_Ch>::get_dimensions_of(
-        const std::string& str, float scale) const
+        const std::basic_string_view<_Ch>& str, float scale) const
 {
     glm::ivec2 dimensions{};
+    dimensions.y = size();
 
-    for (const char& c : str) {
-        Character ch = _face.get_char(static_cast<_Ch>(c));
+    for (const char_type& c : str) {
+        Character ch = _face.get_char(c);
 
         dimensions.x +=
                 static_cast<int>(static_cast<float>(ch.advance >> 6) * scale);
-        if (ch.bearing.y > dimensions.y) {
-            dimensions.y = ch.bearing.y;
-        }
     }
 
     return dimensions;

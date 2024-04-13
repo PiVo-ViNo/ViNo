@@ -9,6 +9,8 @@
 #include <array>
 #include <gui/Box.hpp>
 #include <memory>
+#include <string_view>
+#include <string>
 
 namespace vino {
 
@@ -213,8 +215,8 @@ public:
      * @param window Window where to render text
      * @return std::size_t How many chars from str were rendered
      */
-    std::size_t render_text_inbound(const std::basic_string<char_type>& str,
-            const Font<char_type>& font, const glm::vec3& color,
+    std::size_t render_text_inbound(const std::basic_string_view<_Ch>& str,
+            const Font<_Ch>& font, const glm::vec3& color,
             const glm::ivec2& ll_pos, int x_bound, const Window& window) const;
 
 private:
@@ -301,9 +303,6 @@ public:
             const glm::vec4& color = {1.0, 1.0, 1.0, 1.0});
 };
 
-/// TODO:Q: Maybe LowBox glob_<setting> must be global? Or simply remove
-/// exception throwing, just give glob_<setting> some standart values +
-/// add static method() to set them before actual construction of any LowBox
 template <typename _Ch>
 class LowBox {
 public:
@@ -350,10 +349,10 @@ public:
     void update_text(const std::basic_string<char_type>& text);
     void add_text(const std::basic_string<char_type>& text);
     void update_name(const std::basic_string<char_type>& name);
-    
+
     /**
      * @brief Update text to next slide
-     * 
+     *
      * @return true New slide is not empty
      * @return false New slide is empty
      */

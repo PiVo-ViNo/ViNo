@@ -65,7 +65,7 @@ private:
 
 void open_screen(vino::Window &window)
 {
-    vino::ImgData img("res/title_screen.png");
+    vino::ImgData img("res/title.png");
 
     vino::FullscreenTexture title_tex(window, img);
 
