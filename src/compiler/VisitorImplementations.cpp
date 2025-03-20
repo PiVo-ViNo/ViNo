@@ -253,7 +253,6 @@ void SemanticVisitor::visit_txt_line(const TextLineAst*)
     if (_verb) {
         std::cout << "txtline\n" << std::flush;
     }
-    return;
 }
 
 void SemanticVisitor::visit_txt_file(const TextFileAst* txt_file_ptr)
@@ -279,7 +278,7 @@ void CodeGenVisitor::visit_exit()
     _out_bin_file.put(0x2);
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                "Error:CodeGenVisitor::visit_exit(): Bad file in code "
                 "generation");
     }
     // Exit codes: 0 - no errors, close the application
@@ -288,7 +287,7 @@ void CodeGenVisitor::visit_exit()
     _out_bin_file.put(0x1);
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                "Error:CodeGenVisitor::visit_exit(): Bad file in code "
                 "generation");
     }
 }
@@ -404,14 +403,14 @@ void CodeGenVisitor::visit_bg_file(const BackFileAst* mn_bg_ptr)
     _out_bin_file.put(0x10);  // instruction code
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                "Error:CodeGenVisitor::visit_bg_file(): Bad file in code "
                 "generation");
     }
     _out_bin_file.write(
             ptrPathBg, static_cast<int64_t>(std::strlen(ptrPathBg) + 1));
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                "Error:CodeGenVisitor::visit_bg_file(): Bad file in code "
                 "generation");
     }
     // every path must be 64 chars long: all empty space is zeroed
@@ -438,14 +437,14 @@ void CodeGenVisitor::visit_fg_file(const ForeFileAst* mn_fg_f_ptr)
     _out_bin_file.put(0x20);
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                "Error:CodeGenVisitor::visit_fg_file(): Bad file in code "
                 "generation");
     }
     _out_bin_file.write(
             ptrPathFg, static_cast<int64_t>(std::strlen(ptrPathFg) + 1));
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                "Error:CodeGenVisitor::visit_fg_file(): Bad file in code "
                 "generation");
     }
     // every path must be 64 chars long -- all empty space is zeroed
@@ -480,14 +479,14 @@ void CodeGenVisitor::visit_fg_persona(const ForePersonaAst* fg_pers_ptr)
     _out_bin_file.put(0x22);
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                "Error:CodeGenVisitor::visit_fg_persona(): Bad file in code "
                 "generation");
     }
     _out_bin_file.write(
             ptrPathFg, static_cast<int64_t>(std::strlen(ptrPathFg) + 1));
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                "Error:CodeGenVisitor::visit_fg_persona(): Bad file in code "
                 "generation");
     }
     // every path must be 64 chars long -- all empty space is zeroed
@@ -510,31 +509,50 @@ void CodeGenVisitor::visit_txt_line(const TextLineAst* txt_line_ptr)
     // into the code
     // 2. substr_utf8_min() returns right till size() if len is bigger
     // in this case we don't use write(..., 64)
-    const int32_t instl = 64;  // instruction length
+    constexpr int32_t instl = 64;  // instruction length
 
+    // load speaker_name to bytecode first
+    if (txt_line_ptr->speaker_name.size() > 64) {
+        throw CodeGenError(
+                "Error:CodeGenVisitor::visit_txt_actor(): Actor name longer "
+                "than 64 characters");
+    }
+
+    _out_bin_file.put(0x2A);
+    _out_bin_file.write(txt_line_ptr->speaker_name.c_str(),
+            static_cast<int64_t>(txt_line_ptr->speaker_name.size()));
+
+    // every path must be 64 chars long -- all empty space is zeroed
+    int32_t pos_diff =
+            instl - static_cast<int32_t>(txt_line_ptr->speaker_name.size());
+    while (pos_diff-- > 1) {
+        _out_bin_file.put(0x0);
+    }
+
+    // load text
     std::string sub_text_64 = substr_utf8_min(txt_line_ptr->text, 0, instl - 1);
     for (size_t chpos = 0; !sub_text_64.empty();) {
         const char* ptrChSubText = sub_text_64.c_str();
         _out_bin_file.put(0x30);
         if (_out_bin_file.bad()) {
             throw CodeGenError(
-                    "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                    "Error:CodeGenVisitor::visit_txt_line(): Bad file in code "
                     "generation");
         }
         _out_bin_file.write(ptrChSubText,
                 static_cast<int64_t>(std::strlen(ptrChSubText) + 1));
         if (_out_bin_file.bad()) {
             throw CodeGenError(
-                    "Error:CodeGenVisitor::visit_script(): Bad file in code "
+                    "Error:CodeGenVisitor::visit_txt_line(): Bad file in code "
                     "generation");
         }
         // every path must be 64 chars long -- all empty space is zeroed
-        int32_t pos_diff = instl - static_cast<int32_t>(sub_text_64.size());
+        pos_diff = instl - static_cast<int32_t>(sub_text_64.size());
         while (pos_diff-- > 1) {
             _out_bin_file.put(0x0);
             if (_out_bin_file.bad()) {
                 throw CodeGenError(
-                        "Error:CodeGenVisitor::visit_script(): Bad file in "
+                        "Error:CodeGenVisitor::visit_txt_line(): Bad file in "
                         "code "
                         "generation");
             }
@@ -547,9 +565,8 @@ void CodeGenVisitor::visit_txt_line(const TextLineAst* txt_line_ptr)
     _out_bin_file.put(0x32);
     if (_out_bin_file.bad()) {
         throw CodeGenError(
-                "Error:CodeGenVisitor::visit_script(): Bad file in "
-                "code "
-                "generation");
+                "Error:CodeGenVisitor::visit_txt_line(): Bad file in "
+                "code generation");
     }
 }
 

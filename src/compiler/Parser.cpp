@@ -144,14 +144,19 @@ StmtAst Parser::stmt()
     /// TODO: ! add support of : text Human "I say this" - name of speaker
         case st::TEXT_TYPE: {
             set_current_tok();
+            std::string actor_name{};
+            if (_cur_tok->token == st::VAR) {
+               actor_name = _cur_tok->id; 
+               set_current_tok();
+            }
             if (_cur_tok->token == st::SIGN_EQ) {
                 match(st::TEXT_LINE);
                 main_stmt.expr =
-                        std::make_unique<TextFileAst>(std::move(_cur_tok->id));
+                        std::make_unique<TextFileAst>(actor_name, _cur_tok->id);
             } else {
                 match_cur(st::TEXT_LINE);
                 main_stmt.expr =
-                        std::make_unique<TextLineAst>(std::move(_cur_tok->id));
+                        std::make_unique<TextLineAst>(actor_name, _cur_tok->id);
             }
             break;
         }

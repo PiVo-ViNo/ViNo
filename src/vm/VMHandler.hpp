@@ -88,8 +88,8 @@ public:
      * @brief Handle next instruction.
      *
      * @param[in,out] gui Reference to GUI interface.
-     * @retval true   If a next instruction must be handled 
-     * @retval false  Stop handling 
+     * @retval true   If a next instruction must be handled
+     * @retval false  Stop handling
      */
     virtual bool handle_instruction(GuiInterface&) = 0;
 };
@@ -209,6 +209,24 @@ private:
     vm_instr::LoadFg _loadfg;
 };
 
+class SetSpeakerNameHandler : public IHandler {
+public:
+    explicit SetSpeakerNameHandler(
+            const vm_instr::SetSpeakerName& speakername) :
+        _name(speakername)
+    {
+    }
+
+    bool handle_instruction(GuiInterface& gui) override
+    {
+        // set speaker name in upper box
+        return true; // handle another command (exactly load_txt!)
+    }
+
+private:
+    vm_instr::SetSpeakerName _name;
+};
+
 class LoadTxtLineHandler : public IHandler {
 public:
     explicit LoadTxtLineHandler(const vm_instr::LoadTxtLine& loadtxtline) :
@@ -231,15 +249,11 @@ private:
 
 class PreBreakageHandler : public IHandler {
 public:
-    bool handle_instruction(GuiInterface&) override
-    {
-        return false;
-    }
+    bool handle_instruction(GuiInterface&) override { return false; }
 };
 
 class TxtLineBreakageHandler : public IHandler {
 public:
-
     bool handle_instruction(GuiInterface& gui) override
     {
         gui.low_boxes.back().next_slide();

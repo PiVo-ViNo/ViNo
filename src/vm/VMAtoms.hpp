@@ -74,6 +74,14 @@ struct AddFg {
 }; */
 
 /**
+ * @brief SETSPEAKERNAME instruction 0x2A 
+ * @param speaker_name char[64] string
+ */
+struct SetSpeakerName {
+    std::array<char, 64> speaker_name{};
+};
+
+/**
  * @brief LOADTXTLINE instruction 0x30
  * @param txt_line char[64] String
  */

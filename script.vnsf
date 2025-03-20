@@ -16,9 +16,11 @@ text "I am a stupid dog"
 text = "text.txt"
 foreground = Rin_std
 foreground = Rin_std.rude # the same one 
+text Rin "You are such a BAKA!!!!"
 background = "bg1.png"
 # define new member of Rin_std
 Rin_std.cute = "cute.png"
 foreground = Rin_std.cute
+text Rin "I'm sorry for being rude..."
 foreground = Rin_std.else 
 exit

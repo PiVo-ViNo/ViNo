@@ -57,8 +57,9 @@ private:
     vm_instr::Exit   exit{};
     vm_instr::LoadBg loadbg{};
     // vm_instr::ClearBg     clearbg{};
-    vm_instr::LoadFg      loadfg{};
-    vm_instr::LoadTxtLine loadtxtline{};
+    vm_instr::LoadFg         loadfg{};
+    vm_instr::SetSpeakerName setspeakername{};
+    vm_instr::LoadTxtLine    loadtxtline{};
     // vm_instr::TxtLineBreakage breakage{};
     vm_instr::Jmp jmp{};
 };
@@ -161,16 +162,18 @@ GameStatus main_loop(vino::Window &window)
             glm::vec4{0.8, 0.7, 0.7, 0.8}, glm::vec4{0.7, 0.7, 0.7, 0.9},
             fonts["ARIAL"]);
 
+    // main_gui.buttons.emplace_back(glm::ivec2{});
+
     InstructionsReader instr_reader(m_vm_inst_path);
     // read first instruction (must be START 0x1, but no checks since it's VM)
     std::unique_ptr<IHandler> ptr_handler = instr_reader.read_instruction();
-    bool continue_handling = ptr_handler->handle_instruction(main_gui);
+    ptr_handler->handle_instruction(main_gui);
 
     using dur = std::chrono::duration<float>;
     using sys_time = std::chrono::system_clock;
     auto cur_time = sys_time::now();
     auto dot_time_counter = sys_time::now();
-    int dot_counter = 0;
+    int  dot_counter = 0;
 
     while (main_gui.exit_flag == GameStatus::not_set && !window.should_close())
     {
@@ -190,11 +193,8 @@ GameStatus main_loop(vino::Window &window)
                         && dur(sys_time::now() - cur_time).count() >= 0.5f))
         {
             if (!main_gui.low_boxes.back().next_slide()) {
-                do {
-                    continue_handling =
-                            instr_reader.read_instruction()->handle_instruction(
-                                    main_gui);
-                } while (continue_handling);
+                while (instr_reader.read_instruction()->handle_instruction(
+                        main_gui));
             }
             cur_time = sys_time::now();
         }
@@ -319,6 +319,10 @@ std::unique_ptr<IHandler> InstructionsReader::read_instruction()
             case 0x20:
                 _input_file.read(loadfg.path_fg.data(), 64);
                 return std::make_unique<LoadFgHandler>(loadfg);
+
+            case 0x2A:
+                _input_file.read(setspeakername.speaker_name.data(), 64);
+                return std::make_unique<SetSpeakerNameHandler>(setspeakername);
 
             case 0x30:
                 _input_file.read(loadtxtline.txt_line.data(), 64);

@@ -3,6 +3,7 @@
 #include "IVisitor.hpp"
 #include "TokenEnum.hpp"
 
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <utility>
@@ -175,9 +176,15 @@ struct ForePersonaAst : public BasicAst {
 };
 
 struct TextLineAst : public BasicAst {
-    const std::string text;
+    const std::string speaker_name{};
+    const std::string text{};
 
     explicit TextLineAst(std::string text) : text(std::move(text)) {}
+
+    TextLineAst(std::string speaker, std::string text) :
+        speaker_name(std::move(speaker)),
+        text(std::move(text))
+    {}
 
     explicit TextLineAst(std::string&& text) : text(text) {}
 
@@ -188,12 +195,18 @@ struct TextLineAst : public BasicAst {
 };
 
 struct TextFileAst : public BasicAst {
+    const std::string speaker_name;
     const std::string path_txt;
 
     explicit TextFileAst(std::string path_to_txt) :
         path_txt(std::move(path_to_txt))
     {
     }
+
+    TextFileAst(std::string speaker, std::string path_to_txt) :
+        speaker_name(std::move(speaker)),
+        path_txt(std::move(path_to_txt))
+    {}    
 
     explicit TextFileAst(std::string&& path_to_txt) : path_txt(path_to_txt) {}
 

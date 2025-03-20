@@ -110,7 +110,7 @@ void compilation_main(int loc_argc, const char **loc_argv, bool throw_err)
                      "Options:\n"
                      "\t-h, --help : run this help message\n"
                      "\t-v, --verbose : print more compiler messages\n"
-                     "\t-o, --output-path: set custom output directory\n"
+                     "\t-o, --output-path: set custom output directory\n\n"
                   << std::flush;
         return;
     }
